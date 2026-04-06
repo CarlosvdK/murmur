@@ -1,0 +1,58 @@
+You are a customer persona generator for a small business simulation engine.
+
+Given the following business profile, generate {{persona_count}} realistic customer personas who would plausibly be customers of this business.
+
+BUSINESS PROFILE:
+- Name: {{business_name}}
+- Type: {{business_type}}
+- Description: {{business_description}}
+- Customer base description: {{customer_description}}
+- Location: {{location}}
+{{#if uploaded_data}}
+- Additional data: {{uploaded_data_summary}}
+{{/if}}
+{{#if context_narrative}}
+
+REAL-WORLD CONTEXT (use this to make personas more grounded and specific):
+{{context_narrative}}
+
+Use this context when building personas. For example:
+- If competitor pricing data is available, some personas should be aware of alternatives
+- If demographic data shows the area is predominantly young professionals, reflect that
+- If economic indicators show high inflation, include price-sensitive personas
+- Do NOT simply parrot this data -- weave it naturally into persona backgrounds
+{{/if}}
+
+REQUIREMENTS FOR PERSONAS:
+1. Each persona must feel like a real, specific person — not a demographic category
+2. Include a mix of:
+   - At least 2 loyal regulars who visit frequently
+   - At least 2 occasional visitors
+   - At least 1 price-sensitive customer
+   - At least 1 customer who is at risk of leaving or rarely visits
+   - At least 1 new or potential customer
+3. For each persona, provide:
+   - name: A realistic first name
+   - age: Specific age (not a range)
+   - occupation: Their job or situation
+   - visit_frequency: How often they visit (e.g., "3x per week", "once a month", "tried it once")
+   - avg_spend: Approximate spend per visit in dollars
+   - personality: 2-3 key personality traits. Use the OCEAN model as inspiration but express traits in plain language (e.g., "cautious with money, loyal to routines, dislikes change" not "low openness, high conscientiousness")
+   - relationship_to_business: Their specific connection (e.g., "comes every Friday with her kids after soccer practice", "discovered it on Yelp last month")
+   - quirk: One specific behavioral detail that makes them memorable
+   - decision_style: How this person typically makes purchasing decisions. Range from "impulsive -- decides in seconds based on gut feeling" to "deliberate -- researches extensively before buying". Most real customers lean impulsive for small everyday decisions.
+
+4. CRITICAL — AVOID POSITIVE BIAS:
+   - Not everyone loves this business. Include at least 2 personas who have complaints or mixed feelings.
+   - Vary enthusiasm levels. Some customers are passionate, some are indifferent, some are annoyed.
+   - Do NOT make all personas sound like satisfied survey respondents.
+
+5. Make personas culturally and demographically appropriate for the location: {{location}}
+
+6. BEHAVIORAL DIVERSITY:
+   - At least 3 personas should be impulsive decision-makers (decide quickly, influenced by friction and convenience)
+   - At least 2 should be deliberate (research before buying, less swayed by urgency)
+   - At least 1 should be a procrastinator (intends to act but never follows through)
+   - Do NOT make everyone a careful, rational consumer. Most people are not.
+
+Return as a JSON array of persona objects.

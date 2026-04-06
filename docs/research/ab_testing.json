@@ -1,0 +1,1095 @@
+[
+  {
+    "source": "crossref",
+    "title": "Large-Scale Metric Computation in Online Controlled Experiment Platform",
+    "abstract": "Online controlled experiment (also called A/B test or experiment) is the most important tool for decision-making at a wide range of data-driven companies like Microsoft, Google, Meta, etc. Metric computation is the core procedure for reaching a conclusion during an experiment. With the growth of experiments and metrics in an experiment platform, computing metrics efficiently at scale becomes a non-trivial challenge. This work shows how metric computation in WeChat experiment platform can be done efficiently using bit-sliced index (BSI) arithmetic. This approach has been implemented in a real world system and the performance results are presented, showing that the BSI arithmetic approach is very suitable for large-scale metric computation scenarios.",
+    "year": 2024,
+    "citation_count": 1,
+    "url": "https://doi.org/10.14778/3685800.3685823",
+    "doi": "10.14778/3685800.3685823",
+    "authors": [
+      "Tao Xiong",
+      "Yong Wang"
+    ],
+    "venue": "Proceedings of the VLDB Endowment",
+    "publication_date": "2024",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446774",
+    "relevance_score": 7.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Specifying with Interface and Trait Abstractions in Abstract State Machines: A Controlled Experiment",
+    "abstract": "Abstract State Machine (ASM) theory is a well-known state-based formal method. As in other state-based formal methods, the proposed specification languages for ASMs still lack easy-to-comprehend abstractions to express structural and behavioral aspects of specifications. Our goal is to investigate object-oriented abstractions such as interfaces and traits for ASM-based specification languages. We report on a controlled experiment with 98 participants to study the specification efficiency and effectiveness in which participants needed to comprehend an informal specification as problem (stimulus) in form of a textual description and express a corresponding solution in form of a textual ASM specification using either interface or trait syntax extensions. The study was carried out with a completely randomized design and one alternative (interface or trait) per experimental group. The results indicate that specification effectiveness of the traits experiment group shows a better performance compared to the interfaces experiment group, but specification efficiency shows no statistically significant differences. To the best of our knowledge, this is the first empirical study studying the specification effectiveness and efficiency of object-oriented abstractions in the context of formal methods.",
+    "year": 2021,
+    "citation_count": 4,
+    "url": "https://doi.org/10.1145/3450968",
+    "doi": "10.1145/3450968",
+    "authors": [
+      "Philipp Paulweber",
+      "Georg Simhandl",
+      "Uwe Zdun"
+    ],
+    "venue": "ACM Transactions on Software Engineering and Methodology",
+    "publication_date": "2021",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446806",
+    "relevance_score": 6.08,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Toward Reliable New-User Online Controlled Experiments: A Scientific Growth-Hacking Framework for Data-Driven Decision-Making",
+    "abstract": "",
+    "year": 2025,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1109/access.2025.3634282",
+    "doi": "10.1109/access.2025.3634282",
+    "authors": [
+      "Jian Tian",
+      "Fan Hu"
+    ],
+    "venue": "IEEE Access",
+    "publication_date": "2025",
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768416",
+    "relevance_score": 6.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Introduction to sample size determination and power analysis for clinical trials",
+    "abstract": "",
+    "year": 1981,
+    "citation_count": 795,
+    "url": "https://doi.org/10.1016/0197-2456(81)90001-5",
+    "doi": "10.1016/0197-2456(81)90001-5",
+    "authors": [
+      "John M. Lachin"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1981",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093621",
+    "relevance_score": 6.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Evaluation of an Online Campaign for Promoting Help-Seeking Attitudes for Depression Using a Facebook Advertisement: An Online Randomized Controlled Experiment",
+    "abstract": "\n            Background\n            A depression-awareness campaign delivered through the Internet has been recommended as a public health approach that would enhance mental health literacy and encourage help-seeking attitudes. However, the outcomes of such a campaign remain understudied.\n          \n          \n            Objective\n            The main aim of this study was to evaluate the effectiveness of an online depression awareness campaign, which was informed by the theory of planned behavior, to encourage help-seeking attitudes for depression and to enhance mental health literacy in Hong Kong. The second aim was to examine click-through behaviors by varying the affective facial expressions of people in the Facebook advertisements.\n          \n          \n            Methods\n            Potential participants were recruited through Facebook advertisements, using either a happy or sad face illustration. Volunteer participants registered for the study by clicking on the advertisement and were invited to leave their personal email addresses to receive educational content about depression. The participants were randomly assigned into two groups (campaign or control), and over a four consecutive week period, received either the campaign material or official information developed by the Hospital Authority in Hong Kong. Pretests and posttests were conducted before and after the campaign to measure the differences in help-seeking attitudes and mental health literacy among the cam",
+    "year": null,
+    "citation_count": 26,
+    "url": "https://doi.org/10.2196/mental.3649",
+    "doi": "10.2196/mental.3649",
+    "authors": [
+      "Alison Hui",
+      "Paul Wai-Ching Wong",
+      "King-Wa Fu"
+    ],
+    "venue": "JMIR Mental Health",
+    "publication_date": null,
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446798",
+    "relevance_score": 5.52,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "A FPGA Approach in a Motorised Linear Stage Remote Controlled Experiment",
+    "abstract": "In recent years, an advanced motion control software for rapid development has been introduced by National Instruments, accompanied by innovative and improved FPGA-based hardware platforms. Compared to the well-known standard NI DAQ PCI/USB board solutions, this new approach offers robust stability in a deterministic real-time environment combined with the highest possible performance and re-configurability of the FPGA core. The NI Compact RIO (cRIO) Real Time Controller utilises two distinctive interface modes of functionality: Scan and FPGA modes. This paper presents an application of a motion control flexible workbench based on the FPGA module, and analyses the advantages and disadvantages in comparison to another approach - the LabVIEW NI SoftMotion module run in scan interface mode. The workbench replicates real industrial applications and is very useful for experimentation with Brushless DC/ Permanent Magnet Synchronous motors and drives, and feedback devices.",
+    "year": null,
+    "citation_count": 2,
+    "url": "https://doi.org/10.3991/ijoe.v9is3.2543",
+    "doi": "10.3991/ijoe.v9is3.2543",
+    "authors": [
+      "Stamen Gadzhanov",
+      "Andrew Nafalski",
+      "Zorica Nedic"
+    ],
+    "venue": "International Journal of Online and Biomedical Engineering (iJOE)",
+    "publication_date": null,
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446813",
+    "relevance_score": 5.04,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "The Online Controlled Experiment Lifecycle",
+    "abstract": "",
+    "year": 2020,
+    "citation_count": 11,
+    "url": "https://doi.org/10.1109/ms.2018.2875842",
+    "doi": "10.1109/ms.2018.2875842",
+    "authors": [
+      "Aleksander Fabijan",
+      "Pavel Dmitriev",
+      "Helena Holmstrom Olsson",
+      "Jan Bosch"
+    ],
+    "venue": "IEEE Software",
+    "publication_date": "2020",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446763",
+    "relevance_score": 4.22,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Regression to the mean: treatment effect without the intervention",
+    "abstract": "AbstractRegression to the mean (RTM) is a widespread statistical phenomenon. It is a group phenomenon that occurs whenever an extreme group is selected from a population based on the measurement of a particular variable. If a second measurement is then taken for the same group, the second mean will be closer to the population mean than the first measurement. This decrease (or increase) can be mistakenly attributed to a treatment effect; the conclusion can be drawn that an effect results from treatment when it in fact results from chance. Any intervention that is aimed at a group or characteristic that is very different from the average will appear to be successful because of RTM. It is therefore important that any genuine reductions because of the treatment are separated out from the effect of RTM. If the problem is ignored then this will lead to errors in the interpretation of results and, potentially, decisions made on the evidence of those results. This paper highlights the importance of the issue and its effects on many common clinical, public health and managerial decisions.",
+    "year": 2005,
+    "citation_count": 109,
+    "url": "https://doi.org/10.1111/j.1365-2753.2004.00505.x",
+    "doi": "10.1111/j.1365-2753.2004.00505.x",
+    "authors": [
+      "Veronica Morton",
+      "David J. Torgerson"
+    ],
+    "venue": "Journal of Evaluation in Clinical Practice",
+    "publication_date": "2005",
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998010",
+    "relevance_score": 4.18,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Common pitfalls in statistical analysis: The perils of multiple testing",
+    "abstract": "",
+    "year": 2016,
+    "citation_count": 156,
+    "url": "https://doi.org/10.4103/2229-3485.179436",
+    "doi": "10.4103/2229-3485.179436",
+    "authors": [
+      "Priya Ranganathan",
+      "CS Pramesh",
+      "Marc Buyse"
+    ],
+    "venue": "Perspectives in Clinical Research",
+    "publication_date": "2016",
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680877",
+    "relevance_score": 4.12,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "How to deal with regression to the mean in intervention studies",
+    "abstract": "",
+    "year": 1996,
+    "citation_count": 156,
+    "url": "https://doi.org/10.1016/s0140-6736(96)90410-9",
+    "doi": "10.1016/s0140-6736(96)90410-9",
+    "authors": [
+      "P.L. Yudkin",
+      "I.M. Stratton"
+    ],
+    "venue": "The Lancet",
+    "publication_date": "1996",
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998030",
+    "relevance_score": 4.12,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "We Need to Talk About Mechanical Turk: What 22,989 Hypothesis Tests Tell Us About Publication Bias and P-Hacking in Online Experiments",
+    "abstract": "",
+    "year": null,
+    "citation_count": 5,
+    "url": "https://doi.org/10.2139/ssrn.4188289",
+    "doi": "10.2139/ssrn.4188289",
+    "authors": [
+      "Abel Brodeur",
+      "Nikolai Cook",
+      "Anthony Heyes"
+    ],
+    "venue": "SSRN Electronic Journal",
+    "publication_date": null,
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768444",
+    "relevance_score": 4.1,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Assessing the effect of questionnaire design on unit and item-nonresponse: evidence from an online experiment",
+    "abstract": "",
+    "year": 2022,
+    "citation_count": 16,
+    "url": "https://doi.org/10.1080/13645579.2021.1929714",
+    "doi": "10.1080/13645579.2021.1929714",
+    "authors": [
+      "Zoltán Kmetty",
+      "Ádám Stefkovics"
+    ],
+    "venue": "International Journal of Social Research Methodology",
+    "publication_date": "2022",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446757",
+    "relevance_score": 3.32,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Evaluation of Multivariate Adaptive Regression Splines and Artificial Neural Network for Prediction of Mean Sea Level Trend around Northern Australian Coastlines",
+    "abstract": "Mean sea level rise is a significant emerging risk from climate change. This research paper is based on the use of artificial intelligence models to assess and predict the trend on mean sea level around northern Australian coastlines. The study uses sea-level times series from four sites (Broom, Darwin, Cape Ferguson, Rosslyn Bay) to make the prediction. Multivariate adaptive regression splines (MARS) and artificial neural network (ANN) algorithms have been implemented to build the prediction model. Both models show high accuracy (R2 &gt; 0.98) and low error values (RMSE &lt; 27%) overall. The ANN model showed slightly better performance compared to MARS over the selected sites. The ANN performance was further assessed for modelling storm surges associated with cyclones. The model reproduced the surge profile with the maximum correlation coefficients ~0.99 and minimum RMS errors ~4 cm at selected validating sites. In addition, the ANN model predicted the maximum surge at Rosslyn Bay for cyclone Marcia to within 2 cm of the measured peak and the maximum surge at Broome for cyclone Narelle to within 7 cm of the measured peak. The results are comparable with a MARS model previously used in this region; however, the ANN shows better agreement with the measured peak and arrival time, although it suffers from slightly higher predictions than the observed sea level by tide gauge station.",
+    "year": null,
+    "citation_count": 8,
+    "url": "https://doi.org/10.3390/math9212696",
+    "doi": "10.3390/math9212696",
+    "authors": [
+      "Nawin Raj",
+      "Zahra Gharineiat"
+    ],
+    "venue": "Mathematics",
+    "publication_date": null,
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998117",
+    "relevance_score": 3.16,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Methodology Support in CASE Tools and Its Impact on Individual Acceptance and Use: A Controlled Experiment",
+    "abstract": "",
+    "year": 2005,
+    "citation_count": 4,
+    "url": "https://doi.org/10.1007/s10664-005-1287-5",
+    "doi": "10.1007/s10664-005-1287-5",
+    "authors": [
+      "Jörg Zettel"
+    ],
+    "venue": "Empirical Software Engineering",
+    "publication_date": "2005",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446752",
+    "relevance_score": 3.08,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Tuning the False Positive Rate / False Negative Rate with Phishing Detection Models",
+    "abstract": "Phishing attacks have risen by 209% in the last 10 years according to the Anti Phishing Working Group (APWG) statistics [19]. Machine learning is commonly used to detect phishing attacks. Researchers have traditionally judged phishing detection models with either accuracy or F1-scores, however in this paper we argue that a single metric alone will never correlate to a successful deployment of machine learning phishing detection model. This is because every machine learning model will have an inherent trade-off between it’s False Positive Rate (FPR) and False Negative Rate (FNR). Tuning the trade-off is important since a higher or lower FPR/FNR will impact the user acceptance rate of any deployment of a phishing detection model. When models have high FPR, they tend to block users from accessing legitimate webpages, whereas a model with a high FNR will allow the users to inadvertently access phishing webpages. Either one of these extremes may cause a user base to either complain (due to blocked pages) or fall victim to phishing attacks. Depending on the security needs of a deployment (secure vs relaxed setting) phishing detection models should be tuned accordingly. In this paper, we demonstrate two effective techniques to tune the trade-off between FPR and FNR: varying the class distribution of the training data and adjusting the probabilistic prediction threshold. We demonstrate both techniques using a data set of 50,000 phishing and 50,000 legitimate sites to perform all expe",
+    "year": null,
+    "citation_count": 3,
+    "url": "https://doi.org/10.35940/ijeat.a1002.1291s52019",
+    "doi": "10.35940/ijeat.a1002.1291s52019",
+    "authors": [],
+    "venue": "International Journal of Engineering and Advanced Technology",
+    "publication_date": null,
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265694",
+    "relevance_score": 3.06,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Performance Evaluation for Mean Sea Level Prediction using Multivariate Adaptive Regression Spline and Artificial Neural Network",
+    "abstract": "Mean sea level (MSL) has been used as a vertical datum for geodetic levelling and mapping in most countries all over the world. This is because the MSL approximates the geoid and serves as a realist reference surface that could be determined mostly through tide measurements over a period of time. However, sea levels have been rising over the years due to global warming and its associated climate change which continuous to melt ice sheets around the Polar Regions. This phenomenon is likely to affect the reliability of MSL, thus it is important to determine the local MSL at regular time periods. This study assessed the performance of Artificial Neural Network (ANN) and Multivariate Adaptive Regression Spline (MARS) models in predicting the MSL. Tide gauge records from the Takoradi Harbour of Ghana were used in the study. Monthly maximum, minimum and mean tidal values were derived from the secondary data and used for both model formulation and model testing. A comparative analysis of both models showed that the ANN model performed better than the MARS model. A Root Mean Square Error (RMSE) of 0.0359 m was obtained for the ANN model, whereas 0.0555 m was obtained for the MARS model. Mean Absolute Percentage Error (MAPE) of 3.1414% was obtained for the ANN model and whereas the MARS model yielded 5.6349%. A Mean Absolute Error (MAE) for the ANN model was 0.0284 m as against 0.0446 m for the MARS model. Correlation coefficient values of 0.9720 and 0.8874 were obtained for the ANN m",
+    "year": null,
+    "citation_count": 3,
+    "url": "https://doi.org/10.4314/gm.v18i1.1",
+    "doi": "10.4314/gm.v18i1.1",
+    "authors": [
+      "Cynthia Borkai Boye",
+      "Valentine Ikechukwu Amoah"
+    ],
+    "venue": "Ghana Mining Journal",
+    "publication_date": null,
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998108",
+    "relevance_score": 3.06,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "REGRESSION TO THE MEAN: METHODOLOGICAL ISSUES FOR EVALUATION OF HEART RATE VARIABILITY VARIABLES FOR STRESS ASSESSMENT",
+    "abstract": "There is now a substantial body of evidence linking the baseline level of heart rate variability (HRV) with the magnitude of stress-induced reduction in respiratory sinus arrhythmia. However, it remains to be proved to what extent these interindividual differences in stress responses may be attributed to the statistical phenomenon of regression to the mean (RTM). We sought to test the hypothesis that the statistical artifact RTM explains pan of the baseline effect. \nHeart rate recording was carried out in 1156 volunteers. To obtain an estimate of the stress response. 148 persons were randomly selected. Participants were monitored on a rest day and just before an academic examination for state anxiety and HRV. Participants were divided into quartiles according to baseline HRV levels and were compared for response to academic stress. \nWe observed a significant reduction in HRV in subjects with a high baseline HRV (&gt; 75th percentile), while a significant increase was found in the group with low baseline HRV. Regression analysis demonstrated that the value of baseline HRV correlated with the magnitude of stress reaction consistent with the RTM model. Baseline-adjusted ANCOVA does not reveal significant intergroup differences in the changes hi heart rate (HR) and HRV from rest to exam. RTM-adjusted estimates confirmed an exam effect for HR and HRV. The results of our study strongly support RTM as the source of variability of stress-related changes in HRV.",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.26787/nydha-2686-6838-2020-22-11-100-107",
+    "doi": "10.26787/nydha-2686-6838-2020-22-11-100-107",
+    "authors": [
+      "Dimitriev D.A."
+    ],
+    "venue": "\"Medical &amp; pharmaceutical journal \"Pulse\"",
+    "publication_date": null,
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998095",
+    "relevance_score": 3.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Estimating regression to the mean and true effects of an intervention in a four‐wave panel study",
+    "abstract": "ABSTRACTObjectives  First, to analyse whether a taxation‐related decrease in spirit prices had a similar effect on spirit consumption for low‐, medium‐ and high‐level drinkers. Secondly, as the relationship between baseline values and post‐intervention changes is confounded with regression to the mean (RTM) effects, to apply different approaches for estimating the RTM effect and true change.Sample  Consumption of spirits and total alcohol consumption were analysed in a four‐wave panel study (one pre‐intervention and three post‐intervention measurements) of 889 alcohol consumers sampled from the general population of Switzerland.Methods  Two correlational methods, one method quantitatively estimating the RTM effect and one growth curve approach based on hierarchical linear models (HLM), were used to estimate RTM effects among low‐, medium‐ and high‐level drinkers.Results  Adjusted for RTM effects, high‐level drinkers increased consumption more than lighter drinkers in the short term, but this was not a persisting effect. Changes in taxation affected mainly light and moderate drinkers in the long term. All methods concurred that RTM effects were present to a considerable degree, and methods quantifying the RTM effect or adjusting for it yielded similar estimates.Conclusion  Intervention studies have to consider RTM effects both in the study design and in the evaluation methods. Observed changes can be adjusted for RTM effects and true change can be estimated. The recommended me",
+    "year": 2008,
+    "citation_count": 20,
+    "url": "https://doi.org/10.1111/j.1360-0443.2007.02034.x",
+    "doi": "10.1111/j.1360-0443.2007.02034.x",
+    "authors": [
+      "Gerhard Gmel",
+      "Matthias Wicki",
+      "Jürgen Rehm",
+      "Jean‐Luc Heeb"
+    ],
+    "venue": "Addiction",
+    "publication_date": "2008",
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998141",
+    "relevance_score": 2.4,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Prospects and Pitfalls of Statistical Testing: Insights from Replicating the Demographic Prisoner's Dilemma",
+    "abstract": "",
+    "year": null,
+    "citation_count": 15,
+    "url": "https://doi.org/10.18564/jasss.1634",
+    "doi": "10.18564/jasss.1634",
+    "authors": [
+      "Wolfgang Radax",
+      "Bernhard Rengs"
+    ],
+    "venue": "Journal of Artificial Societies and Social Simulation",
+    "publication_date": null,
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680869",
+    "relevance_score": 2.3,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Informing the Design and Evaluation of Superuser Care Management Initiatives",
+    "abstract": "\n            Background:\n            Health care spending is concentrated among a small number of high-cost patients, and the popularity of initiatives to improve care and reduce cost among such “superusers” (SUs) is growing. However, SU costs decline naturally over time, even without intervention, a statistical phenomenon known as regression-to-the-mean (RTM).\n          \n          \n            Objectives:\n            We assess the magnitude of RTM in hospital costs for cohorts of hospital SUs identified on the basis of high inpatient (IP) or emergency department (ED) utilization. We further examine how cost and RTM are associated with patient characteristics including behavioral health (BH) problems, multiple chronic conditions, and indicators of vulnerability.\n          \n          \n            Study Design:\n            Using longitudinally linked all-payer hospital billing data, we selected patient cohorts with ≥2 IP stays (IP SUs) or ≥6 ED visits (ED SUs) during a 6-month baseline period, and additional subgroups defined by combinations of IP and ED superuse.\n          \n          \n            Population Studied:\n            A total of 289,060 NJ hospital IP and treat-and-release ED patients over 2009–2011.\n          \n          \n            Results:\n            Hospital costs among IP and ED SUs declined 70% and 38%, respectively, over 8 quarters following the baseline period. The decrease occurs more quickly for IP SUs compared with ED SUs. Presence of BH problems was posi",
+    "year": 2016,
+    "citation_count": 9,
+    "url": "https://doi.org/10.1097/mlr.0000000000000568",
+    "doi": "10.1097/mlr.0000000000000568",
+    "authors": [
+      "Sujoy Chakravarty",
+      "Joel C. Cantor"
+    ],
+    "venue": "Medical Care",
+    "publication_date": "2016",
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998085",
+    "relevance_score": 2.18,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Statistical hypothesis testing and some pitfalls",
+    "abstract": "",
+    "year": null,
+    "citation_count": 5,
+    "url": "https://doi.org/10.11613/bm.2009.002",
+    "doi": "10.11613/bm.2009.002",
+    "authors": [
+      "Vesna Ilakovac"
+    ],
+    "venue": "Biochemia Medica",
+    "publication_date": null,
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680841",
+    "relevance_score": 2.1,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "A Novel Framework for Lung Nodule Classification with Low False Positive and High True Positive Detection Rate",
+    "abstract": "",
+    "year": 2020,
+    "citation_count": 1,
+    "url": "https://doi.org/10.5373/jardcs/v12sp3/20201383",
+    "doi": "10.5373/jardcs/v12sp3/20201383",
+    "authors": [
+      "Popuri Ramesh Babu"
+    ],
+    "venue": "Journal of Advanced Research in Dynamical and Control Systems",
+    "publication_date": "2020",
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265699",
+    "relevance_score": 2.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Mean-Variance and Mean-Variance-Correlation Neural Network Regression Models",
+    "abstract": "",
+    "year": null,
+    "citation_count": 1,
+    "url": "https://doi.org/10.2139/ssrn.3438332",
+    "doi": "10.2139/ssrn.3438332",
+    "authors": [
+      "Andrea Gabrielli"
+    ],
+    "venue": "SSRN Electronic Journal",
+    "publication_date": null,
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998045",
+    "relevance_score": 2.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Pitfalls of statistical hypothesis testing: multiple testing",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1136/bmj.g5624",
+    "doi": "10.1136/bmj.g5624",
+    "authors": [],
+    "venue": "BMJ",
+    "publication_date": null,
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680807",
+    "relevance_score": 2.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "HIV testing algorithm using fourth generation reagents reduces the false positive rate of screening tests",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1038/s41598-025-97169-y",
+    "doi": "10.1038/s41598-025-97169-y",
+    "authors": [
+      "Yu Gou",
+      "Zhengxiang Gao",
+      "Yifei Duan",
+      "Yu Wu",
+      "Leiwen Peng"
+    ],
+    "venue": "Scientific Reports",
+    "publication_date": null,
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265702",
+    "relevance_score": 2.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "PB2281: HOW TO AVOID FALSE-NEGATIVE AND FALSE-POSITIVE COVID-19 PCR TESTING",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1097/01.hs9.0000851952.46425.fc",
+    "doi": "10.1097/01.hs9.0000851952.46425.fc",
+    "authors": [
+      "I. Fevraleva",
+      "O. Glinshchikova",
+      "A. Sudarikov"
+    ],
+    "venue": "HemaSphere",
+    "publication_date": null,
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265705",
+    "relevance_score": 2.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Very high rate of false positive biochemical results when screening for phaeochromocytoma in a large, undifferentiated population with variable indications for testing",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1530/endoabs.65.p17",
+    "doi": "10.1530/endoabs.65.p17",
+    "authors": [
+      "Gregory Kline",
+      "Jessica Boyd",
+      "Alexander Leung",
+      "Andrew Tang",
+      "Hossein Sadrzadeh"
+    ],
+    "venue": "Endocrine Abstracts",
+    "publication_date": null,
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265710",
+    "relevance_score": 2.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "How Experiments End by Peter Galison",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.5840/jphil199087276",
+    "doi": "10.5840/jphil199087276",
+    "authors": [
+      "Ian Hacking"
+    ],
+    "venue": "Journal of Philosophy",
+    "publication_date": null,
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768498",
+    "relevance_score": 2.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "If You Ignore Manipulation Errors in Your Experiments You Might Be P-Hacking Without Knowing.",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.2139/ssrn.3421032",
+    "doi": "10.2139/ssrn.3421032",
+    "authors": [
+      "Wagner A. Kamakura"
+    ],
+    "venue": "SSRN Electronic Journal",
+    "publication_date": null,
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768505",
+    "relevance_score": 2.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Pitfalls of statistical hypothesis testing: type I and type II errors",
+    "abstract": "",
+    "year": 2014,
+    "citation_count": 25,
+    "url": "https://doi.org/10.1136/bmj.g4287",
+    "doi": "10.1136/bmj.g4287",
+    "authors": [
+      "P. Sedgwick"
+    ],
+    "venue": "BMJ",
+    "publication_date": "2014",
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680852",
+    "relevance_score": 1.5,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Sample Size Determination for Equivalence Test Using Rate Ratio of Sensitivity and Specificity in Paired Sample Data",
+    "abstract": "",
+    "year": 2001,
+    "citation_count": 21,
+    "url": "https://doi.org/10.1016/s0197-2456(01)00134-9",
+    "doi": "10.1016/s0197-2456(01)00134-9",
+    "authors": [
+      "Kung-Jong Lui",
+      "William G. Cumberland"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "2001",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093640",
+    "relevance_score": 1.42,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Avoiding Statistical Pitfalls",
+    "abstract": "",
+    "year": 1991,
+    "citation_count": 20,
+    "url": "https://doi.org/10.1214/ss/1177011686",
+    "doi": "10.1214/ss/1177011686",
+    "authors": [
+      "Christopher Chatfield"
+    ],
+    "venue": "Statistical Science",
+    "publication_date": "1991",
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680884",
+    "relevance_score": 1.4,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Honesty testing: Estimating and reducing the false positive rate",
+    "abstract": "",
+    "year": 1989,
+    "citation_count": 7,
+    "url": "https://doi.org/10.1007/bf01023044",
+    "doi": "10.1007/bf01023044",
+    "authors": [
+      "Scott L. Martin"
+    ],
+    "venue": "Journal of Business and Psychology",
+    "publication_date": "1989",
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265689",
+    "relevance_score": 1.14,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Kriging neighbourhood analysis by slope of regression and weight of mean – evaluation with the Jura data set",
+    "abstract": "",
+    "year": 2010,
+    "citation_count": 7,
+    "url": "https://doi.org/10.1179/037178410x12741755140804",
+    "doi": "10.1179/037178410x12741755140804",
+    "authors": [
+      "C. Boyle"
+    ],
+    "venue": "Mining Technology",
+    "publication_date": "2010",
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998148",
+    "relevance_score": 1.14,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Sample size and positive false discovery rate control for multiple testing",
+    "abstract": "",
+    "year": 2007,
+    "citation_count": 2,
+    "url": "https://doi.org/10.1214/07-ejs045",
+    "doi": "10.1214/07-ejs045",
+    "authors": [
+      "Zhiyi Chi"
+    ],
+    "venue": "Electronic Journal of Statistics",
+    "publication_date": "2007",
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265680",
+    "relevance_score": 1.04,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Sample size calculations for repeated measures experiments",
+    "abstract": "",
+    "year": 1995,
+    "citation_count": 2,
+    "url": "https://doi.org/10.1016/s0197-2456(95)00086-0",
+    "doi": "10.1016/s0197-2456(95)00086-0",
+    "authors": [
+      "James Rochon"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1995",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093564",
+    "relevance_score": 1.04,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "A note on sample size determination for comparison of small probabilities",
+    "abstract": "",
+    "year": 1994,
+    "citation_count": 2,
+    "url": "https://doi.org/10.1016/0197-2456(94)90029-9",
+    "doi": "10.1016/0197-2456(94)90029-9",
+    "authors": [
+      "Ian Gordon",
+      "Ray Watson"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1994",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093658",
+    "relevance_score": 1.04,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Marketing pitfalls of statistical significance testing",
+    "abstract": "",
+    "year": 2005,
+    "citation_count": 1,
+    "url": "https://doi.org/10.1108/02634500510612672",
+    "doi": "10.1108/02634500510612672",
+    "authors": [
+      "Andrew D. Banasiewicz"
+    ],
+    "venue": "Marketing Intelligence &amp; Planning",
+    "publication_date": "2005",
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680860",
+    "relevance_score": 1.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "[Avoiding Statistical Pitfalls]: Comment",
+    "abstract": "",
+    "year": 1991,
+    "citation_count": 1,
+    "url": "https://doi.org/10.1214/ss/1177011690",
+    "doi": "10.1214/ss/1177011690",
+    "authors": [
+      "Ned Glick"
+    ],
+    "venue": "Statistical Science",
+    "publication_date": "1991",
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680890",
+    "relevance_score": 1.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Experiment-research methodology in marketing: types and applications",
+    "abstract": "",
+    "year": 1996,
+    "citation_count": 1,
+    "url": "https://doi.org/10.5860/choice.34-1024",
+    "doi": "10.5860/choice.34-1024",
+    "authors": [],
+    "venue": "Choice Reviews Online",
+    "publication_date": "1996",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446729",
+    "relevance_score": 1.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Lubrication Characteristics of a Temperature-Viscosity-Controlled Hydrodynamic Journal Bearing: Prototype and Experiment",
+    "abstract": "",
+    "year": 2016,
+    "citation_count": 1,
+    "url": "https://doi.org/10.2474/trol.11.75",
+    "doi": "10.2474/trol.11.75",
+    "authors": [
+      "Toshiharu Kazama",
+      "Keisuke Saito",
+      "Yukihito Narita",
+      "Naohiko Hanajima"
+    ],
+    "venue": "Tribology Online",
+    "publication_date": "2016",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446742",
+    "relevance_score": 1.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "The Tetrahedron Computer Methodology Experiment",
+    "abstract": "",
+    "year": 1990,
+    "citation_count": 1,
+    "url": "https://doi.org/10.1016/0898-5529(90)90153-y",
+    "doi": "10.1016/0898-5529(90)90153-y",
+    "authors": [
+      "W.Todd Wipke"
+    ],
+    "venue": "Tetrahedron Computer Methodology",
+    "publication_date": "1990",
+    "query": "online controlled experiment methodology",
+    "scraped_at": "2026-04-05T17:20:55.446747",
+    "relevance_score": 1.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Estimating Prevalence, False-Positive Rate, and False-Negative Rate with Use of Repeated Testing When True Responses Are Unknown",
+    "abstract": "",
+    "year": 2007,
+    "citation_count": 1,
+    "url": "https://doi.org/10.1086/521582",
+    "doi": "10.1086/521582",
+    "authors": [
+      "Johanna Jakobsdottir",
+      "Daniel E. Weeks"
+    ],
+    "venue": "The American Journal of Human Genetics",
+    "publication_date": "2007",
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265686",
+    "relevance_score": 1.02,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "[Avoiding Statistical Pitfalls]: Rejoinder",
+    "abstract": "",
+    "year": 1991,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1214/ss/1177011693",
+    "doi": "10.1214/ss/1177011693",
+    "authors": [
+      "Christopher Chatfield"
+    ],
+    "venue": "Statistical Science",
+    "publication_date": "1991",
+    "query": "A/B testing statistical pitfalls",
+    "scraped_at": "2026-04-05T17:20:46.680896",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "The art and science of reproductive donor screening: pooled testing (PT) vs. individual donor nucleic acid testing (ID NAT) and false positive test rate",
+    "abstract": "",
+    "year": 2007,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1016/j.fertnstert.2007.07.101",
+    "doi": "10.1016/j.fertnstert.2007.07.101",
+    "authors": [
+      "J.B. Gorlin",
+      "M. Janzen",
+      "J. VanHulzen"
+    ],
+    "venue": "Fertility and Sterility",
+    "publication_date": "2007",
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265697",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Achieving High Reliability in SAODV by Decreasing False Positive Blackhole Detection Rate in MANET",
+    "abstract": "",
+    "year": 2015,
+    "citation_count": 0,
+    "url": "https://doi.org/10.70729/ijser1578",
+    "doi": "10.70729/ijser1578",
+    "authors": [
+      "Yudhister Chawla",
+      "Hardayal Singh Shekhawat"
+    ],
+    "venue": "International Journal of Scientific Engineering and Research",
+    "publication_date": "2015",
+    "query": "false positive rate A/B testing",
+    "scraped_at": "2026-04-05T17:21:04.265707",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "How Experiments End.",
+    "abstract": "",
+    "year": 1990,
+    "citation_count": 0,
+    "url": "https://doi.org/10.2307/2026884",
+    "doi": "10.2307/2026884",
+    "authors": [
+      "Ian Hacking",
+      "Peter Galison"
+    ],
+    "venue": "The Journal of Philosophy",
+    "publication_date": "1990",
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768455",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Some experiments in digital holographic recording",
+    "abstract": "",
+    "year": 1980,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1049/ree.1980.0056",
+    "doi": "10.1049/ree.1980.0056",
+    "authors": [
+      "K. Hacking"
+    ],
+    "venue": "Radio and Electronic Engineer",
+    "publication_date": "1980",
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768463",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Hackers and hacking: a reference handbook",
+    "abstract": "",
+    "year": 2014,
+    "citation_count": 0,
+    "url": "https://doi.org/10.5860/choice.51-2432",
+    "doi": "10.5860/choice.51-2432",
+    "authors": [],
+    "venue": "Choice Reviews Online",
+    "publication_date": "2014",
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768473",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Hacking: digital media and technological determinism",
+    "abstract": "",
+    "year": 2009,
+    "citation_count": 0,
+    "url": "https://doi.org/10.5860/choice.46-5659",
+    "doi": "10.5860/choice.46-5659",
+    "authors": [],
+    "venue": "Choice Reviews Online",
+    "publication_date": "2009",
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768480",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Correction: ABC-CLIO's Hackers and Hacking: A Reference Handbook",
+    "abstract": "",
+    "year": 2013,
+    "citation_count": 0,
+    "url": "https://doi.org/10.5860/choice.51.02.208a",
+    "doi": "10.5860/choice.51.02.208a",
+    "authors": [],
+    "venue": "Choice Reviews Online",
+    "publication_date": "2013",
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768487",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Coding freedom: the ethics and aesthetics of hacking",
+    "abstract": "",
+    "year": 2013,
+    "citation_count": 0,
+    "url": "https://doi.org/10.5860/choice.50-6221",
+    "doi": "10.5860/choice.50-6221",
+    "authors": [],
+    "venue": "Choice Reviews Online",
+    "publication_date": "2013",
+    "query": "p-hacking online experiments",
+    "scraped_at": "2026-04-05T17:21:12.768514",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Sample size determination using an interim analysis",
+    "abstract": "",
+    "year": 1992,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1016/0197-2456(92)90131-i",
+    "doi": "10.1016/0197-2456(92)90131-i",
+    "authors": [
+      "David R. Bristol"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1992",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093585",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Sample size determination for comparison of rates of change with lognormal distributions",
+    "abstract": "",
+    "year": 1987,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1016/0197-2456(87)90111-5",
+    "doi": "10.1016/0197-2456(87)90111-5",
+    "authors": [],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1987",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093594",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "52 Application of gee procedures for sample size calculations in repeated measures experiments",
+    "abstract": "",
+    "year": 1997,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1016/s0197-2456(97)91037-0",
+    "doi": "10.1016/s0197-2456(97)91037-0",
+    "authors": [
+      "James Rochon"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1997",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093603",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Determination of sample size taking account of certain prior information",
+    "abstract": "",
+    "year": 1991,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1016/0197-2456(91)90273-o",
+    "doi": "10.1016/0197-2456(91)90273-o",
+    "authors": [
+      "Masashi Goto",
+      "Mitsugu Kanba"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1991",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093613",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Sample size determination when efficacy and safety are considered jointly",
+    "abstract": "",
+    "year": 1988,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1016/0197-2456(88)90069-4",
+    "doi": "10.1016/0197-2456(88)90069-4",
+    "authors": [
+      "Alfred W. Rademaker",
+      "D.George Wyse"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1988",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093631",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "A bayesian approach to sample size determination in phase II cancer clinical trials",
+    "abstract": "",
+    "year": 1984,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1016/0197-2456(84)90083-7",
+    "doi": "10.1016/0197-2456(84)90083-7",
+    "authors": [
+      "Richard J. Sylvester"
+    ],
+    "venue": "Controlled Clinical Trials",
+    "publication_date": "1984",
+    "query": "sample size determination controlled experiments",
+    "scraped_at": "2026-04-05T17:21:21.093649",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  },
+  {
+    "source": "crossref",
+    "title": "Book Review: Regression to the Mean: a Novel of Evaluation Politics",
+    "abstract": "",
+    "year": 2009,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1177/1035719x0900900209",
+    "doi": "10.1177/1035719x0900900209",
+    "authors": [
+      "Darrel N Caulley"
+    ],
+    "venue": "Evaluation Journal of Australasia",
+    "publication_date": "2009",
+    "query": "regression to the mean intervention evaluation",
+    "scraped_at": "2026-04-05T17:21:29.998038",
+    "relevance_score": 1.0,
+    "category": "ab_testing"
+  }
+]

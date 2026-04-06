@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --black: #000000;
+  --blue: #448CFD;
+  --orange: #FF8720;
+  --pink: #FF8DE4;
+  --eggshell: #F5F3EF;
+  --grey-600: #555555;
+  --grey-400: #999999;
+  --border: #E5E2DC;
+
+  /* Legacy compat */
+  --background: #F5F3EF;
+  --foreground: #000000;
+  --murmur-cream: #F5F3EF;
+  --murmur-ink: #000000;
+  --murmur-warm-grey: #555555;
+  --murmur-amber: #FF8720;
+  --murmur-amber-light: rgba(255, 135, 32, 0.15);
+  --murmur-white: #FFFFFF;
+  --murmur-border: #E5E2DC;
+  --murmur-positive: #22c55e;
+  --murmur-negative: #ef4444;
+  --murmur-neutral: #f59e0b;
+}
+
+body {
+  color: var(--black);
+  background: var(--eggshell);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+  .gradient-text {
+    background: linear-gradient(90deg, #448CFD, #FF8DE4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, #448CFD, #FF8720, #FF8DE4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .grad-a {
+    background: linear-gradient(90deg, #448CFD 0%, #FF8DE4 100%);
+  }
+
+  .grad-b {
+    background: linear-gradient(135deg, #FF8720 0%, #FF8DE4 100%);
+  }
+
+  .grad-c {
+    background: linear-gradient(135deg, #448CFD 0%, #FF8DE4 35%, #FF8720 70%, #448CFD 100%);
+  }
+
+  .grad-c-animate {
+    background: linear-gradient(135deg, #448CFD 0%, #FF8DE4 35%, #FF8720 70%, #448CFD 100%);
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  .font-serif-display {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+  }
+}
+
+@keyframes gradient-shift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}

@@ -1,0 +1,1493 @@
+[
+  {
+    "source": "semantic_scholar",
+    "title": "Mixture-of-Personas Language Models for Population Simulation",
+    "abstract": "Advances in Large Language Models (LLMs) paved the way for their emerging applications in various domains, such as human behavior simulations, where LLMs could augment human-generated data in social science research and machine learning model training. However, pretrained LLMs often fail to capture the behavioral diversity of target populations due to the inherent variability across individuals and groups. To address this, we propose \\textit{Mixture of Personas} (MoP), a \\textit{probabilistic} prompting method that aligns the LLM responses with the target population. MoP is a contextual mixture model, where each component is an LM agent characterized by a persona and an exemplar representing subpopulation behaviors. The persona and exemplar are randomly chosen according to the learned mixing weights to elicit diverse LLM responses during simulation. MoP is flexible, requires no model finetuning, and is transferable across base models. Experiments for synthetic data generation show that MoP outperforms competing methods in alignment and diversity metrics.",
+    "year": 2025,
+    "citation_count": 20,
+    "url": "https://www.semanticscholar.org/paper/0f25d552eefd9649d080e2eda27482f7ba20a126",
+    "doi": "10.48550/arXiv.2504.05019",
+    "authors": [
+      "Ngoc Bui",
+      "Hieu Trung Nguyen",
+      "Shantanu Kumar",
+      "Julian Theodore",
+      "Weikang Qiu"
+    ],
+    "venue": "Annual Meeting of the Association for Computational Linguistics",
+    "publication_date": "2025-04-07",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806478",
+    "relevance_score": 9.4,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Survey on Synthetic Data Generation, Evaluation Methods and GANs",
+    "abstract": "Synthetic data consists of artificially generated data. When data are scarce, or of poor quality, synthetic data can be used, for example, to improve the performance of machine learning models. Generative adversarial networks (GANs) are a state-of-the-art deep generative models that can generate novel synthetic samples that follow the underlying data distribution of the original dataset. Reviews on synthetic data generation and on GANs have already been written. However, none in the relevant literature, to the best of our knowledge, has explicitly combined these two topics. This survey aims to fill this gap and provide useful material to new researchers in this field. That is, we aim to provide a survey that combines synthetic data generation and GANs, and that can act as a good and strong starting point for new researchers in the field, so that they have a general overview of the key contributions and useful references. We have conducted a review of the state-of-the-art by querying four major databases: Web of Sciences (WoS), Scopus, IEEE Xplore, and ACM Digital Library. This allowed us to gain insights into the most relevant authors, the most relevant scientific journals in the area, the most cited papers, the most significant research areas, the most important institutions, and the most relevant GAN architectures. GANs were thoroughly reviewed, as well as their most common training problems, their most important breakthroughs, and a focus on GAN architectures for tabular d",
+    "year": null,
+    "citation_count": 347,
+    "url": "https://doi.org/10.3390/math10152733",
+    "doi": "10.3390/math10152733",
+    "authors": [
+      "Alvaro Figueira",
+      "Bruno Vaz"
+    ],
+    "venue": "Mathematics",
+    "publication_date": null,
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416631",
+    "relevance_score": 8.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Methodological individualism and agent-based computational simulation: A reply to Kincaid and Zahle",
+    "abstract": " This study reflects on Harold Kincaid and Jule Zahle’s view that there is no necessary association between methodological individualism and agent-based models because the analysis of social phenomena in terms of the latter cannot always be regarded as an implementation of the former. Their view remains in contention with the standpoint of several philosophers of science and social scientists, including Chen and Di Iorio. Kincaid and Zahle’s main argument against such a standpoint is that agent-based simulation is compatible with holistic explanations that are at odds with methodological individualism. The following study argues that Kincaid and Zahle’s conclusion remains untenable since it stems from inaccurate historical assumptions concerning the tradition of methodological individualism and the way the individualism-holism debate is understood within this tradition. ",
+    "year": 2024,
+    "citation_count": 3,
+    "url": "https://doi.org/10.1177/05390184241258370",
+    "doi": "10.1177/05390184241258370",
+    "authors": [
+      "Francesco Di Iorio"
+    ],
+    "venue": "Social Science Information",
+    "publication_date": "2024",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.908929",
+    "relevance_score": 7.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Research Methodology and Biostatistics Series VII Guard Against Biases for Validity of the Findings",
+    "abstract": "Various biases, knowingly or unknowingly can creep into medical research, affecting the validity of findings and often lead to disappointing results when applied in real-world settings. This article provides a concise overview of more than 30 types of biases that can adversely influence research outcomes. The objective is to raise readers’ awareness of these biases so that pre-emptive actions can be taken to ensure study validity, and thereby enhance the credibility of the findings.",
+    "year": 2025,
+    "citation_count": 0,
+    "url": "https://doi.org/10.62830/mmj2-03-32e1",
+    "doi": "10.62830/mmj2-03-32e1",
+    "authors": [
+      "Abhaya Indrayan"
+    ],
+    "venue": "Research Methodology and Biostatistics Series VII  Guard Against Biases for Validity of the Findings",
+    "publication_date": "2025",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912442",
+    "relevance_score": 7.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "A Survey on Multi Agent System and Its Applications in Power System Engineering",
+    "abstract": "An Intelligent Agent (IA) is a type of autonomous entity in the field of Artificial Intelligence (AI) that gathers information about its surroundings using sensors, takes action in response to that information using actuators (\"agent\" part), and guides its behavior to achieve predetermined results (i.e. it is rational). Agents that are both intelligent and able to learn or utilize information to accomplish their tasks would be ideal. Similar to how economists study agents, cognitive scientists, ethicists, philosophers of practical reason and researchers in a wide range of other disciplines study variations of the IAmodel used in multidisciplinary socio-cognitive modelling and computer social simulation models. In this article, the term \"Multi-Agent System\" (MAS) has been used to refer to a system in which two or more autonomous entities communicate with one another. The key objective of this research is to provide a critical analysis of MAS and its applications in power systems. A case study to define the application of MAS in power system is also provided, using a critical implementation of fuzzy logic controllers.",
+    "year": 2023,
+    "citation_count": 87,
+    "url": "https://www.semanticscholar.org/paper/7c096230b06f3dc4e91b56c804d02d34408f0d92",
+    "doi": "10.53759/832x/jcims202301001",
+    "authors": [
+      "Madeleine Wang Yue Dong"
+    ],
+    "venue": "Journal of Computational Intelligence in Materials Science",
+    "publication_date": "2023-01-05",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806491",
+    "relevance_score": 6.74,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Agent-Based Computational Epidemiological Modeling",
+    "abstract": "The study of epidemics is useful for not only understanding outbreaks and trying to limit their adverse effects, but also because epidemics are related to social phenomena such as government instability, crime, poverty, and inequality. One approach for studying epidemics is to simulate their spread through populations. In this work, we describe an integrated multi-dimensional approach to epidemic simulation, which encompasses: (1) a theoretical framework for simulation and analysis; (2) synthetic population (digital twin) generation; (3) (social contact) network construction methods from synthetic populations, (4) stylized network construction methods; and (5) simulation of the evolution of a virus or disease through a social network. We describe these aspects and end with a short discussion on simulation results that inform public policy.",
+    "year": 2021,
+    "citation_count": 32,
+    "url": "https://www.semanticscholar.org/paper/4ec75422c05af0b2d30dc9df03f95ece0fdec81f",
+    "doi": "10.1007/s41745-021-00260-2",
+    "authors": [
+      "Keith Bissett",
+      "Jose Cadena",
+      "Maleq Khan",
+      "C. Kuhlman"
+    ],
+    "venue": "Journal of the Indian Institute of Science",
+    "publication_date": "2021-07-01",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806483",
+    "relevance_score": 6.64,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Identify Customer Element Through Empathy Map and User Persona",
+    "abstract": "",
+    "year": 2023,
+    "citation_count": 15,
+    "url": "https://doi.org/10.1016/j.procs.2023.10.411",
+    "doi": "10.1016/j.procs.2023.10.411",
+    "authors": [
+      "Puti Sinansari",
+      "Syauqina Hening Salsabila",
+      "Syarifa Hanoum",
+      "Agnieszka Lopatka",
+      "Wojciech Wlodarski"
+    ],
+    "venue": "Procedia Computer Science",
+    "publication_date": "2023",
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364217",
+    "relevance_score": 6.3,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Technological and social networks of a pastoralist artificial society: agent-based modeling of mobility patterns",
+    "abstract": "This paper explores the advantages of simulation to raise the question of how digital and social networks affect the mobility in a pastoralist artificial society in the context of environmental degradation. We aim to explore mechanisms and develop scenarios, which are going to be validated through further research. We use a model of a simple pastoralist society in a world without borders to migration by adding the possibility of experiencing the effects of social structures (such as family and friends) and technological networks (e.g., social media). It appears obvious that pastoralist mobility depends on other dimensions as land tenure and traditional knowledge; however, isolating these two effects and experimenting in a simple society allow us to filter the multidimensionality of mobility decisions and concentrate on comparing scenarios in several different social structures and technological network combinations. The results show an expected behavior of more connection and more mobility, and a non-linear emergent behavior where pastoralists wait for a longer amount of time to mobilize when they interact using powerful social and technological networks. This occurs until they decide to move, and then, they mobilize more quickly and strongly than they did when communication was non-existent between them. The literature on migration explains this emergent non-linear behavior.",
+    "year": 2021,
+    "citation_count": 5,
+    "url": "https://www.semanticscholar.org/paper/6bfe21d8cb30c03a76d3c754bfa3ef95594d50bb",
+    "doi": "10.1007/s42001-020-00100-w",
+    "authors": [
+      "J. Rodriguez-Lopez",
+      "Meike Schickhoff",
+      "S. Sengupta",
+      "J. Scheffran"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2021-02-03",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806527",
+    "relevance_score": 6.1,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "An agent-based simulation model for analyzing and optimizing omni-channel retailing operation decisions",
+    "abstract": "",
+    "year": 2024,
+    "citation_count": 4,
+    "url": "https://doi.org/10.1016/j.jretconser.2024.103845",
+    "doi": "10.1016/j.jretconser.2024.103845",
+    "authors": [
+      "Jing Li",
+      "XiaoWen Liu"
+    ],
+    "venue": "Journal of Retailing and Consumer Services",
+    "publication_date": "2024",
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129833",
+    "relevance_score": 6.08,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Identifying Personal and Social Drivers of Dietary Patterns: An Agent-Based Model of Dutch Consumer Behavior",
+    "abstract": "",
+    "year": null,
+    "citation_count": 3,
+    "url": "https://doi.org/10.18564/jasss.5020",
+    "doi": "10.18564/jasss.5020",
+    "authors": [
+      "Natalie Davis",
+      "Brian Dermody",
+      "Mark Koetse",
+      "George van Voorn"
+    ],
+    "venue": "Journal of Artificial Societies and Social Simulation",
+    "publication_date": null,
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129823",
+    "relevance_score": 6.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Toward a Quantitative Science of Nonviolence: Sensitivity Analysis of an Agent-Based Model of Nonviolent Resistance",
+    "abstract": null,
+    "year": 2025,
+    "citation_count": 1,
+    "url": "https://www.semanticscholar.org/paper/841c1cc85d8fccd7ca495608be053a54d7bbe2da",
+    "doi": null,
+    "authors": [
+      "Joshua Steakelum",
+      "Hang Dinh",
+      "L. Fiondella"
+    ],
+    "venue": "Annual Modeling and Simulation Conference",
+    "publication_date": "2025-05-26",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806467",
+    "relevance_score": 6.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Impact of arbitrage trading between an ETF and its underlying assets on market liquidity of their markets using an agent-based simulation",
+    "abstract": null,
+    "year": 2024,
+    "citation_count": 1,
+    "url": "https://www.semanticscholar.org/paper/4fbfc3bbea75416ed59712a808d6066348bec15c",
+    "doi": "10.1007/s42001-024-00324-0",
+    "authors": [
+      "Xin Guan",
+      "Takanobu Mizuta",
+      "Isao Yagi"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2024-09-18",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806473",
+    "relevance_score": 6.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Long-term care comparative studies by agent-based simulation: a computational framework and a case study",
+    "abstract": null,
+    "year": 2024,
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/523435715ae7b52c6d351f047414ba6b2f8dfcfd",
+    "doi": "10.1007/s42001-024-00331-1",
+    "authors": [
+      "Shuang Chang",
+      "Koji Maruhashi"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2024-11-26",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806457",
+    "relevance_score": 6.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Filter bubbles as a vector of tradition? Decoding opinion dynamics with agent-based modelling",
+    "abstract": null,
+    "year": 2025,
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/fcabdb1838168b18ddcade3b00f2424a602e90c7",
+    "doi": "10.1007/s42001-025-00422-7",
+    "authors": [
+      "Benoît Desmarchelier",
+      "F. Djellal",
+      "F. Gallouj"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2025-08-17",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806496",
+    "relevance_score": 6.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Consumer skepticism and online reviews: An Elaboration Likelihood Model perspective",
+    "abstract": "Online consumers vary in their tendency to believe or disbelieve online reviews. Based on an Elaboration Likelihood Model (ELM; Petty &amp; Cacioppo, 1981, 1986), the present study tested the effects of consumer skepticism on online consumers. A total of 278 undergraduates expressed\n their attitudes about a product in an online experiment. Two findings emerged from the results. First, highly skeptical consumers tend to base their attitudes on intrinsic beliefs instead of situational factors; that is, they are biased against certain types of information and indifferent\n to the message quality. Second, consumers with low skepticism tend to adopt the peripheral route in forming attitude; that is, they are more persuaded by review quantity. These findings contribute to the ELM research literature by considering a potentially important personality factor in the\n ELM framework. Managerial implications are suggested.",
+    "year": 2009,
+    "citation_count": 168,
+    "url": "https://doi.org/10.2224/sbp.2009.37.1.137",
+    "doi": "10.2224/sbp.2009.37.1.137",
+    "authors": [
+      "Peter J. Sher",
+      "Sheng-Hsien Lee"
+    ],
+    "venue": "Social Behavior and Personality: an international journal",
+    "publication_date": "2009",
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029891",
+    "relevance_score": 5.36,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Impact of maker-taker fees on stock exchange competition from an agent-based simulation",
+    "abstract": null,
+    "year": 2022,
+    "citation_count": 2,
+    "url": "https://www.semanticscholar.org/paper/d06bec82f5a7671cac5023ad77af627d3385e5ec",
+    "doi": "10.1007/s42001-022-00169-5",
+    "authors": [
+      "Mahiro Hoshino",
+      "Takanobu Mizuta",
+      "Y. Sudo",
+      "Isao Yagi"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2022-06-25",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806500",
+    "relevance_score": 5.04,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Buyer persona del turista Generación Z, un reto para los Guías Turísticos",
+    "abstract": "El objetivo del estudio es analizar las necesidades de la Generación Z (GZ) respecto a los componentes del rol profesional del guía de turistas (GT), con el propósito de construir un arquetipo que represente las percepciones de esta generación hacia los servicios turísticos en las visitas guiadas. Se empleó un enfoque metodológico mixto (CUAL y CUAN) con un diseño secuencial DEXPLOS, que incluyó 1) un grupo focal y el uso del mapa de empatía, 2) la aplicación de una encuesta en escala Likert de 10 niveles para realizar un Análisis Factorial Exploratorio y Confirmatorio, 3) la construcción del buyer persona. El enfoque CUAL reveló que la GZ valora la actitud profesional, el rol cuidador, la narrativa personalizada y las recomendaciones específicas del GT, aunque destacó la importancia de respetar itinerarios y de incluir pausas frecuentes. Por su parte, el enfoque CUAN confirmó que los componentes instrumental, social, interaccional, comunicativo, el rol cuidador y la actitud profesional son esenciales para este segmento, con variables destacadas como la honestidad, el manejo emocional y el humor. Finalmente, la construcción del buyer persona de la GZ recomienda personalizar servicios, emplear tecnología, mostrar empatía y fomentar la sostenibilidad para conectar con este segmento altamente conectado y exigente.",
+    "year": null,
+    "citation_count": 1,
+    "url": "https://doi.org/10.29105/vtga11.5-1162",
+    "doi": "10.29105/vtga11.5-1162",
+    "authors": [
+      "Ángel Hernández-Morales",
+      "Pablo Guerra-Rodríguez",
+      "Claudio E Hernández-Morales"
+    ],
+    "venue": "Vinculatégica EFAN",
+    "publication_date": null,
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416712",
+    "relevance_score": 5.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "MAS-Bench: a benchmarking for parameter calibration of multi-agent crowd simulation",
+    "abstract": "Multi-agent simulation (MAS) has attracted significant attention for the prevention of pedestrian accidents and the spread of infectious diseases caused by overcrowding in recent years. In the MAS paradigm, each pedestrian is represented by a single agent. Control parameters for each agent need to be calibrated based on pedestrian traffic data to reproduce phenomena of interest accurately. Furthermore, observing all pedestrian traffic at large-scale events such as festivals and sports games is difficult. In such cases, parameter optimization is essential so that the appropriate parameters can be determined by solving an error minimization problem between the simulation results and incomplete observed pedestrian traffic data. We propose a benchmark problem, namely MAS-Bench, to discuss the performance of MAS parameter calibration methods uniformly. Numerical experiments demonstrate the baseline performance of four well-known optimization methods on six different error minimization problems that are defined on MAS-Bench. Moreover, we investigate the validity of the error function in the calibration by evaluating the correlation between the calibration and estimation scores. These scores are error functions relating to the available and unavailable observations, respectively.",
+    "year": 2024,
+    "citation_count": 1,
+    "url": "https://www.semanticscholar.org/paper/1a01094e8b1a5285377ff072bb205ee90c1ba879",
+    "doi": "10.1007/s42001-024-00302-6",
+    "authors": [
+      "S. Shigenaka",
+      "Shunki Takami",
+      "Yuki Tanigaki",
+      "Shuhei Watanabe",
+      "Masaki Onishi"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2024-07-18",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806462",
+    "relevance_score": 5.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Purchasing Power to the People: An Agent-Based Simulation of Pandemic Economic Recovery",
+    "abstract": null,
+    "year": 2021,
+    "citation_count": 1,
+    "url": "https://www.semanticscholar.org/paper/79d2cc3ed2127b11d6b27ace6c9fefcd433979d0",
+    "doi": "10.1007/978-3-030-83418-0_6",
+    "authors": [
+      "Youngsun Hwang",
+      "Joseph Immormino",
+      "Glenn-Iain Steinback"
+    ],
+    "venue": "Proceedings of the 2020 Conference of The Computational Social Science Society of the Americas",
+    "publication_date": null,
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806513",
+    "relevance_score": 5.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Bridging of different sites by bohemians and tourists: analysis by agent-based simulation",
+    "abstract": "Individuals often aggregate in areas of high density where they can form profitable social networks. Individuals of few resources cannot manage the high costs of density and are displaced into areas of low density. The lifestyle of bohemian and tourist may increase the profits of all parties and shrink inequalities among sites. Since these lifestyles are possible only for the rich, this phenomenon may further expand inequality. To test the effects of the lifestyle of bohemian and tourist on inequality, we run an agent-based simulation (ABS) in which some agents (individuals) select only their residence sites (singular) and others select two sites for their residence and visits (dual), paying additive costs. The ABS demonstrates that when we increase the number of duals, all agents gain higher profits, and inequalities among agents of different sites decrease. The ABS also demonstrates that any agent evolves to a dual when the costs of density and travel are small. Further research could consider the possibility of the dual lifestyle by conducting studies on groups of bohemians and tourists.",
+    "year": 2020,
+    "citation_count": 1,
+    "url": "https://www.semanticscholar.org/paper/0c6968e8e2b0fc4f4f570c1d793b26a45ed0360f",
+    "doi": "10.1007/s42001-020-00096-3",
+    "authors": [
+      "S. Horiuchi"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2020-12-02",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806532",
+    "relevance_score": 5.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Financial Revolution through Agent-based Artificial Simulation Computational Models for Predicting Market Behavior",
+    "abstract": "The fundamental theory of the Efficient market hypothesis (EMH), which states that market participants are rational, has received a lot of criticism. The complexity of behavior in the capital market is still a black box, especially when psychological biases influence aggressively on decision-making amid uncertainty. Experimental research on finance and capital markets in the form of AI using machine learning seeks to predict the results of more complex interactions. This multidisciplinary approach offers efforts to explain social phenomena from the micro level to macro descriptions which are built artificially through the computational world. The processing modeling approach is preferred because it includes the complexes that emerge from the behavior and interactions of individuals in the real world. Agent Based Model (ABM) is an AI approach in the form of computational simulation that performs a bottom-up approach by combining irrational–rational agent interactions through networks in microenvironments. Using the ABM approach through Netlogo computing, this study proves that AI can be used to analyze investor behavior in the capital market.\r\nKeywords: Agent Based Model, artificial intelligence, investor behavior",
+    "year": null,
+    "citation_count": 1,
+    "url": "https://doi.org/10.18502/kss.v9i21.16771",
+    "doi": "10.18502/kss.v9i21.16771",
+    "authors": [
+      "Satia Nur Maharani",
+      "Setya Ayu Rahmawati"
+    ],
+    "venue": "KnE Social Sciences",
+    "publication_date": null,
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.909014",
+    "relevance_score": 5.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Research Methodology and Biostatistics Series II - Quality of Medical Research",
+    "abstract": "Medical research has mushroomed, and concerns are expressed regarding the quality of such voluminous research output. Among several factors, the quality can be substantially improved by effective control ofuncertainties that severely afflict the reliability and validity of all empirical research.  Uncertainty is an endemic affliction of human activity, and medical research is particularly susceptible. Two primary types of medical uncertainties are aleatory and epistemic. The former is inherent due to biological, environmental, and other natural variations, and the latter arises mostly from knowledge gaps.  Biostatistical methods are equipped to handle sampling fluctuations that are a source of a major part of the aleatory uncertainties. Tools such as scoring systems, aetiology diagrams, and expert systems can help to reduce some types of epistemic uncertainties. Proper choice of research toolsremains crucial for controlling most epistemics.",
+    "year": 2024,
+    "citation_count": 0,
+    "url": "https://doi.org/10.62830/mmj1-2-32e",
+    "doi": "10.62830/mmj1-2-32e",
+    "authors": [
+      "Abhaya Indrayan"
+    ],
+    "venue": "Research Methodology and Biostatistics Series II - Quality of Medical Research",
+    "publication_date": "2024",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912469",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Television Viewing and Consumer Behavior: The Effect of Personality Traits and Demographic Variables on Children’s Consumer Socialization.",
+    "abstract": "&lt;h1&gt;&lt;span lang=\"EN-GB\"&gt;The central purpose of this study was to find out the relationship between television viewing habits of children and their consumer behavior, however this study also focuses on possible factors influencing television viewing. A total of 50 questionnaires were distributed to school going children between the ages of 10-12, personality measurements were taken through a semantic test.&lt;/span&gt;&lt;span lang=\"EN-GB\"&gt; The aspects of children’s consumer socialization included in this study are how much television children watch, what they watch and their purchasing behavior. The children’s gender and family income are considered as influences on their television viewing and consumer socialization. Results of the study indicated that family income and personality traits had a significant effect on the Childs consumer socialization; it also identified relationship between other demographic factors and consumer socialization. Shown by a p value in the chi-square table as p&amp;lt;0.1.&lt;/span&gt;&lt;span lang=\"EN-GB\"&gt;This research was originally conducted in Malaysia and it will be interesting to see its results in Pakistan, secondly with the growing influence of television viewing in our everyday lives and also the identification of children as a vital part of the consumer population this study carries importance both in the field of psychology and marketing. &lt;/span&gt;&lt;/h1&gt;&lt;h1&gt; &lt;/h1&gt;",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.5296/jsr.v4i2.3795",
+    "doi": "10.5296/jsr.v4i2.3795",
+    "authors": [
+      "Zeenat Ismail",
+      "Jehangir Kaleem"
+    ],
+    "venue": "Journal of Sociological Research",
+    "publication_date": null,
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029880",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Persona Recovery through Homage",
+    "abstract": "Tània Balló’s Las sinsombrero documentary series (2015-2021) about modern Spanish women led to the creation of multimedia projects and online spaces for paying homage to forgotten women throughout history. However, such crowdsourced and scholarly recuperation efforts are at odds with the prevailing canonization of the Spanish avant-garde artistic group known as the “Generation of 1927”. A deliberately constructed practice of homage has historically excluded women’s legacies and granted nearly exclusive support for the ten male poets considered the originators of the Generation of 1927. Modern women writers like María Teresa León and Concha Méndez lacked such cultural support and thus constructed personas in their life writing by placing themselves outside the sphere of influence of the Generation of 1927 despite their successful literary careers.\nThis creative piece brings together persona studies and homage to study how performances of prestige by writers and literary historians reveal the gendered, classed, and sexualised ways that the literary history of the Generation of 1927 has been constructed. My proposed theory of homage uncovers the closeted and undocumented sapphic and sororal relationships between women, and imagines queer feminist futures where women’s work is central to understanding the cultural milieux of the Generation of 1927. These poetic tributes are what I call “life-making homages” that celebrate and grant prestige to recuperated knowledge of writers’ qu",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.21153/psj2022vol8no1art1524",
+    "doi": "10.21153/psj2022vol8no1art1524",
+    "authors": [
+      "Angela Acosta"
+    ],
+    "venue": "Persona Studies",
+    "publication_date": null,
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416603",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "ANALISIS CUSTOMER PERSONA DAN KEBUTUHAN PENGGUNA UNTUK PAYMENT INTEGRATOR DI INDONESIA: SEBUAH PENDEKATAN DESIGN THINKING”",
+    "abstract": "Along with the exponential growth of Indonesia’s digital economy, the need for efficient and user-centered payment solutions has become increasingly crucial for business actors (merchants). This study aims to comprehensively map the landscape of merchant needs in Indonesia related to payment integrator services, a field that is often dominated by technology-driven approaches rather than user-centered ones. Using a qualitative approach adapted from the early stages of the Design Thinking methodology (Empathize and Define), this study conducted in-depth interviews with five business entities from diverse sectors, including Internet Service Providers (ISPs), property management, and banking.\r\nThe results identify three fundamentally different customer personas based on their primary decision drivers: (1) Cost-Driven Users, who prioritize the lowest transaction fees (MDR); (2) Quality &amp; Risk-Driven Users, who emphasize system reliability, security, and regulatory compliance; and (3) Liquidity-Driven Users, who are highly sensitive to fund disbursement speed (settlement). Further analysis reveals universal pain points such as high costs and slow settlement, as well as desired gains such as payment channel flexibility and trust in service providers.\r\nThese findings provide a strategic foundation for financial technology product developers to design sharper and more relevant value propositions that align with actual market needs, moving beyond standard feature offerings and crea",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.35794/jmbi.v13i1.66394",
+    "doi": "10.35794/jmbi.v13i1.66394",
+    "authors": [
+      "Jaka Arya Pradana",
+      "Ellya Zulaikha"
+    ],
+    "venue": "JMBI UNSRAT (Jurnal Ilmiah Manajemen Bisnis dan Inovasi Universitas Sam Ratulangi).",
+    "publication_date": null,
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364130",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "RANCANGAN USER PERSONA DAN CUSTOMER JOURNEY MAP  SEBAGAI REPRESENTASI KEBUTUHAN PENGGUNA  MEDIA SOSIAL X PADA FITUR PENCARIAN",
+    "abstract": "Teknologi internet telah menjadi bagian integral dari kehidupan sehari-hari dan memunculkan media sosial sebagai alat komunikasi dan interaksi yang kuat. Dalam konteks ini Twitter atau yang kini telah berubah menjadi X, adalah salah satu platform media sosial terkemuka yang terus berkembang. Namun dalam fitur pencariannya, pengguna masih mengalami tantangan yang menimbulkan terhambatnya dalam proses pencarian informasi. Penelitian ini bertujuan untuk mengetahui kebutuhan pengguna serta meningkatkan kualitas media sosial X terhadap fitur pencariannya melalui analisis User Experience Design, terutama dalam pengembangan User Persona dan Customer Journey Map. Metode penelitian yang dilakukan meliputi tahapan pengumpulan data melalui kuesioner, perancangan user persona dan customer journey map berdasarkan hasil kuesioner, serta prioritization dengan menerapkan listing problem dan matriks Eisenhower. Hasilnya adalah representasi pengguna dalam bentuk User Persona yang menggambarkan karakteristik dan kebutuhan pengguna, serta Customer Journey Map yang mengilustrasikan perjalanan pengguna dalam mencari informasi. Prioritas pengembangan fitur juga dihasilkan menggunakan prioritization listing problem dan matriks Eisenhower. Penelitian ini memberikan perspektif yang luas tentang meningkatkan pengalaman pengguna terhadap fitur pencarian media sosial X.",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.36040/jati.v8i3.9531",
+    "doi": "10.36040/jati.v8i3.9531",
+    "authors": [
+      "Inez Zahra",
+      "Apriade Voutama"
+    ],
+    "venue": "JATI (Jurnal Mahasiswa Teknik Informatika)",
+    "publication_date": null,
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364199",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Casting the customer: Persona and audience representation in local ads. case study: Beirut beer versus Almaza",
+    "abstract": "Advertising, as part of Integrated Marketing Communications, is a crucial practice that connects the brand to its customers. When brands aim to reach their target audience effectively and try to retain customer loyalty, their advertisements need to reflect and mirror valuable aspects of the viewers. In the Lebanese context, many companies merge elements that resonate with their target audience or a category of people to try to strengthen their customer retention such as identification characteristics that might seem unnoticed to viewers. Beirut Beer, which directly competes with famous and similar companies in the Lebanese beer market, uses identification elements in its advertisements to try and resonate with a specific category of people that it aims to target and retain. This study analyzes and studies identification elements and practices that are included in Beirut Beer ads, examines why they were chosen, and how they affect the viewers’ choice in light of the VALS Theory, Identification Theory, and Persuasion Techniques. Our findings show that the identification elements used by Beirut Beer are chosen by taking into consideration their direct competitor and specifically choosing the opposite target audience. Therefore, instead of riskily trying to compete with older and more important companies in the Lebanese beer market and putting itself at risk, Beirut Beer’s main strategy is to target its competitor’s opposite audience.",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.53894/ijirss.v8i7.10487",
+    "doi": "10.53894/ijirss.v8i7.10487",
+    "authors": [
+      "Josiane El Khoury"
+    ],
+    "venue": "International Journal of Innovative Research and Scientific Studies",
+    "publication_date": null,
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364227",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "An agent-based model of the spread of behavioural risk-factors for cardiovascular disease in city-scale populations",
+    "abstract": "Cardiovascular disease (CVD) is the leading cause of mortality globally, and is the second main cause of mortality in the UK. Four key modifiable behaviours are known to increase CVD risk, namely: tobacco use, unhealthy diet, physical inactivity and harmful use of alcohol. Behaviours that increase the risk of CVD can spread through social networks because individuals consciously and unconsciously mimic the behaviour of others they relate to and admire. Exploiting these social influences may lead to effective and efficient public health interventions to prevent CVD. This project aimed to construct and validate an agent-based model (ABM) of how the four major behavioural risk-factors for CVD spread through social networks in a population, and examine whether the model could be used to identify targets for public health intervention and to test intervention strategies. Previous ABMs have typically focused on a single risk factor or considered very small populations. We created a city-scale ABM to model the behavioural risk-factors of individuals, their social networks (spousal, household, friendship and workplace), the spread of behaviours through these social networks, and the subsequent impact on the development of CVD. We compared the model output (predicted CVD events over a ten year period) to observed data, demonstrating that the model output is realistic. The model output is stable up to at least a population size of 1.2M agents (the maximum tested). We found that there i",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.1371/journal.pone.0303051",
+    "doi": "10.1371/journal.pone.0303051",
+    "authors": [
+      "James Archbold",
+      "Sophie Clohessy",
+      "Deshani Herath",
+      "Nathan Griffiths",
+      "Oyinlola Oyebode"
+    ],
+    "venue": "PLOS ONE",
+    "publication_date": null,
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129816",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Ethnic segregation and spatial patterns of attitudes: studying the link using register data and social simulation",
+    "abstract": "We theorize the causal link between ethnic residential segregation and polarization of ethnic attitudes within and between ethnic groups (e.g. attitudes towards immigration policies, multiculturalism, tolerance or trust in certain ethnic groups). We propose that the complex relationship between segregation and polarization might be explained by three assumptions: (1) ethnic membership moderates social influence–residents influence each other’s attitudes and their ethnic background moderates this influence; (2) spatial proximity between residents increases opportunities for influence; (3) the degree of ethnic segregation varies across space–and therefore, the mix of intra- and inter-ethnic influence also varies across space. We borrow and extend an (agent-based) simulation model of social influence to systematically explore how these three assumptions affect the polarization of ethnic attitudes within and between ethnic groups under the assumptions made in the model. We simulate neighborly interactions and social influence dynamics in the districts of Rotterdam, using empirically observed segregation patterns as input of our simulations. According to our model, polarization in ethnic attitudes is stronger in districts and parts of districts where mixing of ethnic groups allows for many opportunities to interact with both the ethnic ingroup and the outgroup. Our study provides a new theoretical perspective on polarization of ethnic attitudes by demonstrating that the segregation-polarization link can emerge as an unintended outcome from repeated intra- and inter-ethnic interactions in segregated spaces.",
+    "year": 2023,
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/e51b4837a1a9da589b5316f9f7475eaddd4931a0",
+    "doi": "10.1007/s42001-023-00216-9",
+    "authors": [
+      "Thomas Feliciani",
+      "J. Tolsma",
+      "A. Flache"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2023-06-30",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806488",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Leveraging Computational Model Approach in Understanding Infectious Disease: A Case Study in Sabah, Malaysia",
+    "abstract": "The COVID-19 pandemic due to the SARS-CoV-2 coronavirus has vastly impacted our national health and economic industries. Hence, the utilisation of big data simulation of the outbreak is essential to guide policymakers, government, and health authorities in better understanding the dynamics of the infectious disease. This paper integrates the Agent-Based-Model (ABM) and Susceptible, Exposed, Infectious and Recovered (SEIR) framework to understand the dynamic transmission of COVID-19 in Sabah, Malaysia. This study employed NetLogo software, which includes parameters such as geographical distribution, population density, variant type, lockdown measures, and vaccination rates across 27 districts, to run the simulation and assess the potential impact of public health interventions. The methodology involves different scenario simulations using varying variant types, vaccination coverage, lockdown, and social distancing measures to determine the virus transmission level. The results indicate that higher vaccination coverage and strict adherence to preventive measures can reduce the spread of the virus, especially in highly densely populated areas. Our simulation resulted in a 2.54% variance with the true data following the parameters and settings mentioned above. Additionally, this study also found that geographical structure and uneven distribution of healthcare across the Sabah district notably affect disease and disaster management and intervention policy and efficacy. These insights are crucial for Malaysian policymakers and health authorities, which need to tailor the public health responses considering geographical and demographic settings. Future recommendations include data of higher geographical resolution, immunisation records, and real-time mobility data to portray a more realistic simulation.",
+    "year": 2025,
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/89222b005a2dc0c2d93b98da3be10437a114cad4",
+    "doi": "10.47836/pjst.33.2.06",
+    "authors": [
+      "Siti Sarah Mohd Isnan",
+      "A. Abdullah",
+      "Abdul Rashid Mohamed Shariff",
+      "Iskandar Ishak",
+      "Sharifah Norkhadijah Syed Ismail"
+    ],
+    "venue": "Pertanika journal of science & technology",
+    "publication_date": "2025-02-21",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806505",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Large-scale agent-based simulation and crowd sensing with mobile agents",
+    "abstract": null,
+    "year": 2021,
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/b41c63831f9257834b3d9845fa093df25ce89d3e",
+    "doi": "10.4324/9781003025245-16",
+    "authors": [
+      "Stefan Bosse"
+    ],
+    "venue": "Handbook of Computational Social Science, Volume 2",
+    "publication_date": "2021-11-10",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806523",
+    "relevance_score": 5.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "An agent-based computational framework for simulation of global pandemic and social response on planet X",
+    "abstract": "",
+    "year": 2020,
+    "citation_count": 27,
+    "url": "https://doi.org/10.1007/s00466-020-01886-2",
+    "doi": "10.1007/s00466-020-01886-2",
+    "authors": [
+      "T. I. Zohdi"
+    ],
+    "venue": "Computational Mechanics",
+    "publication_date": "2020",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.909068",
+    "relevance_score": 4.54,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "THE ROLE OF PERSONALITY TRAITS IN ONLINE CONSUMER COMPLAINT BEHAVIOR AND SERVICE RECOVERY EXPECTATION",
+    "abstract": "To date, the literature on service failure and recovery has tended to be focused on bricks-and-mortar stores. In this study the relationships among service failures, consumer complaint behaviors, and service recovery expectations in an online setting were investigated. Data were collected\n from 252 respondents in a questionnaire survey. Results of multiple regression analysis show that personality traits in terms of Type A and locus of control may moderate the relationships among e-service failures, consumer complaint behaviors, and service recovery expectations. When e-service\n failures occur, Type A and internally oriented consumers engage in aggressive complaint behaviors and expect high service recovery efforts. Conversely, Type B and externally oriented consumers tend to tolerate e-service failures and refrain from complaining. Finally, theoretical and managerial\n implications are discussed.",
+    "year": 2008,
+    "citation_count": 26,
+    "url": "https://doi.org/10.2224/sbp.2008.36.9.1223",
+    "doi": "10.2224/sbp.2008.36.9.1223",
+    "authors": [
+      "Jen-Hung Huang",
+      "Chiao-Chen Chang"
+    ],
+    "venue": "Social Behavior and Personality: an international journal",
+    "publication_date": "2008",
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029919",
+    "relevance_score": 4.52,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Consistency Between Consumer Personality and Brand Personality Influences Brand Attachment",
+    "abstract": "We investigated the impact of consistency between consumer personality and brand personality on emotional brand attachment. Participants were 200 undergraduate students at Tsinghua University and we used leading brands in the product category of mobile phone as the survey's stimuli.\n The results of a structural equation model suggested that consistency in the personality dimensions of sincere, cool, and young had a significant positive impact on the participants' brand attachment compared with consistency in the dimensions of simple, sensitive,\n reliable, and competent. The results provide strong support for the hypothesis that people feel emotionally attached to brands that match their personality or reflect who they believe they are. We also discuss important theoretical and practical implications of these findings.",
+    "year": 2015,
+    "citation_count": 20,
+    "url": "https://doi.org/10.2224/sbp.2015.43.9.1419",
+    "doi": "10.2224/sbp.2015.43.9.1419",
+    "authors": [
+      "Qing Yao",
+      "Rong Chen",
+      "Xiaobing Xu"
+    ],
+    "venue": "Social Behavior and Personality: an international journal",
+    "publication_date": "2015",
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029908",
+    "relevance_score": 4.4,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "An Agent-Based Model of Electricity Consumer: Smart Metering Policy Implications in Europe",
+    "abstract": "",
+    "year": null,
+    "citation_count": 9,
+    "url": "https://doi.org/10.18564/jasss.3150",
+    "doi": "10.18564/jasss.3150",
+    "authors": [
+      "Julija Vasiljevska",
+      "Jochem Douw",
+      "Anna Mengolini",
+      "Igor Nikolic"
+    ],
+    "venue": "Journal of Artificial Societies and Social Simulation",
+    "publication_date": null,
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129800",
+    "relevance_score": 4.18,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "A computational simulation-based framework for estimating potential product impact during product design",
+    "abstract": "Abstract The impact of engineered products is a topic of concern in society. Product impact may fall under the categories of economic, environmental or social impact, with the last category defined as the effect of a product on the day-to-day life of people. Design teams lack sufficient tools to estimate the social impact of products, and the combined impacts of economic, environmental and social impacts for the products they are designing. This paper aims to provide a framework for the estimation of product impact during product design. To estimate product impact, models of both the product and society are required. This framework integrates models of the product, scenario, society and impact into an agent-based model to estimate product impact. Although this paper demonstrates the framework using only social impact, the framework can also be applied to economic or environmental impacts individually or all three concurrently. Agent-based modelling has been used previously for product adoption models, but it has not been extended to estimate product impact. Having tools for impact estimation allows for optimising the product design parameters to increase the potential positive impact and reduce potential negative impact.",
+    "year": 2021,
+    "citation_count": 7,
+    "url": "https://www.semanticscholar.org/paper/754b6ac8d92497fe1e6b7dffa792f87ed3be2433",
+    "doi": "10.1017/dsj.2021.16",
+    "authors": [
+      "Christopher S. Mabey",
+      "Andrew Armstrong",
+      "C. Mattson",
+      "J. Salmon",
+      "N. Hatch"
+    ],
+    "venue": "Design Science",
+    "publication_date": "2021-09-13",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806509",
+    "relevance_score": 4.14,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "From Micro Behaviors to Macro Dynamics: An Agent-Based Economic Model with Consumer Credit",
+    "abstract": "",
+    "year": null,
+    "citation_count": 5,
+    "url": "https://doi.org/10.18564/jasss.3260",
+    "doi": "10.18564/jasss.3260",
+    "authors": [
+      "Paola D'Orazio",
+      "Gianfranco Giulioni"
+    ],
+    "venue": "Journal of Artificial Societies and Social Simulation",
+    "publication_date": null,
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129765",
+    "relevance_score": 4.1,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Conceptualising and Simulating Insurance Consumer Behaviour: an Agent-Based-Model Approach",
+    "abstract": "",
+    "year": null,
+    "citation_count": 3,
+    "url": "https://doi.org/10.7763/ijmo.2011.v1.44",
+    "doi": "10.7763/ijmo.2011.v1.44",
+    "authors": [
+      "Aurelija Ulbinaitė",
+      "Marija Kučinskienė",
+      "Yannick Le Moullec"
+    ],
+    "venue": "International Journal of Modeling and Optimization",
+    "publication_date": null,
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129740",
+    "relevance_score": 4.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Causation in Agent-Based Computational Social Science",
+    "abstract": null,
+    "year": 2020,
+    "citation_count": 3,
+    "url": "https://www.semanticscholar.org/paper/48a9d0395e9a7460dd22807df0c1d37a13ede3d9",
+    "doi": "10.1007/978-3-030-34127-5_5",
+    "authors": [
+      "D. Anzola"
+    ],
+    "venue": "Conference of the European Social Simulation Association",
+    "publication_date": "2020-05-21",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806447",
+    "relevance_score": 4.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "The Third Way of Agent-Based Social Simulation and a Computational Account of Emergence",
+    "abstract": "",
+    "year": null,
+    "citation_count": 2,
+    "url": "https://doi.org/10.18564/jasss.1604",
+    "doi": "10.18564/jasss.1604",
+    "authors": [
+      "Roy Wilson"
+    ],
+    "venue": "Journal of Artificial Societies and Social Simulation",
+    "publication_date": null,
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.908958",
+    "relevance_score": 4.04,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Correction to: An agent-based computational framework for simulation of global pandemic and social response on planet X",
+    "abstract": "",
+    "year": 2020,
+    "citation_count": 2,
+    "url": "https://doi.org/10.1007/s00466-020-01920-3",
+    "doi": "10.1007/s00466-020-01920-3",
+    "authors": [
+      "T. I. Zohdi"
+    ],
+    "venue": "Computational Mechanics",
+    "publication_date": "2020",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.909083",
+    "relevance_score": 4.04,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Self-Congruency Effects of Brand Personality and Country Personality on Consumer Behavior in Germany",
+    "abstract": "",
+    "year": null,
+    "citation_count": 1,
+    "url": "https://doi.org/10.2139/ssrn.2972118",
+    "doi": "10.2139/ssrn.2972118",
+    "authors": [
+      "Reimo Jahn"
+    ],
+    "venue": "SSRN Electronic Journal",
+    "publication_date": null,
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029795",
+    "relevance_score": 4.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Guiding AI-Assisted persona generation with Hofstede's cultural dimensions: a mixed-methods evaluation",
+    "abstract": "",
+    "year": null,
+    "citation_count": 1,
+    "url": "https://doi.org/10.1080/0144929x.2025.2581258",
+    "doi": "10.1080/0144929x.2025.2581258",
+    "authors": [
+      "Giulia Rosemary Avis",
+      "Sara Nocco",
+      "An Qi Zhao",
+      "Marco Cremaschi"
+    ],
+    "venue": "Behaviour &amp; Information Technology",
+    "publication_date": null,
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416656",
+    "relevance_score": 4.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "A multi-agent based simulation model of consumer behaviour in the health and wellness food market",
+    "abstract": "",
+    "year": 2023,
+    "citation_count": 1,
+    "url": "https://doi.org/10.1016/j.procs.2023.10.085",
+    "doi": "10.1016/j.procs.2023.10.085",
+    "authors": [
+      "Agata Wawrzyniak"
+    ],
+    "venue": "Procedia Computer Science",
+    "publication_date": "2023",
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129773",
+    "relevance_score": 4.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Personality Prediction Ocean Model Using Machine Learning",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.55248/gengpi.4.1023.102623",
+    "doi": "10.55248/gengpi.4.1023.102623",
+    "authors": [
+      "Dr. C. Sunitha",
+      "Abirami N"
+    ],
+    "venue": "International Journal of Research Publication and Reviews",
+    "publication_date": null,
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029821",
+    "relevance_score": 4.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "THE EFFECT OF PERSONALITY AND CONSUMER BEHAVIOR ON HEALTHY BEHAVIOR.",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.21474/ijar01/6497",
+    "doi": "10.21474/ijar01/6497",
+    "authors": [
+      "Deni Kurniawan"
+    ],
+    "venue": "International Journal of Advanced Research",
+    "publication_date": null,
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029830",
+    "relevance_score": 4.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "THE INFLUENCE OF PERSONALITY ON THE FORMATION OF CONSUMER BEHAVIOR",
+    "abstract": "",
+    "year": 2020,
+    "citation_count": 0,
+    "url": "https://doi.org/10.32843/2663-5208.2020.18.1.1",
+    "doi": "10.32843/2663-5208.2020.18.1.1",
+    "authors": [
+      "O.I. Shcherba"
+    ],
+    "venue": "Habitus",
+    "publication_date": "2020",
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029843",
+    "relevance_score": 4.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "A Study on OCEAN Model for Personality Prediction",
+    "abstract": "",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.55248/gengpi.6.0525.1797",
+    "doi": "10.55248/gengpi.6.0525.1797",
+    "authors": [
+      "Mr. Hemant Kumar Bhardwaj",
+      "Khushi Chaudhary",
+      "Nitish Kumar",
+      "Prabhat Chaudhary",
+      "Prince Kumar"
+    ],
+    "venue": "International Journal of Research Publication and Reviews",
+    "publication_date": null,
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029854",
+    "relevance_score": 4.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Ensuring Compliance and Accuracy in Deceased Customer Asset Distribution with BPM Case Management",
+    "abstract": "",
+    "year": 2023,
+    "citation_count": 0,
+    "url": "https://doi.org/10.21275/sr24716112140",
+    "doi": "10.21275/sr24716112140",
+    "authors": [
+      "Sai Kiran Nandipati"
+    ],
+    "venue": "International Journal of Science and Research (IJSR)",
+    "publication_date": "2023",
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364169",
+    "relevance_score": 4.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Is Generative Artificial Intelligence Ready for Computational Social Science?",
+    "abstract": null,
+    "year": 2025,
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/297cafacc0817b810f0cb1ad8e853d21f01902cc",
+    "doi": "10.1007/978-3-032-07638-0_19",
+    "authors": [
+      "Maxime Morge"
+    ],
+    "venue": "Practical Applications of Agents and Multi-Agent Systems",
+    "publication_date": null,
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806431",
+    "relevance_score": 4.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Advances in Computational Social Science: The Fourth World Congress (Agent-Based Social Systems) by Terano Takao Chen Shu-Heng and Tai Chung-Ching Yamamoto Ryuichi",
+    "abstract": null,
+    "year": 2018,
+    "citation_count": 0,
+    "url": "https://www.semanticscholar.org/paper/9dc725bf6d0f863cd338b81f9b782b9d82202033",
+    "doi": null,
+    "authors": [
+      "Martina Dünser"
+    ],
+    "venue": "Journal of Artificial Societies and Social Simulation",
+    "publication_date": null,
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806452",
+    "relevance_score": 4.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "External Validity and Model Validity: A Conceptual Approach for Systematic Review Methodology",
+    "abstract": "Background. Evidence rankings do not consider equally internal (IV), external (EV), and model validity (MV) for clinical studies including complementary and alternative medicine/integrative health care  (CAM/IHC) research. This paper describe this model and offers an EV assessment tool (EVAT©) for weighing studies according to EV and MV in addition to IV. Methods. An abbreviated systematic review methodology was employed to search, assemble, and evaluate the literature that has been published on EV/MV criteria. Standard databases were searched for keywords relating to EV, MV, and bias‐scoring from inception to Jan 2013. Tools identified and concepts described were pooled to assemble a robust tool for evaluating these quality criteria. Results. This study assembled a streamlined, objective tool to incorporate for the evaluation of quality of EV/MV research that is more sensitive to CAM/IHC research. Conclusion. Improved reporting on EV can help produce and provide information that will help guide policy makers, public health researchers, and other scientists in their selection, development, and improvement in their research‐tested intervention. Overall, clinical  studies with high EV have the potential to provide the most useful information about “real‐world” consequences of health interventions. It is hoped that this novel tool which considers IV, EV, and MV on equal footing will better guide clinical decision making.",
+    "year": 2014,
+    "citation_count": 76,
+    "url": "https://doi.org/10.1155/2014/694804",
+    "doi": "10.1155/2014/694804",
+    "authors": [
+      "Raheleh Khorsan",
+      "Cindy Crawford"
+    ],
+    "venue": "Evidence-Based Complementary and Alternative Medicine",
+    "publication_date": "2014",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912491",
+    "relevance_score": 3.52,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Book Review: The 3M Model of Motivation and Personality: Theory and Empirical Applications to Consumer Behavior",
+    "abstract": "",
+    "year": 2001,
+    "citation_count": 6,
+    "url": "https://doi.org/10.1509/jmkr.38.3.395.18870a",
+    "doi": "10.1509/jmkr.38.3.395.18870a",
+    "authors": [
+      "Harish Sujan"
+    ],
+    "venue": "Journal of Marketing Research",
+    "publication_date": "2001",
+    "query": "OCEAN personality model consumer behavior",
+    "scraped_at": "2026-04-05T17:20:02.029861",
+    "relevance_score": 3.12,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Validación del inventario de conductas parentales: Un análisis factorial confirmatorio",
+    "abstract": "The Parental Behavior Inventory (PBI) it is a recent self-report instrument designed to capture two independent global dimensions of the parental behavior mothers/fathers of preschool and younger students: Two studies were made to obtain evidences of the construct validity and internal dependability. Our first study had the goal of verifying the two constructos (construct validity); the results obtained using an confirmatory factorial analysis point out that both constructs can be identified in the sample of Peruvian evaluated mothers (n=115). The reliability to both subscales also is satisfactory. The second study it was made in 58 mothers, and we looked for extend the construct validity by means of the correlacional study of the PBI with emotional, couple’s relationship and demographic variables; the results suppo",
+    "year": null,
+    "citation_count": 3,
+    "url": "https://doi.org/10.26439/persona2004.n007.892",
+    "doi": "10.26439/persona2004.n007.892",
+    "authors": [
+      "César Merino-Soto",
+      "Maritza Díaz-Casapía",
+      "Virginia DeRoma"
+    ],
+    "venue": "Persona",
+    "publication_date": null,
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364159",
+    "relevance_score": 3.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "semantic_scholar",
+    "title": "Dynamic simulation of social media challenge participation to examine intervention strategies",
+    "abstract": null,
+    "year": 2022,
+    "citation_count": 3,
+    "url": "https://www.semanticscholar.org/paper/b5a6c160faf90e3d4f489f239682d60286fdfa5e",
+    "doi": "10.1007/s42001-022-00183-7",
+    "authors": [
+      "A. Khasawneh",
+      "Kapil Chalil Madathil",
+      "K. Taaffe",
+      "H. Zinzow",
+      "Amal Ponathil"
+    ],
+    "venue": "Journal of Computational Social Science",
+    "publication_date": "2022-09-16",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:30.806518",
+    "relevance_score": 3.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Interplay of ethical trust and social moral norms: Environment modelling and computational mechanisms in agent-based social simulation (ABSS)",
+    "abstract": "",
+    "year": 2011,
+    "citation_count": 2,
+    "url": "https://doi.org/10.3233/wia-2011-0225",
+    "doi": "10.3233/wia-2011-0225",
+    "authors": [
+      "H.C. Lim",
+      "Rob Stocker",
+      "Michael Barlow",
+      "Henry Larkin"
+    ],
+    "venue": "Web Intelligence and Agent Systems: An International Journal",
+    "publication_date": "2011",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.909052",
+    "relevance_score": 3.04,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Actualidad de la posición de Wilhelm Wundt respecto al problema mente-cuerpo",
+    "abstract": "The body-mind problem has been a central and permanent problem not only in the history of psychology but in all the sciences that deal with so-called mental processes. With progress in the neurosciences in the past decades, there is a contemporary trend towards the solution of the problem through brain research. The aim of this study is demonstrate that: (a) the current trend shows a form of naïve materialism, similar to 19th century, “naïve materialism”; and (b) Wilhelm Wundt’s antimaterialist position offers an alternative to naïve materialism which shows to be more plausible.",
+    "year": null,
+    "citation_count": 1,
+    "url": "https://doi.org/10.26439/persona2007.n010.914",
+    "doi": "10.26439/persona2007.n010.914",
+    "authors": [
+      "Saulo de Freitas-Araujo"
+    ],
+    "venue": "Persona",
+    "publication_date": null,
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912503",
+    "relevance_score": 3.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Generation and evaluation of synthetic digital medical images using artificial intelligence",
+    "abstract": "In recent years, there has been a growing interest in the development of intelligent decision-making software in the medical field. The high accuracy of disease diagnosis, classification, and recommendation processes is closely related to the creation of large-scale data sets. In this paper, different from the methods used for rapid calculation of the FID value, it was proposed to introduce the FMD value, whose accuracy is higher than the FID value, in the evaluation of medical images.",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.55439/eit/vol10_iss3/a34",
+    "doi": "10.55439/eit/vol10_iss3/a34",
+    "authors": [
+      "Bakhodir Muminov",
+      "Nigorakhon Nasimova",
+      "Rashid Nasimov"
+    ],
+    "venue": "Economics and Innovative Technologies",
+    "publication_date": null,
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416674",
+    "relevance_score": 3.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Synthetic Data Generation for Privacy Preservation in Financial Technologies",
+    "abstract": "This research examines the utilization of Generative Adversarial Networks (GANs) to produce synthetic financial data that ensures privacy while adhering to stringent regulatory frameworks, such as the General Data Protection Regulation (GDPR) (European Union, 2016) [4] and the California Consumer Privacy Act (CCPA). Financial institutions handle extensive sensitive data, necessitating stringent privacy safeguards. Conventional anonymization techniques frequently reduce data utility, thereby limiting their effectiveness for machine learning, research, and analysis. Conversely, GANs offer an innovative alternative by generating realistic synthetic datasets that maintain the statistical properties of original data without containing personally identifiable information. This paper introduces a GAN-based framework designed specifically for financial data, enhanced with differential privacy (Dwork et al., 2006) [3] to provide robust privacy assurances. Through evaluation on real-world financial datasets, the framework demonstrates its capability to generate high-quality synthetic data applicable in areas such as fraud detection and customer segmentation. Findings suggest that this approach effectively maintains a balance between privacy and utility, presenting a scalable solution for financial institutions to leverage data while ensuring compliance with legal mandates. This study advances privacy-preserving data generation and delivers actionable insights for the financial sector.",
+    "year": 2020,
+    "citation_count": 0,
+    "url": "https://doi.org/10.54660/.ijmrge.2020.1.1.139-142",
+    "doi": "10.54660/.ijmrge.2020.1.1.139-142",
+    "authors": [
+      "Adarsh Naidu"
+    ],
+    "venue": "International Journal of Multidisciplinary Research and Growth Evaluation",
+    "publication_date": "2020",
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416684",
+    "relevance_score": 3.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "The Real-Time Data Accuracy as a Driver of Customer Satisfaction in Telecom Services",
+    "abstract": "The telecom sector now prioritizes real-time data accuracy because of increased consumer demand for top-notch customer experiences. The study investigates the connection between real-time data accuracy and customer satisfaction in telecom services. Accurate real-time information becomes essential for shaping customer experiences throughout service delivery and support functions as businesses increasingly depend on data-driven decision-making. This research demonstrates the connection between data inconsistencies and problems that include billing errors along with service interruptions which result in customer dissatisfaction. The study employed a mixed-method approach with qualitative interviews and quantitative surveys among telecom customers and service providers to examine the relationship between data accuracy and customer satisfaction. Real-time data accuracy builds customer trust while reducing resolution time for service problems and increasing customer loyalty. The research emphasizes that inaccurate data erodes customer trust leading to service churn which negatively impacts telecom companies' reputation. The research explores how technology such as AI and machine learning helps maintain real-time data accuracy while automation presents opportunities to reduce human errors. The study proposes several strategies for telecom companies to utilize precise real-time data to boost service quality while enhancing operational efficiency and achieving greater customer satisfa",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.55640/ijdsml-05-02-08",
+    "doi": "10.55640/ijdsml-05-02-08",
+    "authors": [
+      "Rajasekhar Vetukuri"
+    ],
+    "venue": "International journal of data science and machine learning",
+    "publication_date": null,
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364180",
+    "relevance_score": 3.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Presentación",
+    "abstract": " \r\n ",
+    "year": null,
+    "citation_count": 0,
+    "url": "https://doi.org/10.15581/011.32342",
+    "doi": "10.15581/011.32342",
+    "authors": [
+      "Revista Persona y Derecho"
+    ],
+    "venue": "Persona y Derecho",
+    "publication_date": null,
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364207",
+    "relevance_score": 3.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "A Multi-Agent Based Simulation Model of Consumer Behaviour - Food Choice and Cooking Attitudes During the Coronavirous (Covid-19) Outbreak",
+    "abstract": "",
+    "year": 2021,
+    "citation_count": 0,
+    "url": "https://doi.org/10.35808/ersj/2333",
+    "doi": "10.35808/ersj/2333",
+    "authors": [
+      "Agata Wawrzyniak"
+    ],
+    "venue": "EUROPEAN RESEARCH STUDIES JOURNAL",
+    "publication_date": "2021",
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129805",
+    "relevance_score": 3.0,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "The impact of respondent attentiveness on reliability and validity",
+    "abstract": "",
+    "year": 2019,
+    "citation_count": 27,
+    "url": "https://doi.org/10.1080/13645579.2018.1507378",
+    "doi": "10.1080/13645579.2018.1507378",
+    "authors": [
+      "Henning Silber",
+      "Daniel Danner",
+      "Beatrice Rammstedt"
+    ],
+    "venue": "International Journal of Social Research Methodology",
+    "publication_date": "2019",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912552",
+    "relevance_score": 2.54,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Middle alternatives and measurement validity: a recommendation for survey researchers",
+    "abstract": "",
+    "year": 2020,
+    "citation_count": 25,
+    "url": "https://doi.org/10.1080/13645579.2019.1645384",
+    "doi": "10.1080/13645579.2019.1645384",
+    "authors": [
+      "Rui Wang",
+      "Jon A. Krosnick"
+    ],
+    "venue": "International Journal of Social Research Methodology",
+    "publication_date": "2020",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912562",
+    "relevance_score": 2.5,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Notions of Validity in Qualitative Research Methodology",
+    "abstract": " This essay has two objectives. The first is to argue, from both philosophical and empirical perspectives, that all approaches to inquiry are inherently qualitative in nature. The second is to demonstrate that the evolution of inquiry systems has progressed through five distinct stages, each of which can be distinguished by a particular set of assumptions and procedures that inform the inquiry process. Each evolutionary stage also possesses its own characteristic guarantor of validity, that is, a key rule or set of rules meant to insure that the given approach to inquiry indeed measures that which it purports to measure. Implications for knowledge creation and utilization are discussed in some detail. ",
+    "year": 1983,
+    "citation_count": 24,
+    "url": "https://doi.org/10.1177/107554708300500201",
+    "doi": "10.1177/107554708300500201",
+    "authors": [
+      "John W. Ratcliffe"
+    ],
+    "venue": "Knowledge",
+    "publication_date": "1983",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912532",
+    "relevance_score": 2.48,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "ProWGen: a synthetic workload generation tool for simulation evaluation of web proxy caches",
+    "abstract": "",
+    "year": 2002,
+    "citation_count": 74,
+    "url": "https://doi.org/10.1016/s1389-1286(01)00285-7",
+    "doi": "10.1016/s1389-1286(01)00285-7",
+    "authors": [
+      "Mudashiru Busari",
+      "Carey Williamson"
+    ],
+    "venue": "Computer Networks",
+    "publication_date": "2002",
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416701",
+    "relevance_score": 2.48,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Sociology and Social Theory in Agent Based Social Simulation: A Symposium",
+    "abstract": "",
+    "year": 2001,
+    "citation_count": 66,
+    "url": "https://doi.org/10.1023/a:1012919018402",
+    "doi": "10.1023/a:1012919018402",
+    "authors": [
+      "Rosaria Conte",
+      "Bruce Edmonds",
+      "Scott Moss",
+      "R. Keith Sawyer"
+    ],
+    "venue": "Computational &amp; Mathematical Organization Theory",
+    "publication_date": "2001",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.909034",
+    "relevance_score": 2.32,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Validity",
+    "abstract": "",
+    "year": 2018,
+    "citation_count": 8,
+    "url": "https://doi.org/10.1027/1614-2241/a000159",
+    "doi": "10.1027/1614-2241/a000159",
+    "authors": [
+      "Natalja Menold",
+      "Matthias Bluemke",
+      "Anita M. Hubley"
+    ],
+    "venue": "Methodology",
+    "publication_date": "2018",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912542",
+    "relevance_score": 2.16,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Realistic synthetic dataset generation for cyber-physical systems: a performance evaluation",
+    "abstract": "",
+    "year": null,
+    "citation_count": 4,
+    "url": "https://doi.org/10.1007/s42452-025-07292-8",
+    "doi": "10.1007/s42452-025-07292-8",
+    "authors": [
+      "Yaa Acquaah",
+      "Kaushik Roy"
+    ],
+    "venue": "Discover Applied Sciences",
+    "publication_date": null,
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416663",
+    "relevance_score": 2.08,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Synthetic Video Generation for Evaluation of Sprite Generation",
+    "abstract": "Sprite generation is the process of aligning, warping, and blending of pixels that belong to an object in a video. The evaluation of the correctness of a sprite is usually accomplished by a combination of objective and subjective evaluations. Availability of ground-truth image would help mere objective evaluation. In this paper, the authors present video generation from an image based on various camera motion parameters to be used as ground-truth for the sprite evaluation. This paper introduces a framework for evaluation of sprite generation algorithms. Experiments under the proposed framework were performed on the synthetic videos of different camera motion patterns to reveal the components of the sprite generation algorithm to be improved.",
+    "year": 2010,
+    "citation_count": 3,
+    "url": "https://doi.org/10.4018/jmdem.2010040103",
+    "doi": "10.4018/jmdem.2010040103",
+    "authors": [
+      "Yi Chen",
+      "Ramazan S. Aygün"
+    ],
+    "venue": "International Journal of Multimedia Data Engineering and Management",
+    "publication_date": "2010",
+    "query": "synthetic persona generation evaluation",
+    "scraped_at": "2026-04-05T17:20:10.416647",
+    "relevance_score": 2.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Illegal downloading of pop music among university students in Taiwan: An agent‐based model simulation",
+    "abstract": "AbstractThe lifestyle and consumption patterns of the current mobile generation (m‐generation), born after the Internet gained popularity, have changed dramatically. This study investigated university students' consumption attitude toward pop music and their behavior of illegally downloading such music by considering different law enforcement environments. In the first stage of our study, we designed and administered a questionnaire survey and collected 424 responses. The valid sample size was 394. On the basis of the sample, we developed a behavioral model that could be customized according to individual observation. In the second stage, we developed an agent‐based model for performing a simulation.This study divided law enforcement environments into combinations of the probability of being arrested engaging in illegal downloading behavior and the financial penalty after being caught. The results revealed that in an environment where the strength of law enforcement is increased, the agents' willingness to illegally download music in the model decreases. This empirical study highlighted that the deterrent effects in both the real world and simulated model were more sensitive to the probability of being caught primarily because of illegal downloading behavior.Therefore, the study suggests that for the m‐generation of the post‐Internet age, the most feasible approach to achieving instant results is through effective and certain law enforcement, which can effectively reduce the ",
+    "year": 2017,
+    "citation_count": 3,
+    "url": "https://doi.org/10.1002/cb.1630",
+    "doi": "10.1002/cb.1630",
+    "authors": [
+      "Chi‐Ling Pai",
+      "Bin‐Tzong Chie"
+    ],
+    "venue": "Journal of Consumer Behaviour",
+    "publication_date": "2017",
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129793",
+    "relevance_score": 2.06,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Consumer Behavior Using an Agent Based Model: Analyzing 4 Theories",
+    "abstract": "",
+    "year": null,
+    "citation_count": 1,
+    "url": "https://doi.org/10.2139/ssrn.3495241",
+    "doi": "10.2139/ssrn.3495241",
+    "authors": [
+      "Jose Gomez"
+    ],
+    "venue": "SSRN Electronic Journal",
+    "publication_date": null,
+    "query": "agent based model consumer simulation",
+    "scraped_at": "2026-04-05T17:20:28.129828",
+    "relevance_score": 2.02,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Research Methodology and the Question of Validity",
+    "abstract": "",
+    "year": 1986,
+    "citation_count": 31,
+    "url": "https://doi.org/10.2307/3586519",
+    "doi": "10.2307/3586519",
+    "authors": [
+      "Nessa Wolfson"
+    ],
+    "venue": "TESOL Quarterly",
+    "publication_date": "1986",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912521",
+    "relevance_score": 1.62,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Insider research, validity issues, and the OHS professional: one person’s journey",
+    "abstract": "",
+    "year": 2016,
+    "citation_count": 28,
+    "url": "https://doi.org/10.1080/13645579.2015.1019263",
+    "doi": "10.1080/13645579.2015.1019263",
+    "authors": [
+      "Annabel Teusner"
+    ],
+    "venue": "International Journal of Social Research Methodology",
+    "publication_date": "2016",
+    "query": "persona based research methodology validity",
+    "scraped_at": "2026-04-05T17:19:52.912512",
+    "relevance_score": 1.56,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Towards a use of network analysis: quantifying the complexity of Supply Chain Networks",
+    "abstract": "",
+    "year": 2007,
+    "citation_count": 26,
+    "url": "https://doi.org/10.1504/ijecrm.2007.014427",
+    "doi": "10.1504/ijecrm.2007.014427",
+    "authors": [
+      "Daria Battini",
+      "Alessandro Persona",
+      "Stefano Allesina"
+    ],
+    "venue": "International Journal of Electronic Customer Relationship Management",
+    "publication_date": "2007",
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364236",
+    "relevance_score": 1.52,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Development planning based on interoperable agent driven simulation",
+    "abstract": "",
+    "year": 2014,
+    "citation_count": 8,
+    "url": "https://doi.org/10.1016/j.jocs.2014.01.004",
+    "doi": "10.1016/j.jocs.2014.01.004",
+    "authors": [
+      "Marina Massei",
+      "Simonluca Poggi",
+      "Matteo Agresta",
+      "Angelo Ferrando"
+    ],
+    "venue": "Journal of Computational Science",
+    "publication_date": "2014",
+    "query": "computational social science agent simulation",
+    "scraped_at": "2026-04-05T17:20:37.909102",
+    "relevance_score": 1.16,
+    "category": "persona_methodology"
+  },
+  {
+    "source": "crossref",
+    "title": "Goods delivery optimisation in distribution networks with batch production",
+    "abstract": "",
+    "year": 2007,
+    "citation_count": 1,
+    "url": "https://doi.org/10.1504/ijecrm.2007.016021",
+    "doi": "10.1504/ijecrm.2007.016021",
+    "authors": [
+      "Daria Battini",
+      "Maurizio Faccio",
+      "Alessandro Persona",
+      "Pietro Vecchiato"
+    ],
+    "venue": "International Journal of Electronic Customer Relationship Management",
+    "publication_date": "2007",
+    "query": "customer persona accuracy validation",
+    "scraped_at": "2026-04-05T17:20:19.364189",
+    "relevance_score": 1.02,
+    "category": "persona_methodology"
+  }
+]

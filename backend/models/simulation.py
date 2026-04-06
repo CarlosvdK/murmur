@@ -1,0 +1,76 @@
+from pydantic import BaseModel, Field
+from typing import Optional, List
+from uuid import UUID
+from datetime import datetime
+from enum import Enum
+
+
+class SimulationStatus(str, Enum):
+    PENDING = "pending"
+    GATHERING_CONTEXT = "gathering_context"
+    GENERATING_PERSONAS = "generating_personas"
+    SIMULATING = "simulating"
+    AGGREGATING = "aggregating"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+class SimulationCreate(BaseModel):
+    business_id: UUID
+    question: str
+    variant_a: Optional[str] = None
+    variant_b: Optional[str] = None
+    persona_count: int = 15
+
+
+class Simulation(BaseModel):
+    id: UUID
+    business_id: UUID
+    question: str
+    variant_a: Optional[str] = None
+    variant_b: Optional[str] = None
+    status: SimulationStatus
+    persona_count: int
+    prompt_version: str
+    business_snapshot: Optional[dict] = None
+    error_message: Optional[str] = None
+    created_at: datetime
+    completed_at: Optional[datetime] = None
+
+
+class SimulationProgress(BaseModel):
+    """Real-time progress for the frontend — inspired by MiroFish status cards."""
+    simulation_id: UUID
+    status: SimulationStatus
+    step: str  # Human-readable current step
+    personas_generated: int = 0
+    personas_interviewed: int = 0
+    personas_total: int = 0
+    current_persona: Optional[str] = None  # Name of persona being interviewed
+    elapsed_seconds: float = 0
+
+
+class Theme(BaseModel):
+    label: str
+    summary: str
+    count: int
+
+
+class StandoutVoice(BaseModel):
+    persona_name: str
+    quote: str
+
+
+class SimulationResult(BaseModel):
+    id: UUID
+    simulation_id: UUID
+    summary: str
+    recommendation: Optional[str] = None
+    confidence_score: str  # "high", "medium", "low"
+    confidence_reasoning: Optional[str] = None
+    winner: Optional[str] = None  # For A/B: "A", "B", "tie", "depends"
+    winner_reasoning: Optional[str] = None
+    themes: Optional[List[Theme]] = None
+    standout_voices: Optional[List[StandoutVoice]] = None
+    raw_output: dict = {}
+    created_at: datetime
