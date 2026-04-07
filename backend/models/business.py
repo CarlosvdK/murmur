@@ -45,6 +45,22 @@ class BusinessCreate(BaseModel):
     location_country: Optional[str] = None
     location_lat: Optional[float] = None
     location_lng: Optional[float] = None
+    # Extended fields
+    location_settings: Optional[list[str]] = None
+    area_draws: Optional[list[str]] = None
+    customer_transport: Optional[list[str]] = None
+    has_parking: Optional[str] = None
+    first_visit_reasons: Optional[list[str]] = None
+    seasonal_patterns: Optional[list[str]] = None
+    customer_community: Optional[str] = None
+    opening_hours: Optional[dict] = None
+    google_business_url: Optional[str] = None
+    tripadvisor_url: Optional[str] = None
+    instagram_url: Optional[str] = None
+    facebook_url: Optional[str] = None
+    prior_change_types: Optional[list[str]] = None
+    prior_change_went: Optional[str] = None
+    anything_else: Optional[str] = None
 
 
 class Business(BaseModel):
@@ -78,6 +94,22 @@ class Business(BaseModel):
     location_city: Optional[str] = None
     location_neighbourhood: Optional[str] = None
     location_country: Optional[str] = None
+    # Extended fields
+    location_settings: Optional[list[str]] = None
+    area_draws: Optional[list[str]] = None
+    customer_transport: Optional[list[str]] = None
+    has_parking: Optional[str] = None
+    first_visit_reasons: Optional[list[str]] = None
+    seasonal_patterns: Optional[list[str]] = None
+    customer_community: Optional[str] = None
+    opening_hours: Optional[dict] = None
+    google_business_url: Optional[str] = None
+    tripadvisor_url: Optional[str] = None
+    instagram_url: Optional[str] = None
+    facebook_url: Optional[str] = None
+    prior_change_types: Optional[list[str]] = None
+    prior_change_went: Optional[str] = None
+    anything_else: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 

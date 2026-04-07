@@ -276,3 +276,38 @@ async def place_details(data: PlaceDetailsRequest):
     except Exception as e:
         logger.error("Place details failed: %s", e)
         return {}
+
+
+class AutofillRequest(BaseModel):
+    url: str
+
+
+@router.post("/autofill")
+async def autofill_from_url(data: AutofillRequest):
+    """Auto-fill business details from a URL (website, Google Maps, or Google Business Profile)."""
+    settings = get_settings()
+
+    # Try to use the existing research_business logic
+    # by passing the URL as the input
+    research_data = BusinessResearchRequest(input=data.url)
+    result = await research_business(research_data)
+
+    found = {}
+    not_found = []
+
+    for field in ["name", "type", "formatted_address", "description", "website", "rating", "review_count", "google_place_id", "years_open_estimate"]:
+        val = result.get(field)
+        val_str = str(val).strip() if val else ""
+        # Filter out URL-like values returned as names or descriptions
+        if field == "website" and val_str.startswith("http"):
+            found[field] = val_str
+        elif val_str and not val_str.startswith("http") and val_str != data.url:
+            found[field] = val_str
+        else:
+            not_found.append(field)
+
+    return {
+        "found": found,
+        "not_found": not_found,
+        "confidence": result.get("confidence", "low"),
+    }
