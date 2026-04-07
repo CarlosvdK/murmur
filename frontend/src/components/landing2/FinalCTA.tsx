@@ -19,10 +19,10 @@ export default function FinalCTA() {
 
         <SectionReveal delay={0.2}>
           <a
-            href="/onboarding"
+            href="/signup"
             className="inline-block rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-all hover:bg-gray-900 hover:scale-[1.02]"
           >
-            Try free -- takes 60 seconds
+            Create an account
           </a>
         </SectionReveal>
 

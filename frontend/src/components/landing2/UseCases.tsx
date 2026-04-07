@@ -53,7 +53,7 @@ export default function UseCases() {
             Not on this list? Murmur works for any business with customers.
           </p>
           <a
-            href="/onboarding"
+            href="/signup"
             className="mt-2 inline-block text-sm font-medium text-murmur-amber transition-colors hover:text-murmur-ink"
           >
             Tell us your use case &#8594;

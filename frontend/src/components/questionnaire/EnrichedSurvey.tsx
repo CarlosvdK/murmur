@@ -70,6 +70,8 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupResult, setLookupResult] = useState<Record<string, unknown> | null>(null);
   const [genLoading, setGenLoading] = useState<string | null>(null);
+  const [aiOfferDismissed, setAiOfferDismissed] = useState(false);
+  const [aiAutocompleting, setAiAutocompleting] = useState(false);
 
   const [form, setForm] = useState<BusinessCreate>({
     name: "", type: "", description: "", customer_description: "",
@@ -79,6 +81,8 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
     area_demographics: [], competitor_count: "", area_feel: "",
     website_url: "", additional_customer_notes: "",
     has_prior_change: false, prior_change_description: "", prior_change_outcome: "",
+    location_street: "", location_number: "", location_postcode: "",
+    location_city: "", location_neighbourhood: "", location_country: "",
   });
 
   // Save to localStorage
@@ -166,7 +170,7 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
   };
 
   const canNext = (() => {
-    if (step === 0) return form.name && form.type && form.description;
+    if (step === 0) return form.name && form.type && form.description && form.location_city;
     if (step === 1) return form.business_role;
     if (step === 2) return form.area_demographics && (form.area_demographics as string[]).length > 0;
     return true;
@@ -174,7 +178,16 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
 
   const handleSubmit = () => {
     localStorage.removeItem("murmur_survey");
-    onSubmit(form);
+    // Compose location string from structured fields
+    const locationParts = [
+      form.location_street,
+      form.location_number,
+      form.location_postcode,
+      form.location_city,
+      form.location_country,
+    ].filter(Boolean);
+    const composedLocation = locationParts.join(", ");
+    onSubmit({ ...form, location: composedLocation || form.location });
   };
 
   const totalSteps = 4;
@@ -253,11 +266,51 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
     );
   }
 
+  const handleAiAutocomplete = async () => {
+    if (!form.name) return;
+    setAiAutocompleting(true);
+    try {
+      const result = await researchBusiness(form.name + (form.location_city ? " " + form.location_city : ""));
+      if (result) {
+        const r = result;
+        setForm((prev) => ({
+          ...prev,
+          description: (r.description as string) || prev.description,
+          location: (r.formatted_address as string) || prev.location,
+          google_place_id: (r.google_place_id as string) || prev.google_place_id,
+          website_url: (r.website as string) || prev.website_url,
+          years_open: (r.years_open_estimate as string) || prev.years_open,
+          type: (r.type as string) || prev.type,
+        }));
+      }
+    } catch { /* ignore */ }
+    setAiAutocompleting(false);
+    setAiOfferDismissed(true);
+  };
+
   // ============================================================
   // SURVEY STEPS
   // ============================================================
   return (
     <div className="mx-auto max-w-2xl py-8">
+      {/* AI autocomplete offer */}
+      {step === 0 && form.name && !aiOfferDismissed && (
+        <div className="mb-6 flex items-center gap-4 rounded-xl border border-brand-blue/20 bg-brand-blue/5 p-4">
+          <div className="flex-1">
+            <p className="text-sm font-medium text-black">Want us to fill in some fields automatically?</p>
+            <p className="text-xs text-gray-500">We can look up your business and pre-fill details like description, location, and type.</p>
+          </div>
+          <button
+            onClick={handleAiAutocomplete}
+            disabled={aiAutocompleting}
+            className="shrink-0 rounded-lg bg-brand-blue px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50"
+          >
+            {aiAutocompleting ? "Looking up..." : "Autocomplete"}
+          </button>
+          <button onClick={() => setAiOfferDismissed(true)} className="shrink-0 text-xs text-gray-400 hover:text-gray-600">Dismiss</button>
+        </div>
+      )}
+
       {/* Step indicator */}
       <div className="mb-2 flex items-center justify-between">
         <p className="text-xs text-gray-400">Step {step + 1} of {totalSteps}</p>
@@ -316,13 +369,57 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Where are you? *</label>
-            <input
-              value={form.location || ""}
-              onChange={(e) => update("location", e.target.value)}
-              placeholder="Start typing your address or city..."
-              className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
-            />
+            <label className="mb-2 block text-sm font-medium text-gray-700">Where are you? *</label>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="col-span-2 sm:col-span-1">
+                <input
+                  value={form.location_street || ""}
+                  onChange={(e) => update("location_street", e.target.value)}
+                  placeholder="Street name"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
+                />
+              </div>
+              <div>
+                <input
+                  value={form.location_number || ""}
+                  onChange={(e) => update("location_number", e.target.value)}
+                  placeholder="Number"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
+                />
+              </div>
+              <div>
+                <input
+                  value={form.location_postcode || ""}
+                  onChange={(e) => update("location_postcode", e.target.value)}
+                  placeholder="Postcode"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
+                />
+              </div>
+              <div>
+                <input
+                  value={form.location_city || ""}
+                  onChange={(e) => update("location_city", e.target.value)}
+                  placeholder="City *"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
+                />
+              </div>
+              <div>
+                <input
+                  value={form.location_neighbourhood || ""}
+                  onChange={(e) => update("location_neighbourhood", e.target.value)}
+                  placeholder="Neighbourhood / Area"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
+                />
+              </div>
+              <div>
+                <input
+                  value={form.location_country || ""}
+                  onChange={(e) => update("location_country", e.target.value)}
+                  placeholder="Country *"
+                  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
+                />
+              </div>
+            </div>
           </div>
 
           <div>

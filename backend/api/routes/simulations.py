@@ -2,7 +2,7 @@ import asyncio
 import json
 import logging
 import time
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
@@ -10,7 +10,6 @@ from typing import Optional
 
 from backend.config import get_settings
 from backend.models.business import BusinessSnapshot
-from backend.models.context import BusinessContext
 from backend.models.simulation import (
     SimulationCreate,
     Simulation,
@@ -25,41 +24,205 @@ from backend.context.engine import gather_context
 from backend.reviewer_intelligence import build_reviewer_intelligence
 from backend.reviewer_intelligence.review_signal_extractor import extract_review_signals
 from backend.impact import estimate_impact
-from backend.api.routes.businesses import _businesses
+from backend.db.client import get_supabase
+from backend.auth.dependencies import get_current_user_id
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/simulations", tags=["simulations"])
 
-# In-memory stores for development
-_simulations: dict[UUID, Simulation] = {}
-_simulation_personas: dict[UUID, list[PersonaProfile]] = {}
-_simulation_responses: dict[UUID, list[dict]] = {}
-_simulation_results: dict[UUID, SimulationResult] = {}
+# Ephemeral in-memory stores -- runtime-only state for live SSE streaming.
 _simulation_progress: dict[UUID, SimulationProgress] = {}
-_simulation_context: dict[UUID, BusinessContext] = {}
-_simulation_caveats: dict[UUID, list] = {}
-_simulation_reviewer_intel: dict[UUID, dict] = {}
-_simulation_impact: dict[UUID, dict] = {}
 _simulation_queues: dict[UUID, asyncio.Queue] = {}
 
 
-@router.post("/", response_model=Simulation)
-async def create_simulation(data: SimulationCreate):
-    """Create a simulation and start running it in the background."""
-    business = _businesses.get(data.business_id)
-    if not business:
-        raise HTTPException(status_code=404, detail="Business not found")
+# ---------------------------------------------------------------------------
+# Helpers: convert between Pydantic models and Supabase rows
+# ---------------------------------------------------------------------------
 
-    sim_id = uuid4()
-    snapshot = BusinessSnapshot(
-        name=business.name,
-        type=business.type,
-        description=business.description,
-        customer_description=business.customer_description,
-        location=business.location,
+def _sim_to_row(sim: Simulation) -> dict:
+    return {
+        "id": str(sim.id),
+        "business_id": str(sim.business_id),
+        "question": sim.question,
+        "variant_a": sim.variant_a,
+        "variant_b": sim.variant_b,
+        "status": sim.status.value if isinstance(sim.status, SimulationStatus) else sim.status,
+        "persona_count": sim.persona_count,
+        "prompt_version": sim.prompt_version,
+        "business_snapshot": sim.business_snapshot,
+        "error_message": sim.error_message,
+        "created_at": sim.created_at.isoformat(),
+        "completed_at": sim.completed_at.isoformat() if sim.completed_at else None,
+    }
+
+
+def _row_to_sim(row: dict) -> Simulation:
+    return Simulation(
+        id=row["id"],
+        business_id=row["business_id"],
+        question=row["question"],
+        variant_a=row.get("variant_a"),
+        variant_b=row.get("variant_b"),
+        status=row["status"],
+        persona_count=row["persona_count"],
+        prompt_version=row["prompt_version"],
+        business_snapshot=row.get("business_snapshot"),
+        error_message=row.get("error_message"),
+        created_at=row["created_at"],
+        completed_at=row.get("completed_at"),
     )
 
+
+def _persona_to_row(persona: PersonaProfile, sim_id: UUID) -> dict:
+    return {
+        "simulation_id": str(sim_id),
+        "name": persona.name,
+        "age": persona.age,
+        "occupation": persona.occupation,
+        "visit_frequency": persona.visit_frequency,
+        "avg_spend": persona.avg_spend,
+        "personality": persona.personality,
+        "relationship_to_business": persona.relationship_to_business,
+        "quirk": persona.quirk,
+        "profile": persona.model_dump(),
+    }
+
+
+def _row_to_persona(row: dict) -> PersonaProfile:
+    profile = row.get("profile") or {}
+    return PersonaProfile(
+        name=row["name"],
+        age=row["age"],
+        occupation=row.get("occupation", ""),
+        visit_frequency=row.get("visit_frequency", ""),
+        avg_spend=row.get("avg_spend", 0),
+        personality=row.get("personality", ""),
+        relationship_to_business=row.get("relationship_to_business", ""),
+        quirk=row.get("quirk", ""),
+        openness=profile.get("openness"),
+        conscientiousness=profile.get("conscientiousness"),
+        extraversion=profile.get("extraversion"),
+        agreeableness=profile.get("agreeableness"),
+        neuroticism=profile.get("neuroticism"),
+    )
+
+
+def _response_to_row(resp: dict, sim_id: UUID, persona_db_id: str) -> dict:
+    return {
+        "persona_id": persona_db_id,
+        "simulation_id": str(sim_id),
+        "response": resp.get("response", ""),
+        "reasoning": resp.get("reasoning"),
+        "sentiment": resp.get("sentiment"),
+        "preference": resp.get("preference"),
+        "preference_strength": resp.get("preference_strength"),
+        "raw_output": resp,
+    }
+
+
+def _result_to_row(result: SimulationResult) -> dict:
+    return {
+        "id": str(result.id),
+        "simulation_id": str(result.simulation_id),
+        "summary": result.summary,
+        "recommendation": result.recommendation,
+        "confidence_score": result.confidence_score,
+        "confidence_reasoning": result.confidence_reasoning,
+        "winner": result.winner,
+        "winner_reasoning": result.winner_reasoning,
+        "themes": [t.model_dump() if hasattr(t, "model_dump") else t for t in (result.themes or [])],
+        "standout_voices": [v.model_dump() if hasattr(v, "model_dump") else v for v in (result.standout_voices or [])],
+        "raw_output": result.raw_output,
+        "created_at": result.created_at.isoformat(),
+    }
+
+
+def _row_to_result(row: dict) -> SimulationResult:
+    return SimulationResult(
+        id=row["id"],
+        simulation_id=row["simulation_id"],
+        summary=row["summary"],
+        recommendation=row.get("recommendation"),
+        confidence_score=row["confidence_score"],
+        confidence_reasoning=row.get("confidence_reasoning"),
+        winner=row.get("winner"),
+        winner_reasoning=row.get("winner_reasoning"),
+        themes=row.get("themes"),
+        standout_voices=row.get("standout_voices"),
+        raw_output=row.get("raw_output", {}),
+        created_at=row["created_at"],
+    )
+
+
+# ---------------------------------------------------------------------------
+# DB helpers
+# ---------------------------------------------------------------------------
+
+def _update_sim(sim_id: UUID, **fields):
+    """Update arbitrary fields on a simulation row."""
+    db = get_supabase()
+    db.table("simulations").update(fields).eq("id", str(sim_id)).execute()
+
+
+def _store_personas(personas: list[PersonaProfile], sim_id: UUID) -> list[str]:
+    """Insert persona rows and return their DB-generated UUIDs."""
+    db = get_supabase()
+    rows = [_persona_to_row(p, sim_id) for p in personas]
+    result = db.table("personas").insert(rows).execute()
+    return [r["id"] for r in result.data]
+
+
+def _store_responses(responses: list[dict], sim_id: UUID, persona_db_ids: list[str]):
+    """Insert persona response rows. Maps responses to persona IDs by index."""
+    db = get_supabase()
+    rows = []
+    for i, resp in enumerate(responses):
+        persona_db_id = persona_db_ids[i] if i < len(persona_db_ids) else persona_db_ids[-1]
+        rows.append(_response_to_row(resp, sim_id, persona_db_id))
+    if rows:
+        db.table("persona_responses").insert(rows).execute()
+
+
+def _store_result(result: SimulationResult):
+    db = get_supabase()
+    db.table("simulation_results").insert(_result_to_row(result)).execute()
+
+
+# ---------------------------------------------------------------------------
+# Routes
+# ---------------------------------------------------------------------------
+
+@router.post("/", response_model=Simulation)
+async def create_simulation(
+    data: SimulationCreate,
+    user_id: UUID = Depends(get_current_user_id),
+):
+    """Create a simulation and start running it in the background."""
+    db = get_supabase()
+
+    # Verify business exists and belongs to this user
+    biz = (
+        db.table("businesses")
+        .select("*")
+        .eq("id", str(data.business_id))
+        .eq("user_id", str(user_id))
+        .maybe_single()
+        .execute()
+    )
+    if not biz.data:
+        raise HTTPException(status_code=404, detail="Business not found")
+
+    business_row = biz.data
+    snapshot = BusinessSnapshot(
+        name=business_row["name"],
+        type=business_row["type"],
+        description=business_row["description"],
+        customer_description=business_row.get("customer_description"),
+        location=business_row.get("location"),
+    )
+
+    sim_id = uuid4()
     simulation = Simulation(
         id=sim_id,
         business_id=data.business_id,
@@ -72,19 +235,18 @@ async def create_simulation(data: SimulationCreate):
         business_snapshot=snapshot.model_dump(),
         created_at=datetime.now(timezone.utc),
     )
-    _simulations[sim_id] = simulation
 
+    db.table("simulations").insert(_sim_to_row(simulation)).execute()
+
+    # Ephemeral progress tracking
     _simulation_progress[sim_id] = SimulationProgress(
         simulation_id=sim_id,
         status=SimulationStatus.PENDING,
         step="Queued",
         personas_total=data.persona_count,
     )
-
-    # Create SSE queue for this simulation
     _simulation_queues[sim_id] = asyncio.Queue()
 
-    # Run the simulation pipeline in the background
     asyncio.create_task(
         _run_pipeline(sim_id, snapshot, data.question, data.variant_a,
                       data.variant_b, data.persona_count)
@@ -103,7 +265,6 @@ async def _run_pipeline(
 ):
     """Full simulation pipeline: context -> generate -> interview -> aggregate -> caveats."""
     start = time.monotonic()
-    sim = _simulations[sim_id]
     progress = _simulation_progress[sim_id]
     queue = _simulation_queues.get(sim_id)
 
@@ -117,12 +278,12 @@ async def _run_pipeline(
             })
 
     try:
-        # Step 0: Gather context (NEW)
+        # Step 0: Gather context
         context_narrative = None
         settings = get_settings()
 
         if settings.context_enabled:
-            sim.status = SimulationStatus.GATHERING_CONTEXT
+            _update_sim(sim_id, status=SimulationStatus.GATHERING_CONTEXT.value)
             progress.status = SimulationStatus.GATHERING_CONTEXT
             progress.step = "Researching market context..."
             emit_sse("context", "Researching market context...")
@@ -133,8 +294,10 @@ async def _run_pipeline(
                 emit_sse("context", msg)
 
             context = await gather_context(business, question, on_progress=on_context_progress)
-            _simulation_context[sim_id] = context
             context_narrative = context.filtered_narrative or None
+
+            # Persist context data
+            _update_sim(sim_id, context_data=context.model_dump())
 
             logger.info(
                 "Context gathered: %d/%d tools succeeded, %.1fs, narrative=%d chars",
@@ -144,7 +307,7 @@ async def _run_pipeline(
                 len(context.filtered_narrative),
             )
 
-        # Step 0.5: Reviewer Intelligence (builds calibrated persona manifest)
+        # Step 0.5: Reviewer Intelligence
         manifest = None
         review_signals = None
         if settings.google_places_api_key:
@@ -159,7 +322,6 @@ async def _run_pipeline(
             manifest = await build_reviewer_intelligence(
                 business, persona_count, on_progress=on_ri_progress,
             )
-            # Also grab raw signals for caveat generation (separate from manifest)
             try:
                 review_signals = await extract_review_signals(
                     business.name, business.location,
@@ -167,21 +329,20 @@ async def _run_pipeline(
             except Exception:
                 review_signals = None
             if manifest:
-                _simulation_reviewer_intel[sim_id] = {
+                reviewer_intel = {
                     "total_personas": manifest.total_count,
                     "distribution": manifest.distribution_summary,
                     "confidence": manifest.confidence,
                     "based_on": manifest.based_on,
                     "caveats": manifest.key_caveats,
                 }
-                # Extract review signals for caveats (stored on the manifest)
-                # We don't store the raw signals object -- just pass to caveats
+                _update_sim(sim_id, reviewer_intel=reviewer_intel)
                 logger.info("Reviewer intelligence: manifest with %d specs", manifest.total_count)
             else:
                 logger.info("Reviewer intelligence returned no manifest -- using freeform generation")
 
         # Step 1: Generate personas
-        sim.status = SimulationStatus.GENERATING_PERSONAS
+        _update_sim(sim_id, status=SimulationStatus.GENERATING_PERSONAS.value)
         progress.status = SimulationStatus.GENERATING_PERSONAS
         progress.step = "Generating customer personas..."
         emit_sse("personas", "Generating customer personas...")
@@ -190,13 +351,15 @@ async def _run_pipeline(
             business, persona_count, context_narrative=context_narrative,
             manifest=manifest,
         )
-        _simulation_personas[sim_id] = personas
+
+        persona_db_ids = _store_personas(personas, sim_id)
+
         progress.personas_generated = len(personas)
         progress.personas_total = len(personas)
         emit_sse("personas", f"{len(personas)} customer personas ready")
 
         # Step 2: Interview all personas
-        sim.status = SimulationStatus.SIMULATING
+        _update_sim(sim_id, status=SimulationStatus.SIMULATING.value)
         progress.status = SimulationStatus.SIMULATING
         progress.step = "Interviewing customers..."
         emit_sse("simulation", "Interviewing customers...")
@@ -212,11 +375,12 @@ async def _run_pipeline(
             personas, business, question, variant_a, variant_b,
             on_progress=on_progress, context_narrative=context_narrative,
         )
-        _simulation_responses[sim_id] = responses
+
+        _store_responses(responses, sim_id, persona_db_ids)
         emit_sse("simulation", f"Interviewed {len(responses)} customers")
 
         # Step 3: Aggregate
-        sim.status = SimulationStatus.AGGREGATING
+        _update_sim(sim_id, status=SimulationStatus.AGGREGATING.value)
         progress.status = SimulationStatus.AGGREGATING
         progress.step = "Synthesising customer feedback..."
         emit_sse("aggregation", "Synthesising customer feedback...")
@@ -226,9 +390,9 @@ async def _run_pipeline(
             context_narrative=context_narrative,
         )
 
-        # Step 4.5: Impact estimation (quantitative)
+        # Step 4.5: Impact estimation
         impact = estimate_impact(responses, question)
-        _simulation_impact[sim_id] = {
+        impact_data = {
             "revenue": {
                 "point_estimate_pct": impact.revenue.point_estimate_pct,
                 "ci_low_pct": impact.revenue.ci_low_pct,
@@ -249,17 +413,20 @@ async def _run_pipeline(
         }
 
         # Step 5: Generate caveats
-        caveats = generate_caveats(
+        caveats_list = generate_caveats(
             business, question, persona_count, len(responses),
             variant_a, variant_b, review_signals=review_signals,
         )
-        _simulation_caveats[sim_id] = [
+        caveats_data = [
             {"type": c.type, "title": c.title, "message": c.message,
              "severity": c.severity, "source": c.source}
-            for c in caveats
+            for c in caveats_list
         ]
 
-        # Normalize themes and standout_voices -- Claude may use varying field names
+        # Persist impact + caveats
+        _update_sim(sim_id, impact_data=impact_data, caveats=caveats_data)
+
+        # Normalize themes and standout_voices
         raw_themes = result_data.get("themes") or []
         themes = []
         for t in raw_themes:
@@ -274,7 +441,6 @@ async def _run_pipeline(
         voices = []
         for v in raw_voices:
             if isinstance(v, dict):
-                # Claude uses many field name variants -- try them all
                 pname = (
                     v.get("persona_name")
                     or v.get("name")
@@ -308,11 +474,15 @@ async def _run_pipeline(
             raw_output=result_data.get("raw_output", {}),
             created_at=datetime.now(timezone.utc),
         )
-        _simulation_results[sim_id] = result
 
-        # Done
-        sim.status = SimulationStatus.COMPLETED
-        sim.completed_at = datetime.now(timezone.utc)
+        _store_result(result)
+
+        # Mark simulation as completed
+        _update_sim(
+            sim_id,
+            status=SimulationStatus.COMPLETED.value,
+            completed_at=datetime.now(timezone.utc).isoformat(),
+        )
         progress.status = SimulationStatus.COMPLETED
         progress.step = "Complete"
         progress.elapsed_seconds = time.monotonic() - start
@@ -322,14 +492,16 @@ async def _run_pipeline(
 
     except Exception as e:
         logger.exception("Simulation %s failed: %s", sim_id, e)
-        sim.status = SimulationStatus.FAILED
-        sim.error_message = str(e)
+        _update_sim(
+            sim_id,
+            status=SimulationStatus.FAILED.value,
+            error_message=str(e),
+        )
         progress.status = SimulationStatus.FAILED
         progress.step = f"Failed: {str(e)[:100]}"
         emit_sse("failed", f"Simulation failed: {str(e)[:100]}")
 
     finally:
-        # Signal SSE stream is done
         if queue:
             await queue.put(None)
 
@@ -365,14 +537,21 @@ async def stream_simulation_progress(sim_id: UUID):
     )
 
 
-# --- Existing endpoints ---
+# --- Read endpoints ---
 
 @router.get("/{sim_id}", response_model=Simulation)
 async def get_simulation(sim_id: UUID):
-    sim = _simulations.get(sim_id)
-    if not sim:
+    db = get_supabase()
+    result = (
+        db.table("simulations")
+        .select("*")
+        .eq("id", str(sim_id))
+        .maybe_single()
+        .execute()
+    )
+    if not result.data:
         raise HTTPException(status_code=404, detail="Simulation not found")
-    return sim
+    return _row_to_sim(result.data)
 
 
 @router.get("/{sim_id}/progress", response_model=SimulationProgress)
@@ -386,64 +565,128 @@ async def get_simulation_progress(sim_id: UUID):
 
 @router.get("/{sim_id}/context")
 async def get_simulation_context(sim_id: UUID):
-    """Return the BusinessContext gathered for this simulation (audit trail)."""
-    context = _simulation_context.get(sim_id)
-    if not context:
+    """Return the BusinessContext gathered for this simulation."""
+    db = get_supabase()
+    result = (
+        db.table("simulations")
+        .select("context_data")
+        .eq("id", str(sim_id))
+        .maybe_single()
+        .execute()
+    )
+    if not result.data or not result.data.get("context_data"):
         raise HTTPException(status_code=404, detail="Context not found")
-    return context.model_dump()
+    return result.data["context_data"]
 
 
 @router.get("/{sim_id}/caveats")
 async def get_simulation_caveats(sim_id: UUID):
     """Return caveats generated for this simulation."""
-    caveats = _simulation_caveats.get(sim_id)
-    if caveats is None:
+    db = get_supabase()
+    result = (
+        db.table("simulations")
+        .select("caveats")
+        .eq("id", str(sim_id))
+        .maybe_single()
+        .execute()
+    )
+    if not result.data or result.data.get("caveats") is None:
         raise HTTPException(status_code=404, detail="Caveats not found")
-    return caveats
+    return result.data["caveats"]
 
 
 @router.get("/{sim_id}/reviewer-intelligence")
 async def get_simulation_reviewer_intel(sim_id: UUID):
     """Return the reviewer intelligence analysis for this simulation."""
-    intel = _simulation_reviewer_intel.get(sim_id)
-    if not intel:
+    db = get_supabase()
+    result = (
+        db.table("simulations")
+        .select("reviewer_intel")
+        .eq("id", str(sim_id))
+        .maybe_single()
+        .execute()
+    )
+    if not result.data or not result.data.get("reviewer_intel"):
         raise HTTPException(status_code=404, detail="No reviewer intelligence for this simulation")
-    return intel
+    return result.data["reviewer_intel"]
 
 
 @router.get("/{sim_id}/impact")
 async def get_simulation_impact(sim_id: UUID):
     """Return quantitative impact estimates with confidence intervals."""
-    impact = _simulation_impact.get(sim_id)
-    if not impact:
+    db = get_supabase()
+    result = (
+        db.table("simulations")
+        .select("impact_data")
+        .eq("id", str(sim_id))
+        .maybe_single()
+        .execute()
+    )
+    if not result.data or not result.data.get("impact_data"):
         raise HTTPException(status_code=404, detail="No impact estimate for this simulation")
-    return impact
+    return result.data["impact_data"]
 
 
 @router.get("/{sim_id}/personas", response_model=list[PersonaProfile])
 async def get_simulation_personas(sim_id: UUID):
-    personas = _simulation_personas.get(sim_id)
-    if personas is None:
+    db = get_supabase()
+    result = (
+        db.table("personas")
+        .select("*")
+        .eq("simulation_id", str(sim_id))
+        .execute()
+    )
+    if not result.data:
         raise HTTPException(status_code=404, detail="Personas not found")
-    return personas
+    return [_row_to_persona(row) for row in result.data]
 
 
 @router.get("/{sim_id}/responses")
 async def get_simulation_responses(sim_id: UUID):
-    responses = _simulation_responses.get(sim_id)
-    if responses is None:
+    db = get_supabase()
+    result = (
+        db.table("persona_responses")
+        .select("*")
+        .eq("simulation_id", str(sim_id))
+        .execute()
+    )
+    if not result.data:
         raise HTTPException(status_code=404, detail="Responses not found")
-    return responses
+    return result.data
 
 
 @router.get("/{sim_id}/result", response_model=SimulationResult)
 async def get_simulation_result(sim_id: UUID):
-    result = _simulation_results.get(sim_id)
-    if not result:
+    db = get_supabase()
+    result = (
+        db.table("simulation_results")
+        .select("*")
+        .eq("simulation_id", str(sim_id))
+        .maybe_single()
+        .execute()
+    )
+    if not result.data:
         raise HTTPException(status_code=404, detail="Result not found")
-    return result
+    return _row_to_result(result.data)
 
 
 @router.get("/", response_model=list[Simulation])
-async def list_simulations():
-    return list(_simulations.values())
+async def list_simulations(user_id: UUID = Depends(get_current_user_id)):
+    db = get_supabase()
+    # Get simulations for businesses owned by this user
+    biz_result = (
+        db.table("businesses")
+        .select("id")
+        .eq("user_id", str(user_id))
+        .execute()
+    )
+    biz_ids = [b["id"] for b in biz_result.data]
+    if not biz_ids:
+        return []
+    result = (
+        db.table("simulations")
+        .select("*")
+        .in_("business_id", biz_ids)
+        .execute()
+    )
+    return [_row_to_sim(row) for row in result.data]

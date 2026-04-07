@@ -59,16 +59,16 @@ export default function Home() {
             <SectionReveal delay={0.3}>
               <div className="flex flex-wrap items-center gap-4">
                 <a
-                  href="/onboarding"
+                  href="/login"
                   className="rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-all hover:opacity-80 hover:scale-[1.02]"
                 >
-                  Try free -- no card needed
+                  Sign in
                 </a>
                 <a
-                  href="#demo"
+                  href="/signup"
                   className="rounded-full border border-gray-300 bg-white px-8 py-3.5 text-sm font-medium text-black transition-colors hover:border-gray-500"
                 >
-                  See a live example
+                  Create an account
                 </a>
               </div>
             </SectionReveal>

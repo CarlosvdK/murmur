@@ -277,7 +277,7 @@ export default function LiveDemo() {
               Replay
             </button>
             <a
-              href="/onboarding"
+              href="/signup"
               className="text-sm font-medium text-murmur-amber transition-colors hover:text-murmur-ink"
             >
               Try it with your business &#8594;

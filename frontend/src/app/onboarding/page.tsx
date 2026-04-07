@@ -14,8 +14,8 @@ export default function OnboardingPage() {
     setLoading(true);
     setError(null);
     try {
-      const business = await createBusiness(data);
-      router.push(`/simulate?businessId=${business.id}`);
+      await createBusiness(data);
+      router.push("/app");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Failed to create business");
     } finally {

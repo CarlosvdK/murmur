@@ -36,7 +36,10 @@ class BusinessCreate(BaseModel):
     prior_change_description: Optional[str] = None
     prior_change_outcome: Optional[str] = None
 
-    # Structured location (from Places Autocomplete)
+    # Structured location
+    location_street: Optional[str] = None
+    location_number: Optional[str] = None
+    location_postcode: Optional[str] = None
     location_city: Optional[str] = None
     location_neighbourhood: Optional[str] = None
     location_country: Optional[str] = None
@@ -69,6 +72,9 @@ class Business(BaseModel):
     has_prior_change: Optional[bool] = None
     prior_change_description: Optional[str] = None
     prior_change_outcome: Optional[str] = None
+    location_street: Optional[str] = None
+    location_number: Optional[str] = None
+    location_postcode: Optional[str] = None
     location_city: Optional[str] = None
     location_neighbourhood: Optional[str] = None
     location_country: Optional[str] = None

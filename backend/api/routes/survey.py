@@ -197,3 +197,82 @@ async def generate_customer_description(data: CustomerDescRequest):
     )
 
     return {"description": response.content[0].text.strip()}
+
+
+class PlaceAutocompleteRequest(BaseModel):
+    query: str
+
+
+@router.post("/place-autocomplete")
+async def place_autocomplete(data: PlaceAutocompleteRequest):
+    """Proxy Google Places Autocomplete for location search."""
+    settings = get_settings()
+    if not settings.google_places_api_key:
+        return {"predictions": []}
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            resp = await client.post(
+                "https://places.googleapis.com/v1/places:autocomplete",
+                headers={"X-Goog-Api-Key": settings.google_places_api_key},
+                json={"input": data.query, "includedPrimaryTypes": ["establishment"]},
+            )
+            resp.raise_for_status()
+            result = resp.json()
+        suggestions = result.get("suggestions", [])
+        return {"predictions": [
+            {"description": (s.get("placePrediction", {}).get("text") or {}).get("text", ""),
+             "place_id": s.get("placePrediction", {}).get("placeId", "")}
+            for s in suggestions[:5]
+        ]}
+    except Exception as e:
+        logger.error("Places autocomplete failed: %s", e)
+        return {"predictions": []}
+
+
+class PlaceDetailsRequest(BaseModel):
+    place_id: str
+
+
+@router.post("/place-details")
+async def place_details(data: PlaceDetailsRequest):
+    """Fetch structured address from a Google Place ID."""
+    settings = get_settings()
+    if not settings.google_places_api_key:
+        return {}
+    try:
+        async with httpx.AsyncClient(timeout=5) as client:
+            resp = await client.get(
+                f"https://places.googleapis.com/v1/places/{data.place_id}",
+                headers={
+                    "X-Goog-Api-Key": settings.google_places_api_key,
+                    "X-Goog-FieldMask": "displayName,formattedAddress,addressComponents,location",
+                },
+            )
+            resp.raise_for_status()
+            place = resp.json()
+        components = place.get("addressComponents", [])
+        address: dict = {}
+        for c in components:
+            types = c.get("types", [])
+            text = c.get("longText", "")
+            if "street_number" in types:
+                address["number"] = text
+            elif "route" in types:
+                address["street"] = text
+            elif "postal_code" in types:
+                address["postcode"] = text
+            elif "locality" in types:
+                address["city"] = text
+            elif "sublocality" in types or "neighborhood" in types:
+                address["neighbourhood"] = text
+            elif "country" in types:
+                address["country"] = text
+        loc = place.get("location", {})
+        address["lat"] = loc.get("latitude")
+        address["lng"] = loc.get("longitude")
+        address["formatted"] = place.get("formattedAddress", "")
+        address["name"] = (place.get("displayName") or {}).get("text", "")
+        return address
+    except Exception as e:
+        logger.error("Place details failed: %s", e)
+        return {}
