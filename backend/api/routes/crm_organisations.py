@@ -9,16 +9,12 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from backend.models.crm import OrganisationCreate, Organisation
 from backend.auth.tiers import Tier, check_feature_access
-from backend.auth.dependencies import get_current_user_id
+from backend.auth.dependencies import get_current_user_id, get_current_user_tier
 from backend.db.client import get_supabase
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/crm/organisations", tags=["crm-organisations"])
-
-
-def _get_current_tier() -> Tier:
-    return Tier.CONNECT
 
 
 def _org_to_row(data: OrganisationCreate, user_id: UUID) -> dict:
@@ -75,8 +71,8 @@ def _row_to_org(row: dict) -> Organisation:
 async def create_organisation(
     data: OrganisationCreate,
     user_id: UUID = Depends(get_current_user_id),
+    tier: Tier = Depends(get_current_user_tier),
 ):
-    tier = _get_current_tier()
     if not check_feature_access(tier, "crm_access"):
         raise HTTPException(status_code=403, detail="CRM requires Connect tier or higher")
 

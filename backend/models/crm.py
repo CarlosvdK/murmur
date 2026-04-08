@@ -31,6 +31,8 @@ class ContactCreate(BaseModel):
     role_label: Optional[str] = None
     notes: Optional[str] = None
     tags: Optional[list[str]] = None
+    # Extended fields (stored directly in DB columns from migration_003)
+    extra_data: Optional[dict] = None  # Catch-all for extended fields
 
 
 class Contact(BaseModel):

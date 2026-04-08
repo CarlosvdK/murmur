@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { listSimulations, listContacts, Simulation } from "@/lib/api";
+import { listSimulations, listContacts, getAccuracyStats, Simulation } from "@/lib/api";
 
 export default function ReportsPage() {
   const [simulations, setSimulations] = useState<Simulation[]>([]);
@@ -9,6 +9,7 @@ export default function ReportsPage() {
   const [customerCount, setCustomerCount] = useState(0);
   const [vendorCount, setVendorCount] = useState(0);
   const [twinCount, setTwinCount] = useState(0);
+  const [accuracy, setAccuracy] = useState<{ total_outcomes: number; matched: number; accuracy_pct: number | null }>({ total_outcomes: 0, matched: 0, accuracy_pct: null });
 
   useEffect(() => {
     listSimulations().then(setSimulations).catch(() => {});
@@ -20,6 +21,7 @@ export default function ReportsPage() {
       setVendorCount(v.length);
       setTwinCount((prev) => prev + v.filter((x) => x.has_twin).length);
     }).catch(() => {});
+    getAccuracyStats().then(setAccuracy).catch(() => {});
   }, []);
 
   const completed = simulations.filter((s) => s.status === "completed");
@@ -70,11 +72,12 @@ export default function ReportsPage() {
         {tab === "accuracy" && (
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-xl border border-[#E5E2DC] bg-white p-6">
-              <p className="text-4xl font-bold text-black">70%</p>
-              <p className="mt-1 text-sm text-gray-500">Backtest accuracy</p>
+              <p className="text-4xl font-bold text-black">{accuracy.accuracy_pct !== null ? `${accuracy.accuracy_pct}%` : "--"}</p>
+              <p className="mt-1 text-sm text-gray-500">Prediction accuracy</p>
+              {accuracy.total_outcomes === 0 && <p className="mt-1 text-xs text-gray-400">Report real outcomes to start tracking</p>}
             </div>
             <div className="rounded-xl border border-[#E5E2DC] bg-white p-6">
-              <p className="text-4xl font-bold text-black">0</p>
+              <p className="text-4xl font-bold text-black">{accuracy.total_outcomes}</p>
               <p className="mt-1 text-sm text-gray-500">Validated predictions</p>
             </div>
             <div className="rounded-xl border border-[#E5E2DC] bg-white p-6">

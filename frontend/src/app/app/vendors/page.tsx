@@ -15,8 +15,6 @@ function HealthDot({ sentiment }: { sentiment: string | null }) {
   return <div className={`h-2.5 w-2.5 rounded-full ${colors[sentiment || "unknown"] || colors.unknown}`} />;
 }
 
-type Filter = "all" | "has_twin" | "no_twin";
-
 export default function VendorsPage() {
   const router = useRouter();
   const [vendors, setVendors] = useState<CRMContact[]>([]);
@@ -26,14 +24,11 @@ export default function VendorsPage() {
   const [twinQ, setTwinQ] = useState("");
   const [twinLoading, setTwinLoading] = useState(false);
   const [profileTab, setProfileTab] = useState<"activity" | "twin" | "files">("activity");
-  const [filter, setFilter] = useState<Filter>("all");
   const [search, setSearch] = useState("");
 
   useEffect(() => { listContacts({ contact_type: "vendor" }).then(setVendors).catch(() => {}); }, []);
 
   const filtered = vendors.filter((v) => {
-    if (filter === "has_twin" && !v.has_twin) return false;
-    if (filter === "no_twin" && v.has_twin) return false;
     if (search && !v.full_name.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -64,21 +59,15 @@ export default function VendorsPage() {
               <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search..."
                 className="w-40 rounded-lg border border-[#E5E2DC] px-3 py-1.5 text-sm focus:border-brand-orange focus:outline-none" />
               <button onClick={() => router.push("/app/vendors/new")}
-                className="rounded-lg bg-black px-4 py-1.5 text-sm font-medium text-white hover:opacity-80">+ Add vendor</button>
+                className="rounded-lg bg-black px-4 py-1.5 text-sm font-medium text-white hover:opacity-80">+ New Twin</button>
             </div>
-          </div>
-          <div className="mt-2 flex gap-1.5">
-            {([["all", "All"], ["has_twin", "Has Twin"], ["no_twin", "No Twin"]] as [Filter, string][]).map(([key, label]) => (
-              <button key={key} onClick={() => setFilter(key)}
-                className={`rounded-lg px-3 py-1 text-xs ${filter === key ? "bg-black text-white" : "text-gray-400 hover:bg-gray-100"}`}>{label}</button>
-            ))}
           </div>
         </div>
 
         <table className="w-full">
           <thead><tr className="border-b border-[#E5E2DC] text-left text-[11px] font-medium uppercase tracking-wider text-gray-400">
             <th className="px-6 py-2.5">Name</th><th className="px-4 py-2.5">Company</th>
-            <th className="px-4 py-2.5">Role</th><th className="px-4 py-2.5">Health</th><th className="px-4 py-2.5">Twin</th>
+            <th className="px-4 py-2.5">Role</th><th className="px-4 py-2.5">Health</th><th className="px-4 py-2.5">Confidence</th>
           </tr></thead>
           <tbody>
             {filtered.map((v) => (
@@ -91,7 +80,7 @@ export default function VendorsPage() {
                 <td className="px-4 py-3 text-sm text-gray-500">{v.organisation_name || "--"}</td>
                 <td className="px-4 py-3 text-sm text-gray-500">{v.job_title || "--"}</td>
                 <td className="px-4 py-3"><HealthDot sentiment={v.current_sentiment} /></td>
-                <td className="px-4 py-3">{v.has_twin ? <span className="text-xs font-medium text-brand-orange">{v.twin_corpus_size} msgs</span> : <span className="text-xs text-gray-300">--</span>}</td>
+                <td className="px-4 py-3"><span className={`text-xs font-medium ${v.twin_confidence === "high" ? "text-green-600" : v.twin_confidence === "medium" ? "text-brand-orange" : "text-gray-400"}`}>{v.twin_confidence || "low"}</span></td>
               </tr>
             ))}
           </tbody>
@@ -105,7 +94,7 @@ export default function VendorsPage() {
               The more you know about each vendor, the better Murmur can predict how they&apos;ll respond to negotiations.
             </p>
             <button onClick={() => router.push("/app/vendors/new")}
-              className="mt-4 rounded-lg bg-black px-6 py-2 text-sm font-medium text-white hover:opacity-80">+ Add your first vendor</button>
+              className="mt-4 rounded-lg bg-black px-6 py-2 text-sm font-medium text-white hover:opacity-80">+ Create your first vendor twin</button>
           </div>
         )}
       </div>
@@ -166,30 +155,24 @@ export default function VendorsPage() {
 
             {profileTab === "twin" && (
               <div className="space-y-4">
-                {selected.has_twin ? (
-                  <>
-                    <div className="rounded-lg bg-gray-50 p-3 text-sm text-gray-600">{selected.twin_corpus_size} messages -- Confidence: {selected.twin_confidence || "N/A"}</div>
-                    <div className="flex gap-2">
-                      <input value={twinQ} onChange={(e) => setTwinQ(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleAskTwin()}
-                        placeholder={`Ask about ${selected.first_name}...`}
-                        className="flex-1 rounded-lg border border-[#E5E2DC] px-3 py-2 text-sm focus:border-brand-orange focus:outline-none" />
-                      <button onClick={handleAskTwin} disabled={twinLoading || !twinQ.trim()}
-                        className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-30">{twinLoading ? "..." : "Ask"}</button>
-                    </div>
-                    {queries.map((q) => (
-                      <div key={q.id} className="rounded-lg border border-[#E5E2DC] p-4">
-                        <p className="mb-2 text-sm font-medium text-black">Q: {q.question}</p>
-                        <p className="text-sm text-gray-600">{q.answer}</p>
-                        <p className="mt-2 text-xs text-gray-400">Confidence: {q.confidence}</p>
-                      </div>
-                    ))}
-                  </>
-                ) : (
-                  <div className="py-8 text-center">
-                    <p className="text-gray-400">No twin yet. Upload correspondence first.</p>
-                    <button onClick={() => setProfileTab("files")} className="mt-3 rounded-lg bg-black px-4 py-2 text-sm font-medium text-white">Upload files</button>
+                <div className="rounded-lg bg-gray-50 p-3 text-sm text-gray-600">
+                  Twin confidence: <span className={`font-medium ${selected.twin_confidence === "high" ? "text-green-600" : selected.twin_confidence === "medium" ? "text-brand-orange" : "text-gray-400"}`}>{selected.twin_confidence || "low"}</span>
+                  <span className="ml-2 text-xs text-gray-400">Add more profile data to improve accuracy</span>
+                </div>
+                <div className="flex gap-2">
+                  <input value={twinQ} onChange={(e) => setTwinQ(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleAskTwin()}
+                    placeholder={`Ask how ${selected.first_name} would react to...`}
+                    className="flex-1 rounded-lg border border-[#E5E2DC] px-3 py-2 text-sm focus:border-brand-orange focus:outline-none" />
+                  <button onClick={handleAskTwin} disabled={twinLoading || !twinQ.trim()}
+                    className="rounded-lg bg-black px-4 py-2 text-sm font-medium text-white disabled:opacity-30">{twinLoading ? "..." : "Ask"}</button>
+                </div>
+                {queries.map((q) => (
+                  <div key={q.id} className="rounded-lg border border-[#E5E2DC] p-4">
+                    <p className="mb-2 text-sm font-medium text-black">Q: {q.question}</p>
+                    <p className="text-sm text-gray-600">{q.answer}</p>
+                    <p className="mt-2 text-xs text-gray-400">Confidence: {q.confidence}</p>
                   </div>
-                )}
+                ))}
               </div>
             )}
 

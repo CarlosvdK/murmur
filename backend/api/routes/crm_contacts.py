@@ -9,7 +9,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from backend.models.crm import ContactCreate, Contact
 from backend.auth.tiers import Tier, check_feature_access
-from backend.auth.dependencies import get_current_user_id
+from backend.auth.dependencies import get_current_user_id, get_current_user_tier
 from backend.db.client import get_supabase
 
 logger = logging.getLogger(__name__)
@@ -17,14 +17,11 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/crm/contacts", tags=["crm-contacts"])
 
 
-def _get_current_tier() -> Tier:
-    # TODO: extract from user profile / subscription
-    return Tier.CONNECT
 
 
 def _contact_to_row(data: ContactCreate, user_id: UUID) -> dict:
     now = datetime.now(timezone.utc).isoformat()
-    return {
+    row = {
         "user_id": str(user_id),
         "first_name": data.first_name,
         "last_name": data.last_name,
@@ -45,6 +42,12 @@ def _contact_to_row(data: ContactCreate, user_id: UUID) -> dict:
         "created_at": now,
         "updated_at": now,
     }
+    # Spread extended fields directly into DB columns (migration_003)
+    if data.extra_data:
+        for key, val in data.extra_data.items():
+            if val is not None and val != "" and val != []:
+                row[key] = val
+    return row
 
 
 def _row_to_contact(row: dict) -> Contact:
@@ -85,13 +88,19 @@ def _row_to_contact(row: dict) -> Contact:
 async def create_contact(
     data: ContactCreate,
     user_id: UUID = Depends(get_current_user_id),
+    tier: Tier = Depends(get_current_user_tier),
 ):
-    tier = _get_current_tier()
     if not check_feature_access(tier, "crm_access"):
         raise HTTPException(status_code=403, detail="CRM requires Connect tier or higher")
 
     db = get_supabase()
     row = _contact_to_row(data, user_id)
+    # Every contact is a digital twin -- auto-activate on creation
+    row["has_twin"] = True
+    row["twin_type"] = "profile_twin"
+    # Score confidence based on how much data was provided
+    filled = sum(1 for v in row.values() if v is not None and v != "" and v != [])
+    row["twin_confidence"] = "high" if filled > 20 else "medium" if filled > 12 else "low"
     result = db.table("crm_contacts").insert(row).execute()
     return _row_to_contact(result.data[0])
 

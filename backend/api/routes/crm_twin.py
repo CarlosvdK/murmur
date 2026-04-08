@@ -11,16 +11,13 @@ from backend.crm.correspondence_processor import process_correspondence
 from backend.crm.twin_engine import query_twin
 from backend.crm.signal_detector import detect_signals
 from backend.auth.tiers import Tier, check_feature_access
-from backend.auth.dependencies import get_current_user_id
+from backend.auth.dependencies import get_current_user_id, get_current_user_tier
 from backend.db.client import get_supabase
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/crm/twin", tags=["crm-twin"])
 
-
-def _get_current_tier() -> Tier:
-    return Tier.CONNECT
 
 
 def _verify_contact_ownership(db, contact_id: UUID, user_id: UUID) -> dict:
@@ -45,13 +42,13 @@ async def upload_correspondence(
     file: UploadFile = File(...),
     confirm_rights: bool = Form(False),
     user_id: UUID = Depends(get_current_user_id),
+    tier: Tier = Depends(get_current_user_tier),
 ):
     """Upload correspondence for twin processing.
 
     PRIVACY: Raw file is processed in memory and discarded.
     Only anonymised communication patterns are stored.
     """
-    tier = _get_current_tier()
     if not check_feature_access(tier, "twin_access"):
         raise HTTPException(status_code=403, detail="Twin access requires Connect tier or higher")
 
@@ -156,9 +153,9 @@ async def upload_correspondence(
 async def ask_twin(
     data: TwinQueryRequest,
     user_id: UUID = Depends(get_current_user_id),
+    tier: Tier = Depends(get_current_user_tier),
 ):
     """Ask a question about a contact based on their communication profile."""
-    tier = _get_current_tier()
     if not check_feature_access(tier, "twin_access"):
         raise HTTPException(status_code=403, detail="Twin access requires Connect tier or higher")
 

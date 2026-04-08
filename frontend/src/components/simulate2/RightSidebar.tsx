@@ -10,6 +10,8 @@ interface SimHistory {
 interface Props {
   history: SimHistory[];
   onSelect: (id: string) => void;
+  personaCount: number;
+  onPersonaCountChange: (count: number) => void;
 }
 
 const VERDICT_COLORS: Record<string, string> = {
@@ -26,7 +28,13 @@ const VERDICT_LABELS: Record<string, string> = {
   test_first: "Test",
 };
 
-export default function RightSidebar({ history, onSelect }: Props) {
+const SWARM_OPTIONS = [
+  { label: "Quick (15)", count: 15 },
+  { label: "Standard (35)", count: 35 },
+  { label: "Deep (75)", count: 75 },
+];
+
+export default function RightSidebar({ history, onSelect, personaCount, onPersonaCountChange }: Props) {
   return (
     <aside className="flex h-full w-80 shrink-0 flex-col border-l border-[#E5E2DC] bg-white">
       {/* Past simulations */}
@@ -82,17 +90,18 @@ export default function RightSidebar({ history, onSelect }: Props) {
           <div>
             <p className="text-xs text-gray-500">Swarm size</p>
             <div className="mt-1 flex gap-1.5">
-              {["Quick (15)", "Standard (35)", "Deep (75)"].map((opt, i) => (
-                <span
-                  key={opt}
-                  className={`rounded-lg border px-2 py-1 text-[10px] ${
-                    i === 1
+              {SWARM_OPTIONS.map((opt) => (
+                <button
+                  key={opt.count}
+                  onClick={() => onPersonaCountChange(opt.count)}
+                  className={`rounded-lg border px-2 py-1 text-[10px] transition-all ${
+                    personaCount === opt.count
                       ? "border-brand-orange bg-brand-orange/5 text-brand-orange"
-                      : "border-[#E5E2DC] text-gray-400"
+                      : "border-[#E5E2DC] text-gray-400 hover:border-gray-300"
                   }`}
                 >
-                  {opt}
-                </span>
+                  {opt.label}
+                </button>
               ))}
             </div>
           </div>

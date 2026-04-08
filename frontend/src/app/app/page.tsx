@@ -10,6 +10,21 @@ export default function AppHome() {
   const [ready, setReady] = useState(false);
   const [stats, setStats] = useState({ simulations: 0, customers: 0, vendors: 0, twins: 0 });
 
+  const fetchStats = () => {
+    Promise.all([
+      listSimulations().catch(() => []),
+      listContacts({ contact_type: "customer" }).catch(() => []),
+      listContacts({ contact_type: "vendor" }).catch(() => []),
+    ]).then(([sims, customers, vendors]) => {
+      setStats({
+        simulations: sims.length,
+        customers: customers.length,
+        vendors: vendors.length,
+        twins: [...customers, ...vendors].filter((c) => c.has_twin).length,
+      });
+    });
+  };
+
   useEffect(() => {
     listBusinesses()
       .then((businesses) => {
@@ -17,19 +32,10 @@ export default function AppHome() {
           router.replace("/onboarding");
         } else {
           setReady(true);
-          // Fetch stats in parallel
-          Promise.all([
-            listSimulations().catch(() => []),
-            listContacts({ contact_type: "customer" }).catch(() => []),
-            listContacts({ contact_type: "vendor" }).catch(() => []),
-          ]).then(([sims, customers, vendors]) => {
-            setStats({
-              simulations: sims.length,
-              customers: customers.length,
-              vendors: vendors.length,
-              twins: [...customers, ...vendors].filter((c) => c.has_twin).length,
-            });
-          });
+          fetchStats();
+          // Poll stats every 30 seconds
+          const interval = setInterval(fetchStats, 30000);
+          return () => clearInterval(interval);
         }
       })
       .catch(() => {

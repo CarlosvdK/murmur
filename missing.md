@@ -1,41 +1,60 @@
-# Missing Backend Integration
+# IMPLEMENTATION SESSION -- 2026-04-08
 
-Tracks frontend features that need backend wiring.
+## COMPLETED THIS SESSION
+- Fixed Next.js production build (downgraded from 14.2.35 to 14.2.15 -- stable version without manifest bug)
+- Wired swarm size selector: RightSidebar Quick/Standard/Deep buttons now control persona_count passed to ChatInterface
+- Implemented tier system: `get_current_user_tier()` reads tier from Supabase user metadata, defaults to SIMULATE (free)
+- Removed all hardcoded `_get_current_tier()` functions from crm_contacts.py, crm_organisations.py, crm_twin.py
+- All CRM routes now use `Depends(get_current_user_tier)` for real tier checking
+- Implemented business file uploads: POST /api/uploads/{business_id} now uploads to Supabase Storage, creates DB record, parses CSV files
+- Added 30-second polling for app home stats (simulations, customers, vendors, twins)
+- Added GET /simulations/accuracy-stats endpoint that queries real_outcomes table
+- Wired reports accuracy tab to use real data from real_outcomes instead of hardcoded 70%
+- Added getAccuracyStats() to frontend API client
 
-## Settings Page (new fields added 2026-04-07)
+## FIXED THIS SESSION
+- Swarm size selector was visual-only, now controls actual persona count (15/35/75)
+- Tier gate was hardcoded to Connect for all users, now reads from Supabase user metadata
+- Uploads endpoint was a stub returning fake response, now stores files and parses CSVs
+- App home stats were static (fetched once), now poll every 30 seconds
+- Reports accuracy was hardcoded at 70%, now shows real data (or "--" if no outcomes reported)
 
-### New fields NOT YET in Business model or DB schema:
-These fields exist in the settings frontend but are not saved to Supabase yet.
-They need: (1) Pydantic model field, (2) metadata key in _business_to_row, (3) _row_to_business unpacking.
+## STILL MISSING (0 critical, 1 medium, 0 low)
+- [MEDIUM] Supabase Storage bucket "business-uploads" needs to be created in Supabase dashboard. The upload endpoint will log a warning if it doesn't exist but won't crash -- the DB record is still created.
 
-- `location_settings` (string[]) -- location character chips (beach, urban, etc.)
-- `area_draws` (string[]) -- what draws people to the area
-- `customer_transport` (string[]) -- how customers get there
-- `has_parking` (string) -- parking availability
-- `first_visit_reasons` (string[]) -- how customers first find the business
-- `seasonal_patterns` (string[]) -- busy seasons
-- `customer_community` (string) -- do customers know each other
-- `opening_hours` (JSONB) -- weekly opening hours grid
-- `google_business_url` (string) -- Google Business Profile URL
-- `tripadvisor_url` (string) -- TripAdvisor URL
-- `instagram_url` (string) -- Instagram handle/URL
-- `facebook_url` (string) -- Facebook page URL
-- `prior_change_types` (string[]) -- what kind of prior change
-- `prior_change_went` (string) -- better/expected/worse
-- `anything_else` (string) -- freeform extra notes
+## NEW ISSUES FOUND
+None.
 
-### Backend endpoint needed:
-- `POST /survey/autofill` -- exists (added by agent), uses researchBusiness internally
+## RECOMMENDED NEXT SESSION
+1. Create "business-uploads" bucket in Supabase dashboard (Storage > New bucket)
+2. Run a full end-to-end simulation to verify the Claude API pipeline works
+3. Test the tier system by setting a user's metadata to "simulate" and verifying CRM access is blocked
+4. Add real_outcomes submission UI (so users can report what actually happened after a simulation)
 
-### DB migration needed:
-- Add columns to `businesses` metadata (no schema change needed -- these go in JSONB metadata)
+## ENVIRONMENT VARIABLES NEEDED
+None new.
 
-### To wire up:
-1. Add fields to `BusinessCreate` Pydantic model in `backend/models/business.py`
-2. Add fields to `Business` model
-3. Add fields to `_row_to_business` in `backend/api/routes/businesses.py`
-4. Add fields to `Business` interface in `frontend/src/lib/api.ts`
-5. Add fields to `handleSave()` in settings page
-6. Add fields to load in `useEffect` in settings page
+## DATABASE MIGRATIONS RUN
+None new. All tables and columns exist.
 
-### Status: Frontend UI complete, backend wiring pending
+---
+
+## PREVIOUS SESSION (2026-04-07)
+- Wired customer/vendor form extended fields to backend via extra_data JSONB
+- Fixed dashboard links from /onboarding to /app/simulate
+- Replaced old /simulate page with redirect to /app/simulate
+
+## ALL ITEMS STATUS
+
+| Item | Priority | Status |
+|------|----------|--------|
+| Customer/vendor forms save all fields | CRITICAL | DONE |
+| Dashboard links fixed | CRITICAL | DONE |
+| Old /simulate redirects | MEDIUM | DONE |
+| Next.js production build | MEDIUM | DONE (14.2.15) |
+| Swarm size selector | LOW | DONE |
+| Tier system | HIGH | DONE |
+| File uploads | HIGH | DONE |
+| Stats polling | LOW | DONE |
+| Reports accuracy | LOW | DONE |
+| Supabase Storage bucket | MEDIUM | PENDING (manual step) |

@@ -1,0 +1,1122 @@
+{
+  "DEFAULT": {
+    "country": "Default (Western European average)",
+    "power_distance": 40,
+    "individualism": 65,
+    "masculinity": 50,
+    "uncertainty_avoidance": 65,
+    "long_term_orientation": 50,
+    "indulgence": 55,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  },
+  "ES": {
+    "country": "Spain",
+    "power_distance": 57,
+    "individualism": 51,
+    "masculinity": 42,
+    "uncertainty_avoidance": 86,
+    "long_term_orientation": 48,
+    "indulgence": 44,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "GB": {
+    "country": "United Kingdom",
+    "power_distance": 35,
+    "individualism": 89,
+    "masculinity": 66,
+    "uncertainty_avoidance": 35,
+    "long_term_orientation": 51,
+    "indulgence": 69,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "direct_pragmatic"
+    }
+  },
+  "NL": {
+    "country": "Netherlands",
+    "power_distance": 38,
+    "individualism": 80,
+    "masculinity": 14,
+    "uncertainty_avoidance": 53,
+    "long_term_orientation": 67,
+    "indulgence": 68,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "direct_consensus"
+    }
+  },
+  "DE": {
+    "country": "Germany",
+    "power_distance": 35,
+    "individualism": 67,
+    "masculinity": 66,
+    "uncertainty_avoidance": 65,
+    "long_term_orientation": 83,
+    "indulgence": 40,
+    "simulation_profile": {
+      "change_resistance": "moderate_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "structured_factual"
+    }
+  },
+  "FR": {
+    "country": "France",
+    "power_distance": 68,
+    "individualism": 71,
+    "masculinity": 43,
+    "uncertainty_avoidance": 86,
+    "long_term_orientation": 63,
+    "indulgence": 48,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "intellectual_debate"
+    }
+  },
+  "IT": {
+    "country": "Italy",
+    "power_distance": 50,
+    "individualism": 76,
+    "masculinity": 70,
+    "uncertainty_avoidance": 75,
+    "long_term_orientation": 61,
+    "indulgence": 30,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "expressive_relationship"
+    }
+  },
+  "PT": {
+    "country": "Portugal",
+    "power_distance": 63,
+    "individualism": 27,
+    "masculinity": 31,
+    "uncertainty_avoidance": 99,
+    "long_term_orientation": 28,
+    "indulgence": 33,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "US": {
+    "country": "United States",
+    "power_distance": 40,
+    "individualism": 91,
+    "masculinity": 62,
+    "uncertainty_avoidance": 46,
+    "long_term_orientation": 26,
+    "indulgence": 68,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "low",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "competitive_direct"
+    }
+  },
+  "BR": {
+    "country": "Brazil",
+    "power_distance": 69,
+    "individualism": 38,
+    "masculinity": 49,
+    "uncertainty_avoidance": 76,
+    "long_term_orientation": 44,
+    "indulgence": 59,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "warm_relationship"
+    }
+  },
+  "MX": {
+    "country": "Mexico",
+    "power_distance": 81,
+    "individualism": 30,
+    "masculinity": 69,
+    "uncertainty_avoidance": 82,
+    "long_term_orientation": 24,
+    "indulgence": 97,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "hierarchical_relationship"
+    }
+  },
+  "PL": {
+    "country": "Poland",
+    "power_distance": 68,
+    "individualism": 60,
+    "masculinity": 64,
+    "uncertainty_avoidance": 93,
+    "long_term_orientation": 38,
+    "indulgence": 29,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_formal"
+    }
+  },
+  "SE": {
+    "country": "Sweden",
+    "power_distance": 31,
+    "individualism": 71,
+    "masculinity": 5,
+    "uncertainty_avoidance": 29,
+    "long_term_orientation": 53,
+    "indulgence": 78,
+    "simulation_profile": {
+      "change_resistance": "very_low",
+      "loyalty_tendency": "low",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "consensus_egalitarian"
+    }
+  },
+  "DK": {
+    "country": "Denmark",
+    "power_distance": 18,
+    "individualism": 74,
+    "masculinity": 16,
+    "uncertainty_avoidance": 23,
+    "long_term_orientation": 35,
+    "indulgence": 70,
+    "simulation_profile": {
+      "change_resistance": "very_low",
+      "loyalty_tendency": "low",
+      "social_proof_sensitivity": "very_low",
+      "price_fairness_sensitivity": "low",
+      "negotiation_style": "flat_direct"
+    }
+  },
+  "NO": {
+    "country": "Norway",
+    "power_distance": 31,
+    "individualism": 69,
+    "masculinity": 8,
+    "uncertainty_avoidance": 50,
+    "long_term_orientation": 35,
+    "indulgence": 55,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "egalitarian_consensus"
+    }
+  },
+  "FI": {
+    "country": "Finland",
+    "power_distance": 33,
+    "individualism": 63,
+    "masculinity": 26,
+    "uncertainty_avoidance": 59,
+    "long_term_orientation": 38,
+    "indulgence": 57,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "quiet_factual"
+    }
+  },
+  "BE": {
+    "country": "Belgium",
+    "power_distance": 65,
+    "individualism": 75,
+    "masculinity": 54,
+    "uncertainty_avoidance": 94,
+    "long_term_orientation": 82,
+    "indulgence": 57,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "formal_cautious"
+    }
+  },
+  "CH": {
+    "country": "Switzerland",
+    "power_distance": 34,
+    "individualism": 68,
+    "masculinity": 70,
+    "uncertainty_avoidance": 58,
+    "long_term_orientation": 74,
+    "indulgence": 66,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "precise_structured"
+    }
+  },
+  "AT": {
+    "country": "Austria",
+    "power_distance": 11,
+    "individualism": 55,
+    "masculinity": 79,
+    "uncertainty_avoidance": 70,
+    "long_term_orientation": 60,
+    "indulgence": 63,
+    "simulation_profile": {
+      "change_resistance": "moderate_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "direct_quality_focused"
+    }
+  },
+  "IE": {
+    "country": "Ireland",
+    "power_distance": 28,
+    "individualism": 70,
+    "masculinity": 68,
+    "uncertainty_avoidance": 35,
+    "long_term_orientation": 24,
+    "indulgence": 65,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "friendly_pragmatic"
+    }
+  },
+  "GR": {
+    "country": "Greece",
+    "power_distance": 60,
+    "individualism": 35,
+    "masculinity": 57,
+    "uncertainty_avoidance": 100,
+    "long_term_orientation": 45,
+    "indulgence": 50,
+    "simulation_profile": {
+      "change_resistance": "extreme",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "emotional_relationship"
+    }
+  },
+  "CZ": {
+    "country": "Czech Republic",
+    "power_distance": 57,
+    "individualism": 58,
+    "masculinity": 57,
+    "uncertainty_avoidance": 74,
+    "long_term_orientation": 70,
+    "indulgence": 29,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "reserved_pragmatic"
+    }
+  },
+  "HU": {
+    "country": "Hungary",
+    "power_distance": 46,
+    "individualism": 80,
+    "masculinity": 88,
+    "uncertainty_avoidance": 82,
+    "long_term_orientation": 58,
+    "indulgence": 31,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "competitive_structured"
+    }
+  },
+  "JP": {
+    "country": "Japan",
+    "power_distance": 54,
+    "individualism": 46,
+    "masculinity": 95,
+    "uncertainty_avoidance": 92,
+    "long_term_orientation": 88,
+    "indulgence": 42,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "indirect_consensus"
+    }
+  },
+  "AU": {
+    "country": "Australia",
+    "power_distance": 38,
+    "individualism": 90,
+    "masculinity": 61,
+    "uncertainty_avoidance": 51,
+    "long_term_orientation": 21,
+    "indulgence": 71,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "low",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "casual_direct"
+    }
+  },
+  "CA": {
+    "country": "Canada",
+    "power_distance": 39,
+    "individualism": 80,
+    "masculinity": 52,
+    "uncertainty_avoidance": 48,
+    "long_term_orientation": 36,
+    "indulgence": 68,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "polite_direct"
+    }
+  },
+  "IN": {
+    "country": "India",
+    "power_distance": 77,
+    "individualism": 48,
+    "masculinity": 56,
+    "uncertainty_avoidance": 40,
+    "long_term_orientation": 51,
+    "indulgence": 26,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "hierarchical_bargaining"
+    }
+  },
+  "CN": {
+    "country": "China",
+    "power_distance": 80,
+    "individualism": 20,
+    "masculinity": 66,
+    "uncertainty_avoidance": 30,
+    "long_term_orientation": 87,
+    "indulgence": 24,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "strategic_relationship"
+    }
+  },
+  "KR": {
+    "country": "South Korea",
+    "power_distance": 60,
+    "individualism": 18,
+    "masculinity": 39,
+    "uncertainty_avoidance": 85,
+    "long_term_orientation": 100,
+    "indulgence": 29,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "hierarchical_cautious"
+    }
+  },
+  "TR": {
+    "country": "Turkey",
+    "power_distance": 66,
+    "individualism": 37,
+    "masculinity": 45,
+    "uncertainty_avoidance": 85,
+    "long_term_orientation": 46,
+    "indulgence": 49,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_bargaining"
+    }
+  },
+  "ZA": {
+    "country": "South Africa",
+    "power_distance": 49,
+    "individualism": 65,
+    "masculinity": 63,
+    "uncertainty_avoidance": 49,
+    "long_term_orientation": 34,
+    "indulgence": 63,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "pragmatic_mixed"
+    }
+  },
+  "AR": {
+    "country": "Argentina",
+    "power_distance": 49,
+    "individualism": 46,
+    "masculinity": 56,
+    "uncertainty_avoidance": 86,
+    "long_term_orientation": 20,
+    "indulgence": 62,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "CO": {
+    "country": "Colombia",
+    "power_distance": 67,
+    "individualism": 13,
+    "masculinity": 64,
+    "uncertainty_avoidance": 80,
+    "long_term_orientation": 13,
+    "indulgence": 83,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "CL": {
+    "country": "Chile",
+    "power_distance": 63,
+    "individualism": 23,
+    "masculinity": 28,
+    "uncertainty_avoidance": 86,
+    "long_term_orientation": 31,
+    "indulgence": 68,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "PE": {
+    "country": "Peru",
+    "power_distance": 64,
+    "individualism": 16,
+    "masculinity": 42,
+    "uncertainty_avoidance": 87,
+    "long_term_orientation": 25,
+    "indulgence": 46,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "RO": {
+    "country": "Romania",
+    "power_distance": 90,
+    "individualism": 30,
+    "masculinity": 42,
+    "uncertainty_avoidance": 90,
+    "long_term_orientation": 52,
+    "indulgence": 20,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "HR": {
+    "country": "Croatia",
+    "power_distance": 73,
+    "individualism": 33,
+    "masculinity": 40,
+    "uncertainty_avoidance": 80,
+    "long_term_orientation": 58,
+    "indulgence": 33,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "RS": {
+    "country": "Serbia",
+    "power_distance": 86,
+    "individualism": 25,
+    "masculinity": 43,
+    "uncertainty_avoidance": 92,
+    "long_term_orientation": 52,
+    "indulgence": 28,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "BG": {
+    "country": "Bulgaria",
+    "power_distance": 70,
+    "individualism": 30,
+    "masculinity": 40,
+    "uncertainty_avoidance": 85,
+    "long_term_orientation": 69,
+    "indulgence": 16,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "UA": {
+    "country": "Ukraine",
+    "power_distance": 92,
+    "individualism": 25,
+    "masculinity": 27,
+    "uncertainty_avoidance": 95,
+    "long_term_orientation": 55,
+    "indulgence": 18,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "RU": {
+    "country": "Russia",
+    "power_distance": 93,
+    "individualism": 39,
+    "masculinity": 36,
+    "uncertainty_avoidance": 95,
+    "long_term_orientation": 81,
+    "indulgence": 20,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "TH": {
+    "country": "Thailand",
+    "power_distance": 64,
+    "individualism": 20,
+    "masculinity": 34,
+    "uncertainty_avoidance": 64,
+    "long_term_orientation": 32,
+    "indulgence": 45,
+    "simulation_profile": {
+      "change_resistance": "moderate_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "structured_factual"
+    }
+  },
+  "VN": {
+    "country": "Vietnam",
+    "power_distance": 70,
+    "individualism": 20,
+    "masculinity": 40,
+    "uncertainty_avoidance": 30,
+    "long_term_orientation": 57,
+    "indulgence": 35,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "low",
+      "negotiation_style": "direct_pragmatic"
+    }
+  },
+  "ID": {
+    "country": "Indonesia",
+    "power_distance": 78,
+    "individualism": 14,
+    "masculinity": 46,
+    "uncertainty_avoidance": 48,
+    "long_term_orientation": 62,
+    "indulgence": 38,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  },
+  "MY": {
+    "country": "Malaysia",
+    "power_distance": 100,
+    "individualism": 26,
+    "masculinity": 50,
+    "uncertainty_avoidance": 36,
+    "long_term_orientation": 41,
+    "indulgence": 57,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "low",
+      "negotiation_style": "direct_pragmatic"
+    }
+  },
+  "PH": {
+    "country": "Philippines",
+    "power_distance": 94,
+    "individualism": 32,
+    "masculinity": 64,
+    "uncertainty_avoidance": 44,
+    "long_term_orientation": 27,
+    "indulgence": 42,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  },
+  "SG": {
+    "country": "Singapore",
+    "power_distance": 74,
+    "individualism": 20,
+    "masculinity": 48,
+    "uncertainty_avoidance": 8,
+    "long_term_orientation": 72,
+    "indulgence": 46,
+    "simulation_profile": {
+      "change_resistance": "very_low",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "low",
+      "negotiation_style": "flat_direct"
+    }
+  },
+  "EG": {
+    "country": "Egypt",
+    "power_distance": 70,
+    "individualism": 25,
+    "masculinity": 45,
+    "uncertainty_avoidance": 80,
+    "long_term_orientation": 7,
+    "indulgence": 4,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "SA": {
+    "country": "Saudi Arabia",
+    "power_distance": 95,
+    "individualism": 25,
+    "masculinity": 60,
+    "uncertainty_avoidance": 80,
+    "long_term_orientation": 36,
+    "indulgence": 52,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "AE": {
+    "country": "United Arab Emirates",
+    "power_distance": 90,
+    "individualism": 25,
+    "masculinity": 50,
+    "uncertainty_avoidance": 80,
+    "long_term_orientation": 23,
+    "indulgence": 34,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "IL": {
+    "country": "Israel",
+    "power_distance": 13,
+    "individualism": 54,
+    "masculinity": 47,
+    "uncertainty_avoidance": 81,
+    "long_term_orientation": 38,
+    "indulgence": 0,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "NZ": {
+    "country": "New Zealand",
+    "power_distance": 22,
+    "individualism": 79,
+    "masculinity": 58,
+    "uncertainty_avoidance": 49,
+    "long_term_orientation": 33,
+    "indulgence": 75,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  },
+  "TW": {
+    "country": "Taiwan",
+    "power_distance": 58,
+    "individualism": 17,
+    "masculinity": 45,
+    "uncertainty_avoidance": 69,
+    "long_term_orientation": 93,
+    "indulgence": 49,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "HK": {
+    "country": "Hong Kong",
+    "power_distance": 68,
+    "individualism": 25,
+    "masculinity": 57,
+    "uncertainty_avoidance": 29,
+    "long_term_orientation": 61,
+    "indulgence": 17,
+    "simulation_profile": {
+      "change_resistance": "low",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "low",
+      "negotiation_style": "direct_pragmatic"
+    }
+  },
+  "PK": {
+    "country": "Pakistan",
+    "power_distance": 55,
+    "individualism": 14,
+    "masculinity": 50,
+    "uncertainty_avoidance": 70,
+    "long_term_orientation": 50,
+    "indulgence": 0,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "NG": {
+    "country": "Nigeria",
+    "power_distance": 80,
+    "individualism": 30,
+    "masculinity": 60,
+    "uncertainty_avoidance": 55,
+    "long_term_orientation": 13,
+    "indulgence": 84,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  },
+  "KE": {
+    "country": "Kenya",
+    "power_distance": 70,
+    "individualism": 25,
+    "masculinity": 60,
+    "uncertainty_avoidance": 50,
+    "long_term_orientation": 0,
+    "indulgence": 0,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  },
+  "MA": {
+    "country": "Morocco",
+    "power_distance": 70,
+    "individualism": 46,
+    "masculinity": 53,
+    "uncertainty_avoidance": 68,
+    "long_term_orientation": 14,
+    "indulgence": 25,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "EC": {
+    "country": "Ecuador",
+    "power_distance": 78,
+    "individualism": 8,
+    "masculinity": 63,
+    "uncertainty_avoidance": 67,
+    "long_term_orientation": 0,
+    "indulgence": 0,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "VE": {
+    "country": "Venezuela",
+    "power_distance": 81,
+    "individualism": 12,
+    "masculinity": 73,
+    "uncertainty_avoidance": 76,
+    "long_term_orientation": 16,
+    "indulgence": 100,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "UY": {
+    "country": "Uruguay",
+    "power_distance": 61,
+    "individualism": 36,
+    "masculinity": 38,
+    "uncertainty_avoidance": 99,
+    "long_term_orientation": 26,
+    "indulgence": 53,
+    "simulation_profile": {
+      "change_resistance": "extreme",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "very_cautious_consensus"
+    }
+  },
+  "LT": {
+    "country": "Lithuania",
+    "power_distance": 42,
+    "individualism": 60,
+    "masculinity": 19,
+    "uncertainty_avoidance": 65,
+    "long_term_orientation": 82,
+    "indulgence": 16,
+    "simulation_profile": {
+      "change_resistance": "moderate_high",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "structured_factual"
+    }
+  },
+  "LV": {
+    "country": "Latvia",
+    "power_distance": 44,
+    "individualism": 70,
+    "masculinity": 9,
+    "uncertainty_avoidance": 63,
+    "long_term_orientation": 69,
+    "indulgence": 13,
+    "simulation_profile": {
+      "change_resistance": "moderate_high",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "low",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "structured_factual"
+    }
+  },
+  "EE": {
+    "country": "Estonia",
+    "power_distance": 40,
+    "individualism": 60,
+    "masculinity": 30,
+    "uncertainty_avoidance": 60,
+    "long_term_orientation": 82,
+    "indulgence": 16,
+    "simulation_profile": {
+      "change_resistance": "moderate_high",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "structured_factual"
+    }
+  },
+  "SK": {
+    "country": "Slovakia",
+    "power_distance": 100,
+    "individualism": 52,
+    "masculinity": 100,
+    "uncertainty_avoidance": 51,
+    "long_term_orientation": 77,
+    "indulgence": 28,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  },
+  "SI": {
+    "country": "Slovenia",
+    "power_distance": 71,
+    "individualism": 27,
+    "masculinity": 19,
+    "uncertainty_avoidance": 88,
+    "long_term_orientation": 49,
+    "indulgence": 48,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "very_high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "LU": {
+    "country": "Luxembourg",
+    "power_distance": 40,
+    "individualism": 60,
+    "masculinity": 50,
+    "uncertainty_avoidance": 70,
+    "long_term_orientation": 64,
+    "indulgence": 56,
+    "simulation_profile": {
+      "change_resistance": "high",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "high",
+      "negotiation_style": "relationship_first"
+    }
+  },
+  "MT": {
+    "country": "Malta",
+    "power_distance": 56,
+    "individualism": 59,
+    "masculinity": 47,
+    "uncertainty_avoidance": 96,
+    "long_term_orientation": 47,
+    "indulgence": 66,
+    "simulation_profile": {
+      "change_resistance": "extreme",
+      "loyalty_tendency": "high",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "very_cautious_consensus"
+    }
+  },
+  "CY": {
+    "country": "Cyprus",
+    "power_distance": 57,
+    "individualism": 35,
+    "masculinity": 50,
+    "uncertainty_avoidance": 85,
+    "long_term_orientation": 0,
+    "indulgence": 70,
+    "simulation_profile": {
+      "change_resistance": "very_high",
+      "loyalty_tendency": "very_high",
+      "social_proof_sensitivity": "high",
+      "price_fairness_sensitivity": "very_high",
+      "negotiation_style": "cautious_relationship"
+    }
+  },
+  "IS": {
+    "country": "Iceland",
+    "power_distance": 30,
+    "individualism": 60,
+    "masculinity": 10,
+    "uncertainty_avoidance": 50,
+    "long_term_orientation": 28,
+    "indulgence": 67,
+    "simulation_profile": {
+      "change_resistance": "moderate",
+      "loyalty_tendency": "moderate",
+      "social_proof_sensitivity": "moderate",
+      "price_fairness_sensitivity": "moderate",
+      "negotiation_style": "balanced"
+    }
+  }
+}

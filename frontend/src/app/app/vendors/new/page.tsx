@@ -23,11 +23,16 @@ export default function NewVendorPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const f = form as Record<string, unknown>;
       const contact = await createContact({
-        first_name: (form.first_name as string) || "Unnamed",
-        last_name: form.last_name, email: form.email, phone: form.phone,
-        linkedin_url: form.linkedin_url, contact_type: "vendor",
-        notes: form.vendor_relationship_notes,
+        first_name: (f.first_name as string) || "Unnamed",
+        last_name: f.last_name,
+        email: f.email,
+        phone: f.phone,
+        linkedin_url: f.linkedin_url,
+        contact_type: "vendor",
+        notes: f.vendor_relationship_notes,
+        extra_data: f,
       });
       setSavedId(contact.id);
     } catch { alert("Failed to save"); }
@@ -40,11 +45,11 @@ export default function NewVendorPage() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <button onClick={() => router.back()} className="mb-2 text-xs text-gray-400 hover:text-black">&larr; Back to vendors</button>
-            <h1 className="text-2xl font-bold text-black">Add vendor</h1>
+            <h1 className="text-2xl font-bold text-black">Create Vendor Twin</h1>
           </div>
           <button onClick={handleSave} disabled={saving}
             className="rounded-lg bg-black px-6 py-2.5 text-sm font-medium text-white hover:opacity-80 disabled:opacity-50">
-            {saving ? "Saving..." : "Save vendor"}
+            {saving ? "Saving..." : "Generate Twin"}
           </button>
         </div>
 
@@ -220,7 +225,7 @@ export default function NewVendorPage() {
           <button onClick={() => router.back()} className="text-sm text-gray-400 hover:text-black">Cancel</button>
           <button onClick={handleSave} disabled={saving}
             className="rounded-lg bg-black px-8 py-2.5 text-sm font-medium text-white hover:opacity-80 disabled:opacity-50">
-            {saving ? "Saving..." : "Save vendor"}
+            {saving ? "Saving..." : "Generate Twin"}
           </button>
         </div>
       </div>

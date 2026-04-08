@@ -52,7 +52,7 @@ export default function DashboardPage() {
           </p>
         </div>
         <a
-          href="/onboarding"
+          href="/app/simulate"
           className="rounded-lg bg-legacy-navy px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
         >
           New Simulation
@@ -66,7 +66,7 @@ export default function DashboardPage() {
           <MessageSquare className="mx-auto mb-3 h-8 w-8 text-gray-300" />
           <p className="text-sm text-gray-500">
             No simulations yet.{" "}
-            <a href="/onboarding" className="text-legacy-navy underline">
+            <a href="/app/simulate" className="text-legacy-navy underline">
               Run your first one.
             </a>
           </p>

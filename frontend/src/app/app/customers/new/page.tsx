@@ -25,17 +25,19 @@ export default function NewCustomerPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
+      const f = form as Record<string, unknown>;
       const contact = await createContact({
-        first_name: (form.first_name as string) || "Unnamed",
-        last_name: form.last_name,
-        job_title: form.occupation,
-        email: form.email,
-        phone: form.phone,
-        linkedin_url: form.linkedin_url,
-        city: form.city,
-        country: form.country,
+        first_name: (f.first_name as string) || "Unnamed",
+        last_name: f.last_name,
+        job_title: f.occupation || f.job_title,
+        email: f.email,
+        phone: f.phone,
+        linkedin_url: f.linkedin_url,
+        city: f.city,
+        country: f.country,
         contact_type: "customer",
-        notes: form.relationship_notes,
+        notes: f.relationship_notes,
+        extra_data: f,
       });
       setSavedId(contact.id);
     } catch {
@@ -51,11 +53,11 @@ export default function NewCustomerPage() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <button onClick={() => router.back()} className="mb-2 text-xs text-gray-400 hover:text-black">&larr; Back to customers</button>
-            <h1 className="text-2xl font-bold text-black">Add customer</h1>
+            <h1 className="text-2xl font-bold text-black">Create Customer Twin</h1>
           </div>
           <button onClick={handleSave} disabled={saving}
             className="rounded-lg bg-black px-6 py-2.5 text-sm font-medium text-white hover:opacity-80 disabled:opacity-50">
-            {saving ? "Saving..." : "Save customer"}
+            {saving ? "Saving..." : "Generate Twin"}
           </button>
         </div>
 
@@ -229,7 +231,7 @@ export default function NewCustomerPage() {
           <button onClick={() => router.back()} className="text-sm text-gray-400 hover:text-black">Cancel</button>
           <button onClick={handleSave} disabled={saving}
             className="rounded-lg bg-black px-8 py-2.5 text-sm font-medium text-white hover:opacity-80 disabled:opacity-50">
-            {saving ? "Saving..." : "Save customer"}
+            {saving ? "Saving..." : "Generate Twin"}
           </button>
         </div>
       </div>

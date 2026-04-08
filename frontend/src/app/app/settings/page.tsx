@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { listBusinesses, updateBusiness, researchBusiness, generateDescription, generateCustomerDescription, placeAutocomplete, placeDetails, Business, BusinessCreate } from "@/lib/api";
+import { listBusinesses, updateBusiness, deleteAccount, researchBusiness, generateDescription, generateCustomerDescription, placeAutocomplete, placeDetails, Business, BusinessCreate } from "@/lib/api";
 import { createClient } from "@/lib/supabase/client";
 
 // === EXPANDED BUSINESS TYPES WITH GROUPS ===
@@ -393,7 +393,7 @@ export default function SettingsPage() {
   async function handleSignOut() {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/login"); router.refresh();
+    router.push("/"); router.refresh();
   }
 
   if (loading) return <div className="flex h-full items-center justify-center"><p className="text-gray-400">Loading...</p></div>;
@@ -800,7 +800,15 @@ export default function SettingsPage() {
               <p className="mb-4 text-sm text-red-600/70">Permanently delete your account and all data. This cannot be undone.</p>
               {showDeleteConfirm ? (
                 <div className="flex gap-3"><button onClick={() => setShowDeleteConfirm(false)} className="rounded-lg border border-[#E5E2DC] px-4 py-1.5 text-xs text-gray-600">Cancel</button>
-                  <button className="rounded-lg bg-red-600 px-4 py-1.5 text-xs font-medium text-white">Yes, delete everything</button></div>
+                  <button onClick={async () => {
+                    try {
+                      await deleteAccount();
+                      const supabase = createClient();
+                      await supabase.auth.signOut();
+                      router.push("/");
+                      router.refresh();
+                    } catch { alert("Failed to delete account"); }
+                  }} className="rounded-lg bg-red-600 px-4 py-1.5 text-xs font-medium text-white">Yes, delete everything</button></div>
               ) : (<button onClick={() => setShowDeleteConfirm(true)} className="rounded-lg border border-red-300 px-4 py-1.5 text-xs font-medium text-red-600 hover:bg-red-100">Delete account</button>)}
             </div>
           </div>

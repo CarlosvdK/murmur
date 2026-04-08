@@ -40,6 +40,7 @@ interface SimEntry {
 
 interface Props {
   businessId: string | null;
+  personaCount?: number;
   onSimulationComplete?: (sim: { id: string; question: string; verdict: string }) => void;
 }
 
@@ -115,7 +116,7 @@ function generateClarifyingQuestions(question: string): ClarifyingQuestion[] {
   return questions;
 }
 
-export default function ChatInterface({ businessId, onSimulationComplete }: Props) {
+export default function ChatInterface({ businessId, personaCount = 12, onSimulationComplete }: Props) {
   const [input, setInput] = useState("");
   const [thread, setThread] = useState<SimEntry[]>([]);
   const [running, setRunning] = useState(false);
@@ -221,7 +222,7 @@ export default function ChatInterface({ businessId, onSimulationComplete }: Prop
       const sim = await createSimulation({
         business_id: businessId!,
         question: enrichedQuestion,
-        persona_count: 12,
+        persona_count: personaCount,
       });
 
       setThread((prev) =>

@@ -12,6 +12,7 @@ export default function SimulatePage() {
   const [history, setHistory] = useState<
     { id: string; question: string; verdict: string; date: string }[]
   >([]);
+  const [personaCount, setPersonaCount] = useState(35);
 
   useEffect(() => {
     listBusinesses()
@@ -46,10 +47,13 @@ export default function SimulatePage() {
     <div className="flex h-full">
       <ChatInterface
         businessId={businessId}
+        personaCount={personaCount}
         onSimulationComplete={handleSimComplete}
       />
       <RightSidebar
         history={history}
+        personaCount={personaCount}
+        onPersonaCountChange={setPersonaCount}
         onSelect={() => {
           // TODO: load past simulation
         }}

@@ -173,3 +173,24 @@ async def list_businesses(user_id: UUID = Depends(get_current_user_id)):
         .execute()
     )
     return [_row_to_business(row) for row in result.data]
+
+
+@router.delete("/account")
+async def delete_account(user_id: UUID = Depends(get_current_user_id)):
+    """Delete all user data: businesses (cascades to simulations, personas, etc.), contacts, and auth account."""
+    db = get_supabase()
+
+    # Delete CRM data (contacts cascade to correspondence, signals, twin queries)
+    db.table("crm_contacts").delete().eq("user_id", str(user_id)).execute()
+    db.table("crm_organisations").delete().eq("user_id", str(user_id)).execute()
+
+    # Delete businesses (cascades to simulations, personas, responses, results, uploads, outcomes)
+    db.table("businesses").delete().eq("user_id", str(user_id)).execute()
+
+    # Delete Supabase auth user
+    try:
+        db.auth.admin.delete_user(str(user_id))
+    except Exception:
+        pass  # Auth deletion may fail if using anon key -- user can still be cleaned up in dashboard
+
+    return {"deleted": True}

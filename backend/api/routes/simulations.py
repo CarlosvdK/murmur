@@ -690,3 +690,31 @@ async def list_simulations(user_id: UUID = Depends(get_current_user_id)):
         .execute()
     )
     return [_row_to_sim(row) for row in result.data]
+
+
+@router.get("/accuracy-stats")
+async def get_accuracy_stats(user_id: UUID = Depends(get_current_user_id)):
+    """Return accuracy stats from real_outcomes table."""
+    db = get_supabase()
+    # Get user's business IDs
+    biz_result = db.table("businesses").select("id").eq("user_id", str(user_id)).execute()
+    biz_ids = [b["id"] for b in biz_result.data]
+    if not biz_ids:
+        return {"total_outcomes": 0, "matched": 0, "accuracy_pct": None}
+
+    # Get simulation IDs for those businesses
+    sim_result = db.table("simulations").select("id").in_("business_id", biz_ids).execute()
+    sim_ids = [s["id"] for s in sim_result.data]
+    if not sim_ids:
+        return {"total_outcomes": 0, "matched": 0, "accuracy_pct": None}
+
+    # Get real outcomes
+    outcomes = db.table("real_outcomes").select("*").in_("simulation_id", sim_ids).execute()
+    total = len(outcomes.data)
+    matched = len([o for o in outcomes.data if o.get("outcome_matched")])
+
+    return {
+        "total_outcomes": total,
+        "matched": matched,
+        "accuracy_pct": round((matched / total) * 100) if total > 0 else None,
+    }

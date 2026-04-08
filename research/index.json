@@ -1,0 +1,556 @@
+{
+  "last_updated": "2026-04-08",
+  "total_papers": 25,
+  "hofstede_countries": 69,
+  "domains_with_prompts": 9,
+  "by_domain": {
+    "digital_twins": [
+      "park2023generative",
+      "park2024thousand",
+      "argyle2023out",
+      "gui2023challenge",
+      "kim2024augmented",
+      "toubia2025mega",
+      "li2025llm_persona",
+      "li2025behaviorchain",
+      "aher2023using",
+      "liu2024rational"
+    ],
+    "consumer_psychology": [
+      "kahneman1979prospect",
+      "thaler1985mental",
+      "cialdini1984influence",
+      "oliver1999loyalty",
+      "zeithaml1988perceptions",
+      "anderson1993customer",
+      "vaidyanathan2003fairest",
+      "kalapurakal1991fairness",
+      "singh1990voice",
+      "gelbrich2011meta",
+      "liuthompkins2013repeat",
+      "mosavi2018switching"
+    ],
+    "cultural_dimensions": [
+      "hofstede2001culture",
+      "demooij2010hofstede",
+      "soares2007hofstede",
+      "steenkamp1999cross",
+      "atari2024which",
+      "li2025cultural"
+    ],
+    "behavioral_economics": [
+      "thaler2008nudge",
+      "ariely2008predictably",
+      "dellavigna2009psychology",
+      "camerer2004behavioral",
+      "loewenstein2001risk",
+      "tversky1992advances"
+    ],
+    "simulation_methodology": [
+      "bonabeau2002agent",
+      "rand2011agent",
+      "axelrod1997complexity",
+      "sun2016tutorial"
+    ],
+    "review_bias": [
+      "gao2015vocal",
+      "karaman2021extremity",
+      "hu2009overcoming",
+      "luca2016reviews"
+    ],
+    "negotiation_psychology": [
+      "fisher1981getting",
+      "bazerman1992negotiating",
+      "lewicki2015negotiation",
+      "curhan2006what",
+      "orr2005anchoring"
+    ],
+    "personality_models": [
+      "costa1992normal",
+      "matz2017psychological",
+      "barrick1991big",
+      "nave2018musical"
+    ],
+    "agent_based_modeling": [
+      "bonabeau2002agent",
+      "axelrod1997complexity",
+      "epstein1996growing"
+    ],
+    "decision_making": [
+      "rogers2003diffusion",
+      "slovic1987perception",
+      "ellsberg1961risk",
+      "tversky1992advances",
+      "heidenreich2015innovation"
+    ]
+  },
+  "papers": [
+    {
+      "id": "park2023generative",
+      "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+      "authors": [
+        "Park, J.S.",
+        "O'Brien, J.C.",
+        "Cai, C.J.",
+        "Morris, M.R.",
+        "Liang, P.",
+        "Bernstein, M.S."
+      ],
+      "year": 2023,
+      "venue": "UIST 2023",
+      "citations": 3500,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "LLM agents with rich memory and reflection produce believable human behaviour in simulated environments"
+    },
+    {
+      "id": "park2024thousand",
+      "title": "Generative Agent Simulations of 1,000 People",
+      "authors": [
+        "Park, J.S.",
+        "Zou, C.",
+        "Shaw, A.",
+        "Hill, B.",
+        "Cai, C.",
+        "Morris, M.R.",
+        "Liang, P.",
+        "Bernstein, M.S."
+      ],
+      "year": 2024,
+      "venue": "arXiv 2411.10109",
+      "citations": 85,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Individual-level demographic + interview data enables 85% accuracy in predicting survey responses for 1000 real people"
+    },
+    {
+      "id": "argyle2023out",
+      "title": "Out of One, Many: Using Language Models to Simulate Human Samples",
+      "authors": [
+        "Argyle, L.P.",
+        "Busby, E.C.",
+        "Fulda, N.",
+        "Gubler, J.R.",
+        "Rytting, C.",
+        "Wingate, D."
+      ],
+      "year": 2023,
+      "venue": "Political Analysis",
+      "citations": 750,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Conditioning LLMs on demographic backstories produces response distributions that closely match real human survey data ('silicon sampling')"
+    },
+    {
+      "id": "gui2023challenge",
+      "title": "The Challenge of Using LLMs to Simulate Human Behavior",
+      "authors": [
+        "Gui, G.",
+        "Toubia, O."
+      ],
+      "year": 2023,
+      "venue": "arXiv 2312.15524",
+      "citations": 45,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "LLM personas exhibit systematic positive bias (~20-30% overstatement of acceptance) and homogeneity bias compared to real humans"
+    },
+    {
+      "id": "kahneman1979prospect",
+      "title": "Prospect Theory: An Analysis of Decision under Risk",
+      "authors": [
+        "Kahneman, D.",
+        "Tversky, A."
+      ],
+      "year": 1979,
+      "venue": "Econometrica",
+      "citations": 85000,
+      "domain": "consumer_psychology",
+      "relevance": 5,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Losses are weighted approximately 2x more than equivalent gains in decision-making -- foundational for all price reaction simulations"
+    },
+    {
+      "id": "thaler1985mental",
+      "title": "Mental Accounting and Consumer Choice",
+      "authors": [
+        "Thaler, R.H."
+      ],
+      "year": 1985,
+      "venue": "Marketing Science",
+      "citations": 9500,
+      "domain": "consumer_psychology",
+      "relevance": 4,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Consumers maintain mental accounts that affect how they perceive price changes -- a 10% increase on a 5 EUR item feels different from 10% on a 50 EUR item"
+    },
+    {
+      "id": "gao2015vocal",
+      "title": "Vocal Minority and Silent Majority: How Do Online Ratings Reflect Population Perceptions of Quality",
+      "authors": [
+        "Gao, G.",
+        "Greenwood, B.N.",
+        "Agarwal, R.",
+        "McCullough, J.S."
+      ],
+      "year": 2015,
+      "venue": "MIS Quarterly",
+      "citations": 850,
+      "domain": "review_bias",
+      "relevance": 5,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Online ratings systematically overrepresent extreme opinions. The silent majority (~95% of customers) holds more moderate views."
+    },
+    {
+      "id": "hofstede2001culture",
+      "title": "Culture's Consequences: Comparing Values, Behaviors, Institutions and Organizations Across Nations",
+      "authors": [
+        "Hofstede, G."
+      ],
+      "year": 2001,
+      "venue": "Sage Publications",
+      "citations": 120000,
+      "domain": "cultural_dimensions",
+      "relevance": 5,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Six cultural dimensions (PDI, IDV, MAS, UAI, LTO, IVR) predict systematic differences in consumer behaviour across countries"
+    },
+    {
+      "id": "rogers2003diffusion",
+      "title": "Diffusion of Innovations",
+      "authors": [
+        "Rogers, E.M."
+      ],
+      "year": 2003,
+      "venue": "Free Press (5th edition)",
+      "citations": 130000,
+      "domain": "decision_making",
+      "relevance": 4,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Innovation adoption follows a predictable curve: innovators (2.5%), early adopters (13.5%), early majority (34%), late majority (34%), laggards (16%)"
+    },
+    {
+      "id": "fisher1981getting",
+      "title": "Getting to Yes: Negotiating Agreement Without Giving In",
+      "authors": [
+        "Fisher, R.",
+        "Ury, W."
+      ],
+      "year": 1981,
+      "venue": "Penguin Books",
+      "citations": 15000,
+      "domain": "negotiation_psychology",
+      "relevance": 4,
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true,
+      "key_finding": "Principled negotiation (interests over positions) and BATNA (best alternative) are the strongest predictors of negotiation outcomes"
+    },
+    {
+      "id": "li2025llm_persona",
+      "title": "LLM Generated Persona is a Promise with a Catch",
+      "authors": [
+        "Li, A.",
+        "Chen, H.",
+        "Namkoong, H.",
+        "Peng, T."
+      ],
+      "year": 2025,
+      "venue": "arXiv 2503.16527",
+      "citations": 70,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "key_finding": "LLM personas are sensitive to persona framing -- small prompt changes can flip predictions. Structured demographic anchoring is critical.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "li2025behaviorchain",
+      "title": "How Far Are LLMs from Being Our Digital Twins? A Benchmark for Persona-Based Behavior Chain Simulation",
+      "authors": [
+        "Li, R.",
+        "Xia, H.",
+        "Yuan, X."
+      ],
+      "year": 2025,
+      "venue": "ACL 2025 Findings",
+      "citations": 9,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "key_finding": "LLMs achieve 0.52 accuracy simulating nonfiction personas -- significant room for improvement with structured data.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "aher2023using",
+      "title": "Using Large Language Models to Simulate Multiple Humans and Replicate Human Subject Studies",
+      "authors": [
+        "Aher, G.V.",
+        "Arriaga, R.I.",
+        "Kalai, A.T."
+      ],
+      "year": 2023,
+      "venue": "ICML 2023",
+      "citations": 909,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "key_finding": "LLMs can replicate classic social science experiments when properly conditioned with demographic and contextual information.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "liu2024rational",
+      "title": "Large Language Models Assume People Are More Rational Than We Really Are",
+      "authors": [
+        "Liu, R.",
+        "Geng, J.",
+        "Peterson, J.C."
+      ],
+      "year": 2024,
+      "venue": "arXiv",
+      "citations": 59,
+      "domain": "digital_twins",
+      "relevance": 5,
+      "key_finding": "LLMs overestimate human rationality in decisions. Must inject irrationality, habit, and emotion into persona prompts.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "li2025cultural",
+      "title": "Toward Accurate Psychological Simulations: Investigating LLMs Responses to Personality and Cultural Variables",
+      "authors": [
+        "Li, C.",
+        "Qi, Y."
+      ],
+      "year": 2025,
+      "venue": "Computers in Human Behavior",
+      "citations": 15,
+      "domain": "cultural_dimensions",
+      "relevance": 4,
+      "key_finding": "LLMs struggle with accurate cultural simulation without explicit cultural context injection.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "tversky1992advances",
+      "title": "Advances in Prospect Theory: Cumulative Representation of Uncertainty",
+      "authors": [
+        "Tversky, A.",
+        "Kahneman, D."
+      ],
+      "year": 1992,
+      "venue": "Journal of Risk and Uncertainty",
+      "citations": 24082,
+      "domain": "behavioral_economics",
+      "relevance": 4,
+      "key_finding": "Cumulative prospect theory -- people overweight small probabilities and underweight large ones.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "vaidyanathan2003fairest",
+      "title": "Who is the Fairest of Them All? An Attributional Approach to Price Fairness Perceptions",
+      "authors": [
+        "Vaidyanathan, R.",
+        "Aggarwal, P."
+      ],
+      "year": 2003,
+      "venue": "Journal of Business Research",
+      "citations": 472,
+      "domain": "consumer_psychology",
+      "relevance": 4,
+      "key_finding": "Price fairness depends on attributed cause -- cost-driven increases are 60% more accepted than profit-driven ones.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "kalapurakal1991fairness",
+      "title": "Perceived Price Fairness and Dual Entitlement",
+      "authors": [
+        "Kalapurakal, R.",
+        "Dickson, P.R."
+      ],
+      "year": 1991,
+      "venue": "Advances in Consumer Research",
+      "citations": 173,
+      "domain": "consumer_psychology",
+      "relevance": 4,
+      "key_finding": "Dual entitlement theory: customers feel entitled to a reference price, firms feel entitled to a reference profit. Violations trigger outrage.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "singh1990voice",
+      "title": "Voice, Exit, and Negative Word-of-Mouth Behaviors: An Investigation Across Three Service Categories",
+      "authors": [
+        "Singh, J."
+      ],
+      "year": 1990,
+      "venue": "Journal of the Academy of Marketing Science",
+      "citations": 945,
+      "domain": "consumer_psychology",
+      "relevance": 4,
+      "key_finding": "Dissatisfied customers choose between voice (complain), exit (leave), or negative WOM. Most choose exit silently.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "gelbrich2011meta",
+      "title": "A Meta-Analysis of Organizational Complaint Handling and Customer Responses",
+      "authors": [
+        "Gelbrich, K.",
+        "Roschk, H."
+      ],
+      "year": 2011,
+      "venue": "Journal of Service Research",
+      "citations": 738,
+      "domain": "consumer_psychology",
+      "relevance": 4,
+      "key_finding": "Effective complaint handling can increase loyalty above pre-failure levels (service recovery paradox). Speed of response is the strongest predictor.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "karaman2021extremity",
+      "title": "Online Review Solicitations Reduce Extremity Bias in Online Review Distributions",
+      "authors": [
+        "Karaman, H."
+      ],
+      "year": 2021,
+      "venue": "Management Science",
+      "citations": 90,
+      "domain": "review_bias",
+      "relevance": 5,
+      "key_finding": "Unsolicited reviews are bimodally extreme. Solicited reviews reduce extremity by ~30% and better represent the true population.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "orr2005anchoring",
+      "title": "Anchoring, Information, Expertise, and Negotiation: New Insights from Meta-Analysis",
+      "authors": [
+        "Orr, D.",
+        "Guthrie, C."
+      ],
+      "year": 2005,
+      "venue": "Ohio State Journal on Dispute Resolution",
+      "citations": 179,
+      "domain": "negotiation_psychology",
+      "relevance": 4,
+      "key_finding": "Meta-analysis confirms first offer anchoring effect accounts for 30-50% of final negotiation outcome. Effect persists even for experts.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "heidenreich2015innovation",
+      "title": "Passive Innovation Resistance: The Curse of Innovation?",
+      "authors": [
+        "Heidenreich, S.",
+        "Kraemer, T."
+      ],
+      "year": 2015,
+      "venue": "Journal of Economic Psychology",
+      "citations": 152,
+      "domain": "decision_making",
+      "relevance": 4,
+      "key_finding": "Most innovation resistance is passive (status quo preference) not active (evaluation-based rejection). ~60% of resistance is passive.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "liuthompkins2013repeat",
+      "title": "Not All Repeat Customers Are the Same: Designing Effective Cross-Selling Promotion on the Basis of Attitudinal Loyalty",
+      "authors": [
+        "Liu-Thompkins, Y.",
+        "Tam, L."
+      ],
+      "year": 2013,
+      "venue": "Journal of Marketing",
+      "citations": 326,
+      "domain": "consumer_psychology",
+      "relevance": 4,
+      "key_finding": "Behaviorally loyal (habitual) customers respond differently to promotions than attitudinally loyal ones. Must distinguish the two in simulations.",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    },
+    {
+      "id": "mosavi2018switching",
+      "title": "An Integrative Framework for Customer Switching Behavior",
+      "authors": [
+        "Mosavi, S.M.",
+        "Sangari, M.S.",
+        "Keramati, A."
+      ],
+      "year": 2018,
+      "venue": "The Service Industries Journal",
+      "citations": 117,
+      "domain": "consumer_psychology",
+      "relevance": 4,
+      "key_finding": "Switching behavior is driven by: pricing (30%), service failure (25%), inconvenience (20%), competition (15%), involuntary (10%).",
+      "has_full_text": false,
+      "has_summary": true,
+      "has_insights": true,
+      "has_prompt_fragment": true
+    }
+  ]
+}
