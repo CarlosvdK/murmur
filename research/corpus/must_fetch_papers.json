@@ -1,0 +1,38 @@
+[
+  {
+    "title": "Out of One, Many: Using Language Models to Simulate Human Samples",
+    "authors": [
+      "Lisa P. Argyle",
+      "E. Busby",
+      "Nancy Fulda",
+      "Joshua R Gubler",
+      "Christopher Rytting"
+    ],
+    "year": 2022,
+    "venue": "Political Analysis",
+    "citations": 956,
+    "doi": "10.1017/pan.2023.2",
+    "arxiv_id": "2209.06899",
+    "abstract": "Abstract We propose and explore the possibility that language models can be studied as effective proxies for specific human subpopulations in social science research. Practical and research applications of artificial intelligence tools have sometimes been limited by problematic biases (such as racism or sexism), which are often treated as uniform properties of the models. We show that the \u201calgorithmic bias\u201d within one such tool\u2014the GPT-3 language model\u2014is instead both fine-grained and demographi",
+    "tldr": "It is suggested that language models with sufficient algorithmic fidelity thus constitute a novel and powerful tool to advance understanding of humans and society across a variety of disciplines.",
+    "is_open_access": true,
+    "pdf_url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/035D7C8A55B237942FB6DBAD7CAA4E49/S1047198723000025a.pdf/div-class-title-out-of-one-many-using-language-models-to-simulate-human-samples-div.pdf",
+    "peer_reviewed": true
+  },
+  {
+    "title": "Field Experimentation in Marketing Research",
+    "authors": [
+      "Ayelet Gneezy"
+    ],
+    "year": 2017,
+    "venue": "",
+    "citations": 161,
+    "doi": "10.1509/jmr.16.0225",
+    "arxiv_id": null,
+    "abstract": "",
+    "tldr": "",
+    "is_open_access": false,
+    "pdf_url": "",
+    "peer_reviewed": false
+  }
+]

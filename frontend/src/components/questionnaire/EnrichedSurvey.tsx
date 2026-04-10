@@ -16,14 +16,22 @@ interface Props {
 const BUSINESS_TYPES = [
   "Restaurant", "Cafe / Coffee Shop", "Bar / Pub", "Barbershop / Salon",
   "Grocery Store", "Retail Shop", "Gym / Fitness", "Bakery",
+  "SaaS / Software", "E-commerce", "Consulting", "B2B Services",
+  "Logistics / Shipping", "Healthcare Clinic", "Dental Practice",
+  "Education / Training", "Freelance / Agency", "Hotel / Hospitality",
   "Auto Shop", "Other",
 ];
 
 const TYPE_MAP: Record<string, string> = {
   "Restaurant": "restaurant", "Cafe / Coffee Shop": "cafe",
   "Bar / Pub": "bar", "Barbershop / Salon": "barbershop",
-  "Grocery Store": "grocery", "Retail Shop": "retail",
+  "Grocery Store": "grocery", "Retail Shop": "clothing",
   "Gym / Fitness": "gym", "Bakery": "bakery",
+  "SaaS / Software": "saas", "E-commerce": "ecommerce",
+  "Consulting": "consulting", "B2B Services": "b2b_services",
+  "Logistics / Shipping": "logistics", "Healthcare Clinic": "healthcare_clinic",
+  "Dental Practice": "dental", "Education / Training": "education",
+  "Freelance / Agency": "freelance", "Hotel / Hospitality": "hotel",
   "Auto Shop": "auto", "Other": "other",
 };
 
@@ -83,6 +91,9 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
     has_prior_change: false, prior_change_description: "", prior_change_outcome: "",
     location_street: "", location_number: "", location_postcode: "",
     location_city: "", location_neighbourhood: "", location_country: "",
+    customer_age_distribution: [], customer_income_bracket: "",
+    average_transaction_value: undefined, customer_gender_split: "",
+    local_vs_visitor_ratio: "", digital_savviness: "", price_range: "",
   });
 
   // Save to localStorage
@@ -644,6 +655,160 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
                   onClick={() => update("regular_proportion", opt.v)}
                   className={`rounded-xl border px-4 py-2 text-sm transition-all ${
                     form.regular_proportion === opt.v
+                      ? "border-murmur-amber bg-murmur-amber text-white font-medium"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Customer age range (select all that apply)</label>
+            <p className="mb-2 text-xs text-gray-400">Which age groups make up most of your customers?</p>
+            <div className="flex flex-wrap gap-1.5">
+              {["18-24", "25-34", "35-44", "45-54", "55-64", "65+"].map((bracket) => (
+                <button
+                  key={bracket}
+                  onClick={() => toggleMulti("customer_age_distribution", bracket)}
+                  className={`rounded-lg border px-3 py-1.5 text-xs transition-all ${
+                    (form.customer_age_distribution || []).includes(bracket)
+                      ? "border-murmur-amber bg-murmur-amber text-white"
+                      : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                  }`}
+                >
+                  {bracket}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Customer income level</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { v: "budget", l: "Budget-conscious" },
+                { v: "lower_middle", l: "Lower-middle" },
+                { v: "middle", l: "Middle income" },
+                { v: "upper_middle", l: "Upper-middle" },
+                { v: "affluent", l: "Affluent" },
+                { v: "mixed", l: "Mixed / Varies" },
+              ].map((opt) => (
+                <button
+                  key={opt.v}
+                  onClick={() => update("customer_income_bracket", opt.v)}
+                  className={`rounded-xl border px-4 py-2 text-sm transition-all ${
+                    form.customer_income_bracket === opt.v
+                      ? "border-murmur-amber bg-murmur-amber text-white font-medium"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700">Average transaction value</label>
+            <p className="mb-2 text-xs text-gray-400">How much does a typical customer spend per transaction?</p>
+            <input
+              type="number"
+              value={form.average_transaction_value || ""}
+              onChange={(e) => update("average_transaction_value", e.target.value ? parseFloat(e.target.value) : undefined)}
+              placeholder="e.g. 25"
+              className="w-48 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm focus:border-murmur-amber focus:outline-none focus:ring-2 focus:ring-murmur-amber-light"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Customer gender split</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { v: "mostly_male", l: "Mostly male" },
+                { v: "mostly_female", l: "Mostly female" },
+                { v: "balanced", l: "Balanced" },
+                { v: "unknown", l: "Not sure" },
+              ].map((opt) => (
+                <button
+                  key={opt.v}
+                  onClick={() => update("customer_gender_split", opt.v)}
+                  className={`rounded-xl border px-4 py-2 text-sm transition-all ${
+                    form.customer_gender_split === opt.v
+                      ? "border-murmur-amber bg-murmur-amber text-white font-medium"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Customer base type</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { v: "mostly_local", l: "Mostly local / repeat" },
+                { v: "mixed", l: "Mix of local and new" },
+                { v: "mostly_visitors", l: "Mostly new / one-time" },
+                { v: "all_online", l: "All online" },
+              ].map((opt) => (
+                <button
+                  key={opt.v}
+                  onClick={() => update("local_vs_visitor_ratio", opt.v)}
+                  className={`rounded-xl border px-4 py-2 text-sm transition-all ${
+                    form.local_vs_visitor_ratio === opt.v
+                      ? "border-murmur-amber bg-murmur-amber text-white font-medium"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">How tech-savvy are your customers?</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { v: "low", l: "Low (prefer in-person)" },
+                { v: "moderate", l: "Moderate" },
+                { v: "high", l: "High (apps & online)" },
+                { v: "very_high", l: "Very high (digital-native)" },
+              ].map((opt) => (
+                <button
+                  key={opt.v}
+                  onClick={() => update("digital_savviness", opt.v)}
+                  className={`rounded-xl border px-4 py-2 text-sm transition-all ${
+                    form.digital_savviness === opt.v
+                      ? "border-murmur-amber bg-murmur-amber text-white font-medium"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {opt.l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Your price positioning</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { v: "budget", l: "Budget / Economy" },
+                { v: "mid_range", l: "Mid-range" },
+                { v: "premium", l: "Premium" },
+                { v: "luxury", l: "Luxury / High-end" },
+              ].map((opt) => (
+                <button
+                  key={opt.v}
+                  onClick={() => update("price_range", opt.v)}
+                  className={`rounded-xl border px-4 py-2 text-sm transition-all ${
+                    form.price_range === opt.v
                       ? "border-murmur-amber bg-murmur-amber text-white font-medium"
                       : "border-gray-200 text-gray-600 hover:bg-gray-50"
                   }`}

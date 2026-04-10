@@ -7,6 +7,7 @@ from fastapi.responses import StreamingResponse
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
 from typing import Optional
+from pydantic import BaseModel
 
 from backend.config import get_settings
 from backend.models.business import BusinessSnapshot
@@ -214,13 +215,36 @@ async def create_simulation(
         raise HTTPException(status_code=404, detail="Business not found")
 
     business_row = biz.data
+    metadata = business_row.get("metadata") or {}
+    # Merge metadata into row for snapshot -- fields may be in columns or JSONB
+    merged = {**business_row, **metadata}
     snapshot = BusinessSnapshot(
-        name=business_row["name"],
-        type=business_row["type"],
-        description=business_row["description"],
-        customer_description=business_row.get("customer_description"),
-        location=business_row.get("location"),
+        name=merged["name"],
+        type=merged["type"],
+        description=merged["description"],
+        customer_description=merged.get("customer_description"),
+        location=merged.get("location"),
+        years_open=merged.get("years_open"),
+        business_role=merged.get("business_role"),
+        visit_frequency=merged.get("visit_frequency"),
+        customer_value_drivers=merged.get("customer_value_drivers"),
+        customer_social_context=merged.get("customer_social_context"),
+        regular_proportion=merged.get("regular_proportion"),
+        area_demographics=merged.get("area_demographics"),
+        competitor_count=merged.get("competitor_count"),
+        area_feel=merged.get("area_feel"),
+        additional_customer_notes=merged.get("additional_customer_notes"),
+        customer_age_distribution=merged.get("customer_age_distribution"),
+        customer_income_bracket=merged.get("customer_income_bracket"),
+        average_transaction_value=merged.get("average_transaction_value"),
+        customer_gender_split=merged.get("customer_gender_split"),
+        local_vs_visitor_ratio=merged.get("local_vs_visitor_ratio"),
+        digital_savviness=merged.get("digital_savviness"),
+        price_range=merged.get("price_range"),
     )
+
+    # Build full workspace data for RAG context (already merged above)
+    workspace_data = merged
 
     sim_id = uuid4()
     simulation = Simulation(
@@ -231,14 +255,13 @@ async def create_simulation(
         variant_b=data.variant_b,
         status=SimulationStatus.PENDING,
         persona_count=data.persona_count,
-        prompt_version="v0.1",
+        prompt_version="v0.2",
         business_snapshot=snapshot.model_dump(),
         created_at=datetime.now(timezone.utc),
     )
 
     db.table("simulations").insert(_sim_to_row(simulation)).execute()
 
-    # Ephemeral progress tracking
     _simulation_progress[sim_id] = SimulationProgress(
         simulation_id=sim_id,
         status=SimulationStatus.PENDING,
@@ -249,7 +272,7 @@ async def create_simulation(
 
     asyncio.create_task(
         _run_pipeline(sim_id, snapshot, data.question, data.variant_a,
-                      data.variant_b, data.persona_count)
+                      data.variant_b, data.persona_count, workspace_data)
     )
 
     return simulation
@@ -262,6 +285,7 @@ async def _run_pipeline(
     variant_a: Optional[str],
     variant_b: Optional[str],
     persona_count: int,
+    workspace_data: dict = None,
 ):
     """Full simulation pipeline: context -> generate -> interview -> aggregate -> caveats."""
     start = time.monotonic()
@@ -278,7 +302,26 @@ async def _run_pipeline(
             })
 
     try:
-        # Step 0: Gather context
+        # Step -1: Build enriched context from survey data + research library
+        survey_context = ""
+        research_context = ""
+        try:
+            from backend.survey.rag_builder import build_rag_context
+            if workspace_data:
+                survey_context = build_rag_context(workspace_data)
+                logger.info("Survey RAG context: %d chars from workspace data", len(survey_context))
+        except Exception as e:
+            logger.warning("Survey RAG builder failed (non-fatal): %s", e)
+
+        try:
+            from research.rag_library import get_simulation_context
+            country = (workspace_data or {}).get("location_country", "")
+            research_context = get_simulation_context(country or "DEFAULT", "consumer")
+            logger.info("Research context: %d chars for country=%s", len(research_context), country)
+        except Exception as e:
+            logger.warning("Research library failed (non-fatal): %s", e)
+
+        # Step 0: Gather context (external APIs)
         context_narrative = None
         settings = get_settings()
 
@@ -306,6 +349,36 @@ async def _run_pipeline(
                 context.total_elapsed_seconds,
                 len(context.filtered_narrative),
             )
+
+        # Step 0.1: Build psychological profile
+        profile_context = ""
+        try:
+            from backend.context.profile_builder import build_profile
+            country = (workspace_data or {}).get("location_country", "")
+            psych_profile = build_profile(business, country_code=country)
+            if psych_profile.summary:
+                profile_context = psych_profile.summary
+                logger.info("Psychological profile: %d chars, confidence=%s",
+                            len(profile_context), psych_profile.confidence)
+        except Exception as e:
+            logger.warning("Profile builder failed (non-fatal): %s", e)
+
+        # Combine all context sources: survey + profile + research + live agents
+        enriched_parts = []
+        if survey_context:
+            enriched_parts.append(survey_context)
+        if profile_context:
+            enriched_parts.append(profile_context)
+        if research_context:
+            enriched_parts.append(research_context[:4000])
+        if context_narrative:
+            enriched_parts.append(context_narrative)
+        if enriched_parts:
+            context_narrative = "\n\n---\n\n".join(enriched_parts)
+            logger.info("Enriched context: %d chars total (survey=%d, profile=%d, research=%d, agents=%d)",
+                        len(context_narrative), len(survey_context), len(profile_context),
+                        min(len(research_context), 4000),
+                        len(context_narrative) - len(survey_context) - len(profile_context) - min(len(research_context), 4000))
 
         # Step 0.5: Reviewer Intelligence
         manifest = None
@@ -718,3 +791,40 @@ async def get_accuracy_stats(user_id: UUID = Depends(get_current_user_id)):
         "matched": matched,
         "accuracy_pct": round((matched / total) * 100) if total > 0 else None,
     }
+
+
+class RealOutcomeCreate(BaseModel):
+    simulation_id: str
+    what_actually_happened: str
+    outcome_matched: Optional[bool] = None
+    match_details: Optional[str] = None
+    notes: Optional[str] = None
+
+
+@router.post("/{sim_id}/outcome")
+async def submit_real_outcome(
+    sim_id: UUID,
+    data: RealOutcomeCreate,
+    user_id: UUID = Depends(get_current_user_id),
+):
+    """Submit what actually happened after a simulation prediction."""
+    db = get_supabase()
+
+    # Verify simulation belongs to user's business
+    sim = db.table("simulations").select("business_id").eq("id", str(sim_id)).maybe_single().execute()
+    if not sim.data:
+        raise HTTPException(status_code=404, detail="Simulation not found")
+
+    biz = db.table("businesses").select("id").eq("id", sim.data["business_id"]).eq("user_id", str(user_id)).maybe_single().execute()
+    if not biz.data:
+        raise HTTPException(status_code=404, detail="Business not found")
+
+    outcome = {
+        "simulation_id": str(sim_id),
+        "what_actually_happened": data.what_actually_happened,
+        "outcome_matched": data.outcome_matched,
+        "match_details": data.match_details,
+        "notes": data.notes,
+    }
+    result = db.table("real_outcomes").insert(outcome).execute()
+    return result.data[0] if result.data else {"status": "saved"}

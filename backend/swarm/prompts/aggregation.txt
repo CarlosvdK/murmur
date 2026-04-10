@@ -62,7 +62,7 @@ Before finalising your recommendation, consider:
 - If all personas gave thoughtful, principled responses, the real-world result is likely messier. Real customers are lazier, more impulsive, and more influenced by friction than they admit.
 - Options that reduce friction or effort for the customer tend to win in practice, even if personas say they do not mind the effort.
 - Urgency, scarcity, and visual cues work on real customers even when they say they find them annoying or manipulative. FOMO is powerful.
-- If the consensus is strongly against a "manipulative" or "pushy" tactic, note that real-world A/B tests often show these tactics work despite stated customer objections.
+- CRITICAL: If the consensus is strongly against a "manipulative", "pushy", or friction-reducing tactic (urgency messaging, removing options, adding pressure), flag this as a STATED vs REVEALED preference conflict. Real-world A/B tests consistently show these tactics INCREASE conversions by 10-30% despite customers saying they dislike them (Murphy et al. 2005). Your recommendation must acknowledge that customer sentiment may be negative BUT behavioral outcome may be positive. Do not simply recommend against something just because personas dislike it -- separate "how they feel" from "what they would do".
 - The gap between what people say and what they do is largest for: commitments (signing up), effort (extra steps), and pride (admitting they are influenced by marketing).
 - Lower-commitment options ("Learn More" vs "Sign Up") tend to get more clicks in reality, even when higher-commitment options sound more appealing.
 

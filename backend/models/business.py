@@ -61,6 +61,14 @@ class BusinessCreate(BaseModel):
     prior_change_types: Optional[list[str]] = None
     prior_change_went: Optional[str] = None
     anything_else: Optional[str] = None
+    # Customer demographics (v2.0)
+    customer_age_distribution: Optional[list[str]] = None
+    customer_income_bracket: Optional[str] = None
+    average_transaction_value: Optional[float] = None
+    customer_gender_split: Optional[str] = None
+    local_vs_visitor_ratio: Optional[str] = None
+    digital_savviness: Optional[str] = None
+    price_range: Optional[str] = None
 
 
 class Business(BaseModel):
@@ -110,6 +118,14 @@ class Business(BaseModel):
     prior_change_types: Optional[list[str]] = None
     prior_change_went: Optional[str] = None
     anything_else: Optional[str] = None
+    # Customer demographics (v2.0)
+    customer_age_distribution: Optional[list[str]] = None
+    customer_income_bracket: Optional[str] = None
+    average_transaction_value: Optional[float] = None
+    customer_gender_split: Optional[str] = None
+    local_vs_visitor_ratio: Optional[str] = None
+    digital_savviness: Optional[str] = None
+    price_range: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -131,3 +147,11 @@ class BusinessSnapshot(BaseModel):
     competitor_count: Optional[str] = None
     area_feel: Optional[str] = None
     additional_customer_notes: Optional[str] = None
+    # Customer demographics (v2.0)
+    customer_age_distribution: Optional[list[str]] = None
+    customer_income_bracket: Optional[str] = None
+    average_transaction_value: Optional[float] = None
+    customer_gender_split: Optional[str] = None
+    local_vs_visitor_ratio: Optional[str] = None
+    digital_savviness: Optional[str] = None
+    price_range: Optional[str] = None

@@ -58,6 +58,17 @@ Real customers are:
 - Influenced by defaults. Whatever exists now has a huge advantage just because it is familiar.
 - Bad at predicting themselves. When asked hypothetically, people overestimate how principled they will be.
 
+STATED vs REVEALED PREFERENCES -- THE MOST COMMON ERROR:
+Research shows a ~28% gap between what people SAY and what they DO (Murphy et al. 2005).
+When responding, separate your FEELINGS from your ACTIONS:
+- You might DISLIKE urgency messages ("Only 2 left!") but still book faster because of them.
+- You might WANT a full navigation menu but actually convert more without one.
+- You might PREFER a short page but actually need the detail to feel confident enough to act.
+- You might think personalisation is "creepy" but still click on the personalised version.
+Your sentiment reflects how you FEEL. But your actual behavior may be different.
+When a change reduces friction, creates urgency, or removes decision paralysis -- acknowledge
+that it would probably change your BEHAVIOR even if you don't like it emotionally.
+
 If Option A requires more effort, commitment, or change from the customer -- that is a real
 cost even if it sounds better on paper.
 If something uses urgency, social proof, or visual appeal -- be honest that it would probably

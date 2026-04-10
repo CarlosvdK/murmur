@@ -15,9 +15,9 @@
 #   - Never reuse a retired field id.
 # =============================================================================
 
-version: "1.0.0"
-schema_id: murmur_survey_v1
-last_updated: "2026-04-07"
+version: "2.0.0"
+schema_id: murmur_survey_v2
+last_updated: "2026-04-10"
 
 sections:
   # ===========================================================================
@@ -110,6 +110,23 @@ sections:
               - { value: printing, label: "Printing" }
               - { value: accountant, label: "Accountant" }
               - { value: legal, label: "Legal services" }
+              - { value: consulting, label: "Consulting" }
+              - { value: freelance, label: "Freelance / Agency" }
+              - { value: marketing_agency, label: "Marketing agency" }
+              - { value: cleaning, label: "Cleaning service" }
+              - { value: tutoring, label: "Tutoring / Education" }
+          - group: "Technology"
+            values:
+              - { value: saas, label: "SaaS / Software" }
+              - { value: ecommerce, label: "E-commerce" }
+              - { value: app, label: "Mobile app" }
+              - { value: it_services, label: "IT services" }
+          - group: "B2B"
+            values:
+              - { value: b2b_services, label: "B2B services" }
+              - { value: logistics, label: "Logistics / Shipping" }
+              - { value: wholesale, label: "Wholesale / Distribution" }
+              - { value: manufacturing, label: "Manufacturing" }
           - group: "Hospitality"
             values:
               - { value: hotel, label: "Hotel" }
@@ -117,6 +134,17 @@ sections:
               - { value: campsite, label: "Campsite" }
               - { value: tour_operator, label: "Tour operator" }
               - { value: activity_centre, label: "Activity centre" }
+          - group: "Healthcare"
+            values:
+              - { value: healthcare_clinic, label: "Healthcare clinic" }
+              - { value: dental, label: "Dental practice" }
+              - { value: pharmacy, label: "Pharmacy" }
+              - { value: veterinary, label: "Veterinary" }
+          - group: "Education & Childcare"
+            values:
+              - { value: education, label: "Education / Training" }
+              - { value: childcare, label: "Childcare / Nursery" }
+              - { value: driving_school, label: "Driving school" }
           - group: "Other"
             values:
               - { value: other, label: "Other" }
@@ -989,6 +1017,14 @@ sections:
         label: "Customer social context"
         type: chips
         migration_alias: null
+        options:
+          - { value: solo, label: "Solo / Individual" }
+          - { value: couples, label: "Couples" }
+          - { value: friends, label: "Friends" }
+          - { value: families, label: "Families" }
+          - { value: business_meetings, label: "Business meetings" }
+          - { value: groups, label: "Groups / Teams" }
+          - { value: online_only, label: "Online only" }
         storage:
           strategy: jsonb
           table: businesses
@@ -1167,6 +1203,292 @@ sections:
           required: false
           max_length: null
 
+      # -----------------------------------------------------------------------
+      # 30. customer_age_distribution
+      # -----------------------------------------------------------------------
+      - id: customer_age_distribution
+        label: "Customer age distribution"
+        type: chips
+        migration_alias: null
+        options:
+          - { value: "18-24", label: "18-24" }
+          - { value: "25-34", label: "25-34" }
+          - { value: "35-44", label: "35-44" }
+          - { value: "45-54", label: "45-54" }
+          - { value: "55-64", label: "55-64" }
+          - { value: "65+", label: "65+" }
+        storage:
+          strategy: jsonb
+          table: businesses
+          column: null
+          jsonb_key: customer_age_distribution
+        rag:
+          include: true
+          weight: high
+          section: "CUSTOMER PROFILE"
+          template: "Customer age distribution: {value}"
+        persona:
+          include: true
+          weight: high
+          prompt_fragment: "The customer age mix includes: {value}. Persona ages should reflect this distribution."
+          influence_description: "Age is the strongest driver of consumer behavior differences. Directly shapes persona demographics."
+        ml:
+          include: false
+          feature_type: null
+          encoding: null
+          importance_hint: null
+          derived_features: []
+        accuracy:
+          weight: 7
+          category: essential
+          unlocks: "Enables age-grounded persona generation and generational psychology calibration"
+        validation:
+          required: false
+          max_length: null
+
+      # -----------------------------------------------------------------------
+      # 31. customer_income_bracket
+      # -----------------------------------------------------------------------
+      - id: customer_income_bracket
+        label: "Customer income level"
+        type: select
+        migration_alias: null
+        options:
+          - { value: budget, label: "Budget-conscious" }
+          - { value: lower_middle, label: "Lower-middle income" }
+          - { value: middle, label: "Middle income" }
+          - { value: upper_middle, label: "Upper-middle income" }
+          - { value: affluent, label: "Affluent" }
+          - { value: mixed, label: "Mixed / Varies widely" }
+        storage:
+          strategy: jsonb
+          table: businesses
+          column: null
+          jsonb_key: customer_income_bracket
+        rag:
+          include: true
+          weight: high
+          section: "CUSTOMER PROFILE"
+          template: "Customer income level: {label}"
+        persona:
+          include: true
+          weight: high
+          prompt_fragment: "Customer income level: {label}. This anchors price sensitivity, spending thresholds, and value perception."
+          influence_description: "Determines price sensitivity ceiling and value-vs-quality trade-off orientation"
+        ml:
+          include: false
+          feature_type: null
+          encoding: null
+          importance_hint: null
+          derived_features: []
+        accuracy:
+          weight: 6
+          category: essential
+          unlocks: "Enables income-calibrated price sensitivity in personas"
+        validation:
+          required: false
+          max_length: null
+
+      # -----------------------------------------------------------------------
+      # 32. average_transaction_value
+      # -----------------------------------------------------------------------
+      - id: average_transaction_value
+        label: "Average transaction value"
+        type: number
+        migration_alias: null
+        storage:
+          strategy: jsonb
+          table: businesses
+          column: null
+          jsonb_key: average_transaction_value
+        rag:
+          include: true
+          weight: high
+          section: "CUSTOMER PROFILE"
+          template: "Average transaction value: {value}"
+        persona:
+          include: true
+          weight: high
+          prompt_fragment: "Customers typically spend {value} per transaction. This is the baseline for evaluating any price change impact."
+          influence_description: "Anchors the absolute spend level so personas can judge percentage changes in real terms"
+        ml:
+          include: false
+          feature_type: null
+          encoding: null
+          importance_hint: null
+          derived_features: []
+        accuracy:
+          weight: 6
+          category: essential
+          unlocks: "Enables realistic price change impact assessment"
+        validation:
+          required: false
+          max_length: null
+
+      # -----------------------------------------------------------------------
+      # 33. customer_gender_split
+      # -----------------------------------------------------------------------
+      - id: customer_gender_split
+        label: "Customer gender split"
+        type: select
+        migration_alias: null
+        options:
+          - { value: mostly_male, label: "Mostly male" }
+          - { value: mostly_female, label: "Mostly female" }
+          - { value: balanced, label: "Balanced" }
+          - { value: unknown, label: "Not sure" }
+        storage:
+          strategy: jsonb
+          table: businesses
+          column: null
+          jsonb_key: customer_gender_split
+        rag:
+          include: true
+          weight: medium
+          section: "CUSTOMER PROFILE"
+          template: "Customer gender split: {label}"
+        persona:
+          include: true
+          weight: medium
+          prompt_fragment: "The customer gender split is: {label}. Persona mix should reflect this."
+          influence_description: "Shapes persona demographic diversity to match actual customer base"
+        ml:
+          include: false
+          feature_type: null
+          encoding: null
+          importance_hint: null
+          derived_features: []
+        accuracy:
+          weight: 3
+          category: valuable
+          unlocks: null
+        validation:
+          required: false
+          max_length: null
+
+      # -----------------------------------------------------------------------
+      # 34. local_vs_visitor_ratio
+      # -----------------------------------------------------------------------
+      - id: local_vs_visitor_ratio
+        label: "Local vs visitor ratio"
+        type: select
+        migration_alias: null
+        options:
+          - { value: mostly_local, label: "Mostly local / repeat" }
+          - { value: mixed, label: "Mix of local and new" }
+          - { value: mostly_visitors, label: "Mostly new / one-time" }
+          - { value: all_online, label: "All online (no physical location)" }
+        storage:
+          strategy: jsonb
+          table: businesses
+          column: null
+          jsonb_key: local_vs_visitor_ratio
+        rag:
+          include: true
+          weight: high
+          section: "CUSTOMER PROFILE"
+          template: "Local vs visitor ratio: {label}"
+        persona:
+          include: true
+          weight: high
+          prompt_fragment: "Customer base: {label}. This determines how many personas should be repeat vs first-time, and whether geographic loyalty matters."
+          influence_description: "Controls the loyalty and familiarity baseline across the persona swarm"
+        ml:
+          include: false
+          feature_type: null
+          encoding: null
+          importance_hint: null
+          derived_features: []
+        accuracy:
+          weight: 5
+          category: essential
+          unlocks: "Enables calibrated local-vs-visitor persona distribution"
+        validation:
+          required: false
+          max_length: null
+
+      # -----------------------------------------------------------------------
+      # 35. digital_savviness
+      # -----------------------------------------------------------------------
+      - id: digital_savviness
+        label: "Customer digital savviness"
+        type: select
+        migration_alias: null
+        options:
+          - { value: low, label: "Low (prefer in-person / phone)" }
+          - { value: moderate, label: "Moderate (use basic digital tools)" }
+          - { value: high, label: "High (comfortable with apps and online)" }
+          - { value: very_high, label: "Very high (digital-native, expect seamless tech)" }
+        storage:
+          strategy: jsonb
+          table: businesses
+          column: null
+          jsonb_key: digital_savviness
+        rag:
+          include: true
+          weight: medium
+          section: "CUSTOMER PROFILE"
+          template: "Customer digital savviness: {label}"
+        persona:
+          include: true
+          weight: medium
+          prompt_fragment: "Customer digital savviness: {label}. This shapes how personas react to technology-related changes (apps, online ordering, digital features)."
+          influence_description: "Critical for questions about digital features, loyalty apps, online channels"
+        ml:
+          include: false
+          feature_type: null
+          encoding: null
+          importance_hint: null
+          derived_features: []
+        accuracy:
+          weight: 3
+          category: valuable
+          unlocks: null
+        validation:
+          required: false
+          max_length: null
+
+      # -----------------------------------------------------------------------
+      # 36. price_range
+      # -----------------------------------------------------------------------
+      - id: price_range
+        label: "Business price positioning"
+        type: select
+        migration_alias: null
+        options:
+          - { value: budget, label: "Budget / Economy" }
+          - { value: mid_range, label: "Mid-range" }
+          - { value: premium, label: "Premium" }
+          - { value: luxury, label: "Luxury / High-end" }
+        storage:
+          strategy: jsonb
+          table: businesses
+          column: null
+          jsonb_key: price_range
+        rag:
+          include: true
+          weight: high
+          section: "BUSINESS IDENTITY"
+          template: "Price positioning: {label}"
+        persona:
+          include: true
+          weight: high
+          prompt_fragment: "This is a {label} business. Personas should calibrate their price expectations and sensitivity accordingly."
+          influence_description: "Sets the price expectation baseline -- budget customers react very differently to price changes than luxury customers"
+        ml:
+          include: false
+          feature_type: null
+          encoding: null
+          importance_hint: null
+          derived_features: []
+        accuracy:
+          weight: 5
+          category: essential
+          unlocks: "Enables price-tier-calibrated sensitivity modeling"
+        validation:
+          required: false
+          max_length: null
+
   # ===========================================================================
   # SECTION: local_area
   # survey_target: workspace
@@ -1182,6 +1504,16 @@ sections:
         label: "Area demographics"
         type: chips
         migration_alias: null
+        options:
+          - { value: students, label: "Students" }
+          - { value: young_professionals, label: "Young professionals" }
+          - { value: families, label: "Families" }
+          - { value: retirees, label: "Retirees" }
+          - { value: tourists, label: "Tourists" }
+          - { value: commuters, label: "Commuters" }
+          - { value: mixed_residential, label: "Mixed residential" }
+          - { value: business_district, label: "Business district" }
+          - { value: industrial, label: "Industrial" }
         storage:
           strategy: jsonb
           table: businesses
