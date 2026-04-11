@@ -9,10 +9,10 @@ STRUCTURED PROFILE (FIXED -- do not change these):
 - Segment: {{segment}}
 - Age: {{age}}
 - Income tier: {{income_tier}}
-- Visit frequency: {{visit_frequency}}
+- Engagement pattern: {{visit_frequency}}
 - Price sensitivity: {{price_sensitivity}}
 - Is silent majority: {{is_silent_majority}}
-- Is tourist: {{is_tourist}}
+- Is one-time/transient: {{is_tourist}}
 
 TRAITS THIS PERSONA MUST HAVE:
 {{must_include_traits}}
@@ -27,18 +27,20 @@ Generate narrative detail for this persona. Return JSON with these fields:
 - name: A realistic first name appropriate for the location
 - occupation: A specific job or situation consistent with the income tier
 - personality: 2-3 key personality traits in plain language
-- relationship_to_business: Their specific connection to this business (how they found it, when they come, what they order)
+- relationship_to_business: Their specific connection -- how they found it, why they engage, what they use. ADAPT TO THE BUSINESS TYPE: a SaaS user "integrated it into their daily workflow." A patient "has been seeing Dr. X since 2019." A gym member "comes for the morning classes." Do NOT use generic "visits" language for online or subscription businesses.
 - quirk: One specific behavioural detail that makes them memorable
-- what_would_make_them_leave: The specific thing that would make this person stop coming
-- what_would_make_them_stay: What keeps them coming back despite imperfections
+- spend_model: What and how they pay -- adapt to business model ("$49/mo plan", "$22 per visit", "$3000/quarter retainer", "free tier")
+- decision_style: How they make decisions ("impulsive", "deliberate", "habitual", "procrastinator")
+- what_would_make_them_leave: The specific thing that would make this person disengage
+- what_would_make_them_stay: What keeps them engaged despite imperfections
 - how_they_talk: Their communication style (formal, casual, blunt, quiet, etc.)
 
 CRITICAL RULES:
-- The age, income tier, visit frequency, and price sensitivity are FIXED. Do not contradict them.
-- If is_silent_majority is true, this person has NEVER written an online review. They do not think in terms of ratings or reviews. They just come or they stop coming.
-- If price_sensitivity is high, this person genuinely worries about small price differences in their daily budget.
-- This person is NOT a customer archetype. Give them a life beyond this business -- family, commute, hobbies, stresses.
-- Do NOT make them unusually enthusiastic about dining out or this business type.
-- Include realistic friction: long commute, tight schedule, picky kids, budget pressure, etc.
+- The age, income tier, engagement pattern, and price sensitivity are FIXED. Do not contradict them.
+- If is_silent_majority is true, this person has NEVER written an online review, left feedback, or filled out a survey. They do not think in terms of ratings. They just engage or they stop.
+- If price_sensitivity is high, this person genuinely worries about cost differences in their budget.
+- This person is NOT a customer archetype. Give them a life beyond this business -- family, commute, hobbies, stresses, goals.
+- Do NOT make them unusually enthusiastic about this type of business or product category.
+- Include realistic friction: busy schedule, competing priorities, information overload, budget pressure, decision fatigue.
 
 Return ONLY valid JSON.

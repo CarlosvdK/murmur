@@ -1,0 +1,31 @@
+Looking ahead: if this change actually happens, what would your life ACTUALLY look like?
+
+Think about your real schedule, your real budget, how busy and distracted you actually are. Not the version of you that is sitting here thinking carefully -- the version that is tired, rushed, and making decisions on autopilot.
+
+1. **next_3_interactions**: Walk me through your next 3 interactions with this business after the change. Be specific and realistic:
+   - **interaction_1**: The FIRST time you encounter the change. What happens? How do you feel? What do you do?
+   - **interaction_2**: The second time. Has your reaction changed? Have you adapted? Are you still annoyed, or have you already forgotten about it?
+   - **interaction_3**: By the third time, what is your new normal? Is the change even on your mind anymore?
+
+2. **net_behavior_change**: Overall, are you engaging MORE, SAME, or LESS than before? Be specific about the magnitude -- "slightly less" is different from "dramatically less."
+
+3. **spend_change**: Are you spending MORE, SAME, or LESS than before? Again, be specific about magnitude.
+
+4. **would_tell_others**: Would you mention this change to anyone? If yes, what would you actually say? Not what you would post online -- what you would say to a friend in passing. Most people do not mention most changes to most businesses. Be honest about whether this is even worth talking about.
+
+5. **stated_vs_actual_gap**: Look back at what you said in your earlier responses. Is there a gap between what you SAID you would do and what you would ACTUALLY do? If so, describe it honestly. Common gaps:
+   - "I said I would leave but honestly I would probably just grumble and stay"
+   - "I said I would not care but actually this would bother me more than I admitted"
+   - "I said I would try alternatives but the effort of switching means I probably would not"
+
+6. **single_biggest_factor**: If you had to pick ONE thing that most determines your reaction to this change, what is it? Not a list -- one factor. The thing that, if it were different, would completely change your response.
+
+7. **what_would_change_your_mind**: What specific thing would flip your reaction? If you are negative, what would make you accept this? If you are positive, what would make you resist? Be concrete.
+
+IMPORTANT:
+- Real people adapt to changes faster than they expect. By interaction 3, most changes feel normal.
+- Real people talk about businesses far less than businesses think. Most changes go unmentioned.
+- The stated_vs_actual_gap question is the most important one here. Be ruthlessly honest.
+- If you are a silent majority persona (never reviews, never gives feedback), your response to "would you tell others" should almost always be "no" or "only if someone asked."
+
+Return as JSON.

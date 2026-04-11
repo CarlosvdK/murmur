@@ -149,5 +149,9 @@ async def aggregate_responses(
         "winner_reasoning": result.get("winner_reasoning"),
         "themes": result.get("themes", []),
         "standout_voices": result.get("standout_voices", []),
+        # Focus group data (Phase 5)
+        "baseline_summary": result.get("baseline_summary"),
+        "behavioral_prediction": result.get("behavioral_prediction"),
+        "stated_vs_actual_gap": result.get("stated_vs_actual_gap"),
         "raw_output": result,
     }

@@ -64,7 +64,7 @@ async def build_reviewer_intelligence(
         if on_progress:
             on_progress("Adjusting for review biases (extremity, platform, silent majority)...")
 
-        adjusted = apply_bias_corrections(signals)
+        adjusted = apply_bias_corrections(signals, business_type=business.type)
 
         # Step 3: Estimate silent majority
         silent = estimate_silent_majority(
@@ -76,7 +76,7 @@ async def build_reviewer_intelligence(
         if on_progress:
             on_progress("Building customer segment distribution...")
 
-        segment_profile = build_segments(adjusted, silent, business)
+        segment_profile = build_segments(adjusted, silent, business, business_type=business.type)
 
         # Step 5: Calibrate persona manifest
         manifest = calibrate_personas(segment_profile, persona_count)

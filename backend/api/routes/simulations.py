@@ -81,26 +81,43 @@ def _persona_to_row(persona: PersonaProfile, sim_id: UUID) -> dict:
         "name": persona.name,
         "age": persona.age,
         "occupation": persona.occupation,
-        "visit_frequency": persona.visit_frequency,
-        "avg_spend": persona.avg_spend,
+        "visit_frequency": persona.engagement_pattern,  # DB column is still visit_frequency
+        "avg_spend": persona.avg_spend,  # extracts number from spend_model
         "personality": persona.personality,
         "relationship_to_business": persona.relationship_to_business,
         "quirk": persona.quirk,
-        "profile": persona.model_dump(),
+        "profile": persona.model_dump(),  # stores ALL fields including new ones
     }
 
 
 def _row_to_persona(row: dict) -> PersonaProfile:
     profile = row.get("profile") or {}
+    # Support both old format (visit_frequency/avg_spend) and new (engagement_pattern/spend_model)
+    engagement = (
+        profile.get("engagement_pattern")
+        or row.get("visit_frequency")
+        or ""
+    )
+    spend = (
+        profile.get("spend_model")
+        or (f"${row['avg_spend']}" if row.get("avg_spend") else "")
+        or ""
+    )
     return PersonaProfile(
         name=row["name"],
         age=row["age"],
         occupation=row.get("occupation", ""),
-        visit_frequency=row.get("visit_frequency", ""),
-        avg_spend=row.get("avg_spend", 0),
+        engagement_pattern=engagement,
+        spend_model=spend,
         personality=row.get("personality", ""),
         relationship_to_business=row.get("relationship_to_business", ""),
         quirk=row.get("quirk", ""),
+        segment=profile.get("segment"),
+        income_tier=profile.get("income_tier"),
+        price_sensitivity=profile.get("price_sensitivity"),
+        is_silent_majority=profile.get("is_silent_majority"),
+        digital_behavior=profile.get("digital_behavior"),
+        decision_style=profile.get("decision_style"),
         openness=profile.get("openness"),
         conscientiousness=profile.get("conscientiousness"),
         extraversion=profile.get("extraversion"),
@@ -140,6 +157,7 @@ def _result_to_row(result: SimulationResult) -> dict:
 
 
 def _row_to_result(row: dict) -> SimulationResult:
+    raw = row.get("raw_output") or {}
     return SimulationResult(
         id=row["id"],
         simulation_id=row["simulation_id"],
@@ -151,7 +169,10 @@ def _row_to_result(row: dict) -> SimulationResult:
         winner_reasoning=row.get("winner_reasoning"),
         themes=row.get("themes"),
         standout_voices=row.get("standout_voices"),
-        raw_output=row.get("raw_output", {}),
+        baseline_summary=raw.get("baseline_summary"),
+        behavioral_prediction=raw.get("behavioral_prediction"),
+        stated_vs_actual_gap=raw.get("stated_vs_actual_gap"),
+        raw_output=raw,
         created_at=row["created_at"],
     )
 
@@ -316,8 +337,33 @@ async def _run_pipeline(
         try:
             from research.rag_library import get_simulation_context
             country = (workspace_data or {}).get("location_country", "")
-            research_context = get_simulation_context(country or "DEFAULT", "consumer")
-            logger.info("Research context: %d chars for country=%s", len(research_context), country)
+            research_context = get_simulation_context(
+                country_code=country or "DEFAULT",
+                simulation_type="consumer",
+                business_type=business.type,
+                question=question,
+                demographics={
+                    "age": business.customer_age_distribution,
+                    "income": business.customer_income_bracket,
+                    "digital": business.digital_savviness,
+                },
+            )
+            logger.info("Research context: %d chars for country=%s, type=%s",
+                        len(research_context), country, business.type)
+            # Store which research domains were selected (for frontend display)
+            try:
+                from backend.context.rag_selector import select_rag_articles
+                rag_meta = select_rag_articles(
+                    business_type=business.type, question=question,
+                    has_country=bool(country),
+                )
+                _update_sim(sim_id, rag_selection={
+                    "domains": rag_meta.domains_selected,
+                    "question_type": rag_meta.question_type,
+                    "reasoning": rag_meta.selection_reasoning,
+                })
+            except Exception:
+                pass
         except Exception as e:
             logger.warning("Research library failed (non-fatal): %s", e)
 
@@ -464,13 +510,15 @@ async def _run_pipeline(
         )
 
         # Step 4.5: Impact estimation
-        impact = estimate_impact(responses, question)
+        impact = estimate_impact(responses, question, business_type=business.type)
         impact_data = {
             "revenue": {
                 "point_estimate_pct": impact.revenue.point_estimate_pct,
                 "ci_low_pct": impact.revenue.ci_low_pct,
                 "ci_high_pct": impact.revenue.ci_high_pct,
                 "confidence_level": impact.revenue.confidence_level,
+                "impact_type": getattr(impact.revenue, "impact_type", "revenue"),
+                "impact_label": getattr(impact.revenue, "impact_label", "Estimated revenue change"),
             },
             "customers_likely_stay": impact.customers_likely_stay,
             "customers_likely_reduce": impact.customers_likely_reduce,
@@ -483,6 +531,10 @@ async def _run_pipeline(
             "worst_case_summary": impact.worst_case_summary,
             "best_case_summary": impact.best_case_summary,
             "most_likely_summary": impact.most_likely_summary,
+            "null_hypothesis": impact.null_hypothesis,
+            "alternative_hypothesis": impact.alternative_hypothesis,
+            "reject_null": impact.reject_null,
+            "effect_size": impact.effect_size,
         }
 
         # Step 5: Generate caveats
@@ -544,6 +596,9 @@ async def _run_pipeline(
             winner_reasoning=result_data.get("winner_reasoning"),
             themes=themes or None,
             standout_voices=voices or None,
+            baseline_summary=result_data.get("baseline_summary"),
+            behavioral_prediction=result_data.get("behavioral_prediction"),
+            stated_vs_actual_gap=result_data.get("stated_vs_actual_gap"),
             raw_output=result_data.get("raw_output", {}),
             created_at=datetime.now(timezone.utc),
         )
@@ -698,6 +753,72 @@ async def get_simulation_impact(sim_id: UUID):
     if not result.data or not result.data.get("impact_data"):
         raise HTTPException(status_code=404, detail="No impact estimate for this simulation")
     return result.data["impact_data"]
+
+
+@router.get("/{sim_id}/demographics")
+async def get_simulation_demographics(sim_id: UUID):
+    """Return persona responses grouped by demographic segment."""
+    db = get_supabase()
+
+    # Get personas with their profiles
+    personas_result = (
+        db.table("personas")
+        .select("*")
+        .eq("simulation_id", str(sim_id))
+        .execute()
+    )
+    if not personas_result.data:
+        raise HTTPException(status_code=404, detail="No personas found")
+
+    # Get responses
+    responses_result = (
+        db.table("persona_responses")
+        .select("*")
+        .eq("simulation_id", str(sim_id))
+        .execute()
+    )
+
+    # Build persona lookup
+    persona_map = {}
+    for row in personas_result.data:
+        profile = row.get("profile") or {}
+        persona_map[row["id"]] = {
+            "name": row["name"],
+            "age": row["age"],
+            "segment": profile.get("segment", "Unknown"),
+            "income_tier": profile.get("income_tier"),
+            "price_sensitivity": profile.get("price_sensitivity"),
+        }
+
+    # Group responses by segment
+    groups: dict[str, list] = {}
+    for resp in (responses_result.data or []):
+        persona_info = persona_map.get(resp.get("persona_id"), {})
+        segment = persona_info.get("segment", "Unknown")
+        if segment not in groups:
+            groups[segment] = []
+        sentiment = resp.get("sentiment") or 0
+        groups[segment].append({
+            "persona_name": persona_info.get("name", "Unknown"),
+            "age": persona_info.get("age"),
+            "sentiment": float(sentiment),
+            "raw_output": resp.get("raw_output"),
+        })
+
+    # Build summary
+    result = []
+    for segment, members in groups.items():
+        avg_sent = sum(m["sentiment"] for m in members) / max(len(members), 1)
+        result.append({
+            "group": segment,
+            "count": len(members),
+            "avg_sentiment": round(avg_sent, 2),
+            "personas": [m["persona_name"] for m in members],
+            "members": members,
+        })
+
+    result.sort(key=lambda g: g["count"], reverse=True)
+    return result
 
 
 @router.get("/{sim_id}/personas", response_model=list[PersonaProfile])

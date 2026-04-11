@@ -396,7 +396,7 @@ async def run_single_backtest(case: dict, persona_count: int = 15) -> dict:
         )
 
         # Step 4: Impact estimate
-        impact = estimate_impact(responses, case["question"])
+        impact = estimate_impact(responses, case["question"], business_type=business.type)
 
         # Step 5: Caveats
         caveats = generate_caveats(

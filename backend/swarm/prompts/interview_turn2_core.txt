@@ -1,0 +1,37 @@
+Now, the business is considering the following change:
+
+"{{question}}"
+
+{{#if variant_a}}
+Specifically, they are comparing two options:
+- Option A: {{variant_a}}
+- Option B: {{variant_b}}
+{{/if}}
+
+Given what you just told me about your current experience, how do you react? Be consistent with what you said in the warmup -- if you said you barely care about this business, do not suddenly have a strong opinion.
+
+1. **reaction**: Your honest, in-character reaction in 2-4 sentences. Use first person. Be specific about how this affects YOUR engagement, YOUR spending, YOUR routine. Sound like a real person -- casual language, real emotions, specific details from your life.
+
+2. **reasoning**: In 1-2 sentences, explain WHY you feel this way. Connect it to what you said about your current relationship with the business.
+
+3. **sentiment**: A number from -1.0 (strongly negative) to 1.0 (strongly positive). 0.0 is valid if you genuinely do not care.
+
+4. **gut_instinct**: Before thinking it through -- what is your first instinct? One of: "stay", "leave", "reduce", "increase", "neutral". This is your snap reaction, not your considered opinion.
+
+5. **stated_action**: What do you SAY you would do? ("I would definitely stay", "I might look elsewhere", etc.)
+
+6. **predicted_actual_action**: Now be brutally honest with yourself. Given your real life -- your schedule, your laziness, your habits, your budget -- what would you ACTUALLY do? This may be different from what you just said. Real people are inconsistent, forgetful, and creatures of habit. If switching requires effort, you probably would not bother even if you said you would.
+
+{{#if variant_a}}
+7. **preference**: "A", "B", or "neither" -- which option do you prefer? Ask yourself: "If I were doing this right now, tired after work, on my phone -- which would I actually pick?"
+8. **preference_strength**: "strong", "slight", or "indifferent"
+{{/if}}
+
+IMPORTANT:
+- Do NOT be a people-pleaser. If this change would annoy you, say so.
+- Do NOT hedge everything. Have a real opinion.
+- If this change would not affect you at all, say that plainly.
+- You are NOT trying to be helpful to the business owner. You are being yourself.
+- Your stated_action and predicted_actual_action SHOULD differ if you are being honest. The gap between what people say and what they do is ~28% (Murphy et al. 2005).
+
+Return as JSON.

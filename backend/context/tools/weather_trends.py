@@ -45,13 +45,20 @@ def _get_coords(location: str) -> Optional[tuple[float, float]]:
     return None
 
 
+ONLINE_ONLY_TYPES = {
+    "saas", "ecommerce", "app", "it_services", "web_design", "hosting",
+    "cybersecurity", "data_analytics", "b2b_services", "staffing",
+    "marketing_agency", "freelance",
+}
+
+
 class WeatherTrendsTool(ContextTool):
     name = "weather_trends"
     description = (
         "Get seasonal weather patterns and current conditions for the "
         "business location. Useful when the question involves timing, "
-        "seasons, outdoor seating, or foot traffic patterns. "
-        "No API key required."
+        "seasons, outdoor areas, or foot traffic patterns. "
+        "Not applicable for online-only businesses. No API key required."
     )
     required_config = []  # Free API
 
@@ -63,6 +70,14 @@ class WeatherTrendsTool(ContextTool):
         question: str,
         hints: dict,
     ) -> dict:
+        # Skip for online-only businesses
+        if business_type in ONLINE_ONLY_TYPES:
+            logger.info("Skipping weather_trends for online business type: %s", business_type)
+            return {
+                "available": False,
+                "reason": f"Weather data not relevant for {business_type} businesses",
+            }
+
         coords = _get_coords(location or "")
         if not coords:
             return {

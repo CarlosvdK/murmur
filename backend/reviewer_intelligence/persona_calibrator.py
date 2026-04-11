@@ -99,9 +99,9 @@ def calibrate_personas(
 
             # Anti-optimism traits based on segment
             must_not = [
-                "unusually enthusiastic about dining out",
+                "unusually enthusiastic about this type of business",
                 "always positive about everything",
-                "thinks of themselves as a foodie",
+                "defines their identity through consuming this product or service",
             ]
             if segment.is_silent_majority:
                 must_not.append("has ever written an online review")

@@ -8,6 +8,8 @@ interface ImpactData {
     ci_low_pct: number;
     ci_high_pct: number;
     confidence_level: string;
+    impact_type?: string;
+    impact_label?: string;
   };
   customers_likely_stay: number;
   customers_likely_reduce: number;
@@ -58,10 +60,12 @@ export default function ImpactPanel({ simulationId }: { simulationId: string }) 
 
   return (
     <div className="space-y-5">
-      {/* Revenue Impact Card */}
+      {/* Impact Card */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-gray-900">Estimated Revenue Impact</h3>
+          <h3 className="text-sm font-semibold text-gray-900">
+            {revenue.impact_label || "Estimated Impact"}
+          </h3>
           <span className={`rounded-full px-3 py-1 text-xs font-medium ${dc.bg} ${dc.text}`}>
             {dc.label}
           </span>
@@ -73,7 +77,7 @@ export default function ImpactPanel({ simulationId }: { simulationId: string }) 
             {revenue.point_estimate_pct >= 0 ? "+" : ""}{revenue.point_estimate_pct}%
           </p>
           <p className="mt-1 text-sm text-gray-500">
-            estimated revenue change
+            {(revenue.impact_label || "estimated impact").toLowerCase()}
           </p>
         </div>
 
@@ -165,7 +169,7 @@ export default function ImpactPanel({ simulationId }: { simulationId: string }) 
           </div>
           <div className="rounded-xl bg-amber-50 p-3 text-center">
             <p className="text-2xl font-bold text-amber-700">{data.customers_likely_reduce}</p>
-            <p className="text-[10px] text-amber-600">reduce visits</p>
+            <p className="text-[10px] text-amber-600">reduce engagement</p>
           </div>
           <div className="rounded-xl bg-red-50 p-3 text-center">
             <p className="text-2xl font-bold text-red-700">{data.customers_likely_leave}</p>

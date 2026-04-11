@@ -72,5 +72,10 @@ class SimulationResult(BaseModel):
     winner_reasoning: Optional[str] = None
     themes: Optional[List[Theme]] = None
     standout_voices: Optional[List[StandoutVoice]] = None
+    # Focus group data (Phase 5)
+    baseline_summary: Optional[str] = None  # Summary of Turn 1 warmup data
+    behavioral_prediction: Optional[dict] = None  # Turn 3 predicted behavior
+    stated_vs_actual_gap: Optional[str] = None  # Aggregate say-do gap analysis
+    demographic_breakdown: Optional[List[dict]] = None  # Responses grouped by segment
     raw_output: dict = {}
     created_at: datetime

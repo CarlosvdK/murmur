@@ -242,15 +242,33 @@ def _parse_personas_response(raw_text: str) -> List[PersonaProfile]:
         if isinstance(relationship, list):
             relationship = ". ".join(str(t) for t in relationship)
 
+        # Handle both old format (visit_frequency/avg_spend) and new (engagement_pattern/spend_model)
+        engagement = (
+            p.get("engagement_pattern")
+            or p.get("visit_frequency")
+            or "Unknown"
+        )
+        spend = (
+            p.get("spend_model")
+            or (f"${p['avg_spend']}" if p.get("avg_spend") else "")
+            or ""
+        )
+
         persona = PersonaProfile(
             name=p.get("name", "Unknown"),
             age=p.get("age", 30),
             occupation=p.get("occupation", "Unknown"),
-            visit_frequency=p.get("visit_frequency", "Unknown"),
-            avg_spend=float(p.get("avg_spend", 0)),
+            engagement_pattern=engagement,
+            spend_model=spend,
             personality=personality,
             relationship_to_business=relationship,
             quirk=p.get("quirk", ""),
+            segment=p.get("segment"),
+            income_tier=p.get("income_tier"),
+            price_sensitivity=p.get("price_sensitivity"),
+            is_silent_majority=p.get("is_silent_majority"),
+            digital_behavior=p.get("digital_behavior"),
+            decision_style=p.get("decision_style"),
             openness=p.get("openness"),
             conscientiousness=p.get("conscientiousness"),
             extraversion=p.get("extraversion"),

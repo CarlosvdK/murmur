@@ -1,8 +1,60 @@
 {
-  "last_updated": "2026-04-08",
+  "last_updated": "2026-04-10",
   "total_papers": 25,
   "hofstede_countries": 69,
   "domains_with_prompts": 9,
+  "domain_relevance": {
+    "consumer_psychology": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["pricing", "retention", "feature", "operations", "brand", "general"],
+      "description": "Loss aversion, anchoring, status quo bias, loyalty stages, perceived value"
+    },
+    "behavioral_economics": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["pricing", "retention", "feature"],
+      "description": "Framing, mental accounting, defaults, herd behavior, temporal discounting"
+    },
+    "digital_twins": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["feature", "pricing", "retention", "general"],
+      "description": "LLM simulation fidelity, anti-bias calibration, stated-revealed gap"
+    },
+    "country_profiles": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["pricing", "operations", "brand", "general"],
+      "description": "Hofstede cultural dimensions, uncertainty avoidance, collectivism"
+    },
+    "review_bias": {
+      "industry_relevance": ["food_drink", "retail", "health_wellness", "hospitality"],
+      "question_relevance": ["pricing", "retention"],
+      "description": "Vocal minority, extremity bias, platform distortion, silent majority"
+    },
+    "personality_models": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["feature", "brand", "retention"],
+      "description": "Big Five / OCEAN, trait-behavior mapping, personality-purchase correlation"
+    },
+    "simulation_methodology": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["all"],
+      "description": "Sample size thresholds, confidence calibration, base-rate anchoring"
+    },
+    "negotiation_psychology": {
+      "industry_relevance": ["b2b", "consulting", "logistics", "wholesale"],
+      "question_relevance": ["pricing", "retention"],
+      "description": "BATNA, anchoring in negotiation, concession patterns"
+    },
+    "decision_making": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["feature", "brand", "operations"],
+      "description": "Diffusion of innovations, risk perception, choice overload"
+    },
+    "qualitative_interview_methodology": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["all"],
+      "description": "Focus group methodology, laddering, cognitive interviewing, stated-revealed gap calibration"
+    }
+  },
   "by_domain": {
     "digital_twins": [
       "park2023generative",

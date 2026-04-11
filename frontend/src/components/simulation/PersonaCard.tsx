@@ -49,7 +49,7 @@ export default function PersonaCard({ persona, compact }: Props) {
           <p className="truncate text-xs text-gray-500">{persona.occupation}</p>
         </div>
         <span className="font-mono text-xs text-gray-400">
-          ${persona.avg_spend}/visit
+          {persona.spend_model || (persona.avg_spend ? `$${persona.avg_spend}` : "")}
         </span>
       </div>
     );
@@ -73,9 +73,16 @@ export default function PersonaCard({ persona, compact }: Props) {
       </div>
 
       {/* Stats row */}
-      <div className="mb-3 flex gap-4 text-xs text-gray-500">
-        <span>Visits: {persona.visit_frequency}</span>
-        <span>Spends: ${persona.avg_spend}</span>
+      <div className="mb-3 flex flex-wrap gap-3 text-xs text-gray-500">
+        <span>{persona.engagement_pattern || persona.visit_frequency}</span>
+        {(persona.spend_model || persona.avg_spend) && (
+          <span>{persona.spend_model || `$${persona.avg_spend}`}</span>
+        )}
+        {persona.segment && (
+          <span className="rounded-full bg-brand-orange/10 px-2 py-0.5 text-[10px] font-medium text-brand-orange">
+            {persona.segment}
+          </span>
+        )}
       </div>
 
       {/* Personality traits as tags */}

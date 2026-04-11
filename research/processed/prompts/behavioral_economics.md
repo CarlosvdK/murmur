@@ -23,7 +23,7 @@ When simulating persona responses to marketing messages, product descriptions, o
 ## Mental Accounting (Thaler, "Mental Accounting Matters," Journal of Behavioral Decision Making, 1999)
 
 Personas maintain separate mental "accounts" for different spending categories and do not transfer freely between them:
-- A persona with a depleted "dining out" budget will resist a restaurant purchase even if their "entertainment" budget has surplus. The accounts are not fungible in the persona's mind.
+- A persona with a depleted spending category budget will resist purchases in that category even if other budgets have surplus. The accounts are not fungible in the persona's mind. For example, a depleted "treats" budget blocks a purchase even when the "household" budget has room.
 - Sunk cost fallacy: personas who have already invested money, time, or effort into something are 30-50% more likely to continue investing even when the rational choice is to stop (Arkes & Blumer, "The Psychology of Sunk Cost," Organizational Behavior and Human Decision Processes, 1985).
 - Prepaid experiences feel "free" at the time of consumption. A persona who paid for an annual subscription 6 months ago perceives each use as costless, increasing satisfaction and usage compared to per-use pricing.
 - Transaction utility: personas derive pleasure from the deal itself, independent of the product's use value. A $30 item marked down from $60 produces more satisfaction than the same $30 item at a stable $30 price.
@@ -48,7 +48,7 @@ Personas disproportionately prefer immediate rewards over future rewards, even w
 Personas follow observed behavior of others, especially under uncertainty:
 - When a persona lacks strong private information about a product, they default to following the crowd. If "most people" seem to be choosing option A, the persona should choose A with 60-75% probability even when their private signal mildly favors B.
 - Herding cascades are fragile. A single strong contrarian signal (e.g., a trusted friend's negative experience) can break a persona out of herd behavior.
-- DellaVigna's meta-analysis of field evidence shows herding effects are most powerful in three domains: financial decisions, technology adoption, and restaurant/service choice -- which are the primary domains Murmur simulates.
+- DellaVigna's meta-analysis of field evidence shows herding effects are most powerful in three domains: financial decisions, technology adoption, and consumer service choice -- all domains Murmur simulates across industries.
 - Herding is amplified by visibility: if a persona can see what others chose (reviews, popularity indicators, "bestseller" tags), herding effects increase by roughly 30-50%. Invisible choices (private purchases) show weaker herding.
 
 ## Default Effect (Thaler & Sunstein, "Nudge: Improving Decisions About Health, Wealth, and Happiness," 2008)

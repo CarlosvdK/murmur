@@ -25,18 +25,126 @@ from backend.config import get_settings
 logger = logging.getLogger(__name__)
 
 # Keywords for theme detection (applied across all reviews, never attributed to individuals)
+# Base keywords work across all industries
 PRICE_WORDS = {"expensive", "cheap", "pricey", "overpriced", "affordable", "value",
                "worth it", "rip off", "great price", "good price", "fair price",
-               "too much", "cost", "prices went up", "price increase", "used to be cheaper"}
+               "too much", "cost", "prices went up", "price increase", "used to be cheaper",
+               "not worth", "good deal", "waste of money", "reasonable", "steep"}
 LOYALTY_WORDS = {"regular", "always come", "every week", "favourite", "favorite",
-                 "our spot", "go-to", "come back", "returning", "loyal", "years"}
+                 "our spot", "go-to", "come back", "returning", "loyal", "years",
+                 "been coming", "long time", "never missed", "always use", "recommend",
+                 "love this place", "my go-to", "wouldn't go anywhere else"}
 SWITCHING_WORDS = {"last time", "won't return", "went elsewhere", "never again",
                    "better options", "switched to", "tried instead", "competitor",
-                   "used to come", "stopped coming"}
+                   "used to come", "stopped coming", "cancelled", "switched",
+                   "found better", "moving on", "disappointed", "looking elsewhere",
+                   "not coming back", "lost my business", "unsubscribed"}
 TOURIST_WORDS = {"visiting", "on holiday", "vacation", "trip to", "tourist",
-                 "staying nearby", "hotel", "travel", "first time visiting"}
+                 "staying nearby", "hotel", "travel", "first time visiting",
+                 "passing through", "recommendation from", "found on tripadvisor"}
 LOCAL_WORDS = {"local", "neighbourhood", "neighborhood", "live nearby",
-               "work nearby", "office", "lunch break", "commute"}
+               "work nearby", "office", "lunch break", "commute",
+               "down the street", "around the corner", "walking distance",
+               "my area", "regular customer"}
+
+# Industry-specific keyword extensions
+INDUSTRY_KEYWORDS = {
+    "saas": {
+        "price": {"subscription", "renewal", "monthly fee", "annual plan", "per seat",
+                  "per user", "enterprise", "free tier", "premium", "downgrade", "upgrade"},
+        "loyalty": {"been using", "years now", "can't live without", "essential tool",
+                    "daily driver", "team uses", "company-wide", "integrated into"},
+        "switching": {"cancelled", "migrated", "switched to", "alternative", "competitor",
+                      "churned", "downgraded", "export data", "moving to"},
+    },
+    "ecommerce": {
+        "price": {"shipping cost", "free shipping", "return policy", "discount code",
+                  "sale price", "clearance", "coupon", "deal"},
+        "loyalty": {"always order from", "repeat customer", "member", "rewards",
+                    "prime", "preferred", "trusted seller"},
+        "switching": {"last order", "won't order again", "found cheaper",
+                      "better selection", "faster shipping"},
+    },
+    "healthcare": {
+        "price": {"insurance", "copay", "out of pocket", "deductible", "covered",
+                  "billing", "payment plan", "not covered"},
+        "loyalty": {"been seeing", "my doctor", "trust", "years", "family doctor",
+                    "wonderful staff", "caring"},
+        "switching": {"new doctor", "second opinion", "referred to", "changed providers",
+                      "long wait", "rude staff"},
+    },
+    "fitness": {
+        "price": {"membership", "monthly fee", "contract", "joining fee", "class pass",
+                  "personal training cost", "worth the money"},
+        "loyalty": {"been a member", "love this gym", "great community", "motivating",
+                    "clean facility", "good equipment"},
+        "switching": {"cancelled membership", "too crowded", "let myself go",
+                      "found better", "moved", "new gym"},
+    },
+    "education": {
+        "price": {"tuition", "fees", "scholarship", "financial aid", "worth the investment",
+                  "overpriced courses", "value for money"},
+        "loyalty": {"great teacher", "learned a lot", "life changing", "highly recommend",
+                    "best instructor", "enrolling again"},
+        "switching": {"dropped out", "waste of time", "didn't learn", "too basic",
+                      "found better course", "not worth it"},
+    },
+    "b2b": {
+        "price": {"contract", "proposal", "quote", "invoice", "payment terms",
+                  "cost-effective", "ROI", "budget", "pricing structure"},
+        "loyalty": {"long-term partner", "reliable", "professional", "years of service",
+                    "trusted vendor", "go-to provider", "excellent support"},
+        "switching": {"ended contract", "found alternative", "unreliable",
+                      "missed deadlines", "poor communication", "looking for new"},
+    },
+    "hospitality": {
+        "price": {"room rate", "nightly rate", "booking price", "resort fee",
+                  "hidden charges", "all inclusive", "good value"},
+        "loyalty": {"always stay", "loyalty program", "rewards member", "favorite hotel",
+                    "come every year", "tradition"},
+        "switching": {"won't stay again", "booked elsewhere", "dirty room",
+                      "bad service", "overbooked", "found better"},
+    },
+}
+
+# Map business types to their industry keyword set
+TYPE_TO_KEYWORD_SET = {
+    "saas": "saas", "app": "saas", "it_services": "saas", "web_design": "saas",
+    "hosting": "saas", "cybersecurity": "saas", "data_analytics": "saas",
+    "ecommerce": "ecommerce",
+    "healthcare_clinic": "healthcare", "dental": "healthcare", "physio": "healthcare",
+    "veterinary": "healthcare", "pharmacy": "healthcare", "optometry": "healthcare",
+    "mental_health": "healthcare", "dermatology": "healthcare",
+    "gym": "fitness", "yoga": "fitness", "spa": "fitness",
+    "personal_trainer": "fitness", "martial_arts": "fitness", "dance_studio": "fitness",
+    "education": "education", "tutoring": "education", "language_school": "education",
+    "coding_bootcamp": "education", "music_school": "education", "driving_school": "education",
+    "b2b_services": "b2b", "consulting": "b2b", "logistics": "b2b",
+    "wholesale": "b2b", "manufacturing": "b2b", "staffing": "b2b",
+    "hotel": "hospitality", "hostel": "hospitality", "campsite": "hospitality",
+    "tour_operator": "hospitality", "activity_centre": "hospitality",
+    "airbnb": "hospitality", "event_venue": "hospitality",
+}
+
+
+def get_extended_keywords(business_type: str) -> dict[str, set[str]]:
+    """Get base + industry-specific keywords for a business type."""
+    industry = TYPE_TO_KEYWORD_SET.get(business_type)
+    extended_price = set(PRICE_WORDS)
+    extended_loyalty = set(LOYALTY_WORDS)
+    extended_switching = set(SWITCHING_WORDS)
+
+    if industry and industry in INDUSTRY_KEYWORDS:
+        ind = INDUSTRY_KEYWORDS[industry]
+        extended_price |= ind.get("price", set())
+        extended_loyalty |= ind.get("loyalty", set())
+        extended_switching |= ind.get("switching", set())
+
+    return {
+        "price": extended_price,
+        "loyalty": extended_loyalty,
+        "switching": extended_switching,
+    }
 
 
 @dataclass

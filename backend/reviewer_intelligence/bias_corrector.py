@@ -17,11 +17,50 @@ from backend.reviewer_intelligence.review_signal_extractor import AggregateRevie
 
 logger = logging.getLogger(__name__)
 
-# Correction factors (empirically derived from research)
+# Default correction factors (empirically derived from research)
 EXTREMITY_COMPRESSION = 0.7   # Compress extreme ratings by 30%
 MODERATE_BOOST = 1.3          # Boost moderate ratings by 30%
 GOOGLE_NEGATIVE_UPLIFT = 1.25 # Google underrepresents negative by ~25%
 SILENT_MAJORITY_MULTIPLIER = 20  # Reviews represent ~1/20th of customers
+
+# Industry-specific correction adjustments
+# Different industries have different review dynamics
+INDUSTRY_CORRECTIONS = {
+    # SaaS reviews are more moderate (feature-based, less emotional)
+    "saas": {"extremity": 0.8, "negative_uplift": 1.10, "silent_multiplier": 50},
+    "app": {"extremity": 0.75, "negative_uplift": 1.15, "silent_multiplier": 100},
+    "ecommerce": {"extremity": 0.7, "negative_uplift": 1.20, "silent_multiplier": 30},
+    # Healthcare reviews are more extreme (trust/anxiety-driven)
+    "healthcare_clinic": {"extremity": 0.6, "negative_uplift": 1.30, "silent_multiplier": 40},
+    "dental": {"extremity": 0.6, "negative_uplift": 1.30, "silent_multiplier": 40},
+    "veterinary": {"extremity": 0.65, "negative_uplift": 1.25, "silent_multiplier": 30},
+    # B2B has very few reviews but they're detailed
+    "b2b_services": {"extremity": 0.85, "negative_uplift": 1.05, "silent_multiplier": 100},
+    "consulting": {"extremity": 0.85, "negative_uplift": 1.05, "silent_multiplier": 80},
+    "logistics": {"extremity": 0.8, "negative_uplift": 1.10, "silent_multiplier": 100},
+    # Hospitality has high review rates
+    "hotel": {"extremity": 0.65, "negative_uplift": 1.20, "silent_multiplier": 10},
+    "hostel": {"extremity": 0.65, "negative_uplift": 1.20, "silent_multiplier": 8},
+    # Physical service businesses (default-like)
+    "restaurant": {"extremity": 0.7, "negative_uplift": 1.25, "silent_multiplier": 20},
+    "cafe": {"extremity": 0.7, "negative_uplift": 1.25, "silent_multiplier": 25},
+    "barbershop": {"extremity": 0.75, "negative_uplift": 1.20, "silent_multiplier": 30},
+    "gym": {"extremity": 0.75, "negative_uplift": 1.15, "silent_multiplier": 15},
+    # Retail
+    "grocery": {"extremity": 0.7, "negative_uplift": 1.25, "silent_multiplier": 50},
+    "clothing": {"extremity": 0.7, "negative_uplift": 1.20, "silent_multiplier": 30},
+    # Education -- reviews skew positive (survivors bias)
+    "education": {"extremity": 0.65, "negative_uplift": 1.35, "silent_multiplier": 20},
+    "tutoring": {"extremity": 0.7, "negative_uplift": 1.30, "silent_multiplier": 25},
+}
+
+
+def _get_industry_corrections(business_type: str = "") -> dict:
+    """Get industry-specific correction factors, falling back to defaults."""
+    if business_type and business_type in INDUSTRY_CORRECTIONS:
+        return INDUSTRY_CORRECTIONS[business_type]
+    return {"extremity": EXTREMITY_COMPRESSION, "negative_uplift": GOOGLE_NEGATIVE_UPLIFT,
+            "silent_multiplier": SILENT_MAJORITY_MULTIPLIER}
 
 
 @dataclass
@@ -48,10 +87,17 @@ class BiasAdjustedSignals:
 
 def apply_bias_corrections(
     signals: AggregateReviewSignals,
+    business_type: str = "",
 ) -> BiasAdjustedSignals:
-    """Apply all empirically-grounded corrections to raw review signals."""
+    """Apply all empirically-grounded corrections to raw review signals.
 
+    Uses industry-specific correction factors when available.
+    """
     corrections = []
+    ind = _get_industry_corrections(business_type)
+    extremity = ind["extremity"]
+    negative_uplift = ind["negative_uplift"]
+    silent_mult = ind["silent_multiplier"]
 
     # Step 1: Classify raw sentiment from rating distribution
     total = sum(signals.rating_distribution.values())
@@ -76,21 +122,22 @@ def apply_bias_corrections(
         corrections.append("Inferred distribution from average rating (limited review data)")
 
     # Step 2: Extremity bias correction (Karaman 2021)
-    # Compress extremes, boost moderate centre
-    adj_positive = raw_positive * EXTREMITY_COMPRESSION
-    adj_negative = raw_negative * EXTREMITY_COMPRESSION
-    adj_neutral = raw_neutral * MODERATE_BOOST
+    # Industry-aware compression factor
+    adj_positive = raw_positive * extremity
+    adj_negative = raw_negative * extremity
+    boost = 1 + (1 - extremity)  # inverse: less compression -> less boost
+    adj_neutral = raw_neutral * boost
     corrections.append(
-        f"Extremity bias correction: compressed extreme ratings by {int((1-EXTREMITY_COMPRESSION)*100)}%, "
-        f"boosted moderate by {int((MODERATE_BOOST-1)*100)}%"
+        f"Extremity bias correction ({business_type or 'default'}): "
+        f"compressed extreme ratings by {int((1-extremity)*100)}%, "
+        f"boosted moderate by {int((boost-1)*100)}%"
     )
 
     # Step 3: Google platform correction (Han & Anderson 2026)
-    # Google underrepresents negative experiences
-    adj_negative *= GOOGLE_NEGATIVE_UPLIFT
+    adj_negative *= negative_uplift
     corrections.append(
-        f"Google platform correction: uplifted negative sentiment by {int((GOOGLE_NEGATIVE_UPLIFT-1)*100)}% "
-        "(research shows Google reviewers underreport negative experiences)"
+        f"Platform correction: uplifted negative sentiment by {int((negative_uplift-1)*100)}% "
+        "(research shows reviewers underreport negative experiences)"
     )
 
     # Step 4: Normalise adjusted ratios
@@ -103,12 +150,12 @@ def apply_bias_corrections(
         pos_ratio, neg_ratio, neu_ratio = 0.5, 0.2, 0.3
 
     # Step 5: Silent majority estimation
-    # Reviews represent ~1% of customers (Alchemer research)
-    # Conservative: use 1/20 multiplier
-    review_years = max(1, signals.total_review_count / 50)  # rough estimate of years active
-    estimated_yearly = int(signals.total_review_count * SILENT_MAJORITY_MULTIPLIER / max(review_years, 1))
+    # Industry-aware multiplier (B2B has very few reviews per customer)
+    review_years = max(1, signals.total_review_count / 50)
+    estimated_yearly = int(signals.total_review_count * silent_mult / max(review_years, 1))
     corrections.append(
-        f"Silent majority imputation: estimated {SILENT_MAJORITY_MULTIPLIER}x more customers than reviewers"
+        f"Silent majority imputation ({business_type or 'default'}): "
+        f"estimated {silent_mult}x more customers than reviewers"
     )
 
     # Step 6: Confidence decay

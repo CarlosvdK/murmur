@@ -19,12 +19,20 @@ from backend.context.tools.base import ContextTool
 logger = logging.getLogger(__name__)
 
 
+ONLINE_ONLY_TYPES = {
+    "saas", "ecommerce", "app", "it_services", "web_design", "hosting",
+    "cybersecurity", "data_analytics", "b2b_services", "staffing",
+    "marketing_agency", "freelance",
+}
+
+
 class GooglePlacesTool(ContextTool):
     name = "google_places"
     description = (
         "Find nearby competitor businesses with ratings, price levels, and "
         "review counts. Use to understand the competitive landscape within "
-        "walking distance. Provide competitor_type and search_radius in hints."
+        "walking distance. Provide competitor_type and search_radius in hints. "
+        "Not applicable for online-only businesses (SaaS, e-commerce, etc.)."
     )
     required_config = ["google_places_api_key"]
 
@@ -36,6 +44,15 @@ class GooglePlacesTool(ContextTool):
         question: str,
         hints: dict,
     ) -> dict:
+        # Skip for online-only businesses
+        if business_type in ONLINE_ONLY_TYPES:
+            logger.info("Skipping google_places for online business type: %s", business_type)
+            return {
+                "status": "skipped",
+                "reason": f"Not applicable for {business_type} businesses (no physical location)",
+                "competitors": [],
+            }
+
         settings = get_settings()
         api_key = settings.google_places_api_key
         competitor_type = hints.get("competitor_type", business_type)

@@ -14,10 +14,10 @@ import {
 
 const EXAMPLES = [
   "What if I raised prices by 15%?",
-  "Should I open on Sundays?",
-  "Would my customers use a loyalty card?",
-  "What if I changed my opening hours?",
-  "Would a new menu item sell well?",
+  "Should I change my operating hours?",
+  "Would my customers use a rewards program?",
+  "What if I added a new product or service?",
+  "How would customers react to a rebrand?",
 ];
 
 interface ClarifyingQuestion {
@@ -72,7 +72,7 @@ function generateClarifyingQuestions(question: string): ClarifyingQuestion[] {
   if (q.includes("price") || q.includes("cost") || q.includes("charge") || q.includes("fee")) {
     questions.push(
       { question: "What is your current pricing, and what would the new pricing be?", hint: "Concrete numbers help -- e.g. 'Coffee is 3.50 EUR, thinking of 4.00 EUR'" },
-      { question: "Have you changed prices before? What actually happened to footfall and revenue?", hint: "Real outcomes from past changes are the strongest signal we can use" },
+      { question: "Have you made a similar change before? What actually happened?", hint: "Real outcomes from past changes are the strongest signal we can use" },
       { question: "What do your nearest competitors charge for similar products?", hint: "e.g. 'The cafe two doors down charges 3.80 EUR for a similar coffee'" },
     );
   } else if (q.includes("open") || q.includes("hour") || q.includes("close") || q.includes("sunday") || q.includes("weekend")) {

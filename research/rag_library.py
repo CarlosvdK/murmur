@@ -46,59 +46,59 @@ def get_domain_insights(domain: str) -> str:
 def get_simulation_context(
     country_code: str,
     simulation_type: str = "consumer",
+    business_type: str = "",
+    question: str = "",
+    demographics: dict | None = None,
 ) -> str:
-    """Assembles the full research context to inject into simulation prompts.
+    """Assembles targeted research context for simulation prompts.
+
+    Uses the RAG selector to choose only the most relevant domains
+    instead of loading all 9. Reduces token usage by ~50% while
+    increasing relevance.
 
     Args:
         country_code: ISO 2-letter country code (e.g. "ES", "GB", "NL")
         simulation_type: "consumer" | "vendor" | "general"
+        business_type: Business type from survey (e.g. "saas", "restaurant")
+        question: The user's simulation question
+        demographics: Optional customer demographic data
 
     Returns:
-        A ready-to-use string containing:
-        - Country cultural profile (Hofstede-based adjustments)
-        - Consumer psychology insights (loss aversion, anchoring, etc.)
-        - Review bias correction rules
-        - Simulation methodology calibration
-        - Domain-specific context (vendor negotiation if applicable)
+        A ready-to-use string with selected research domains.
     """
     parts = []
 
-    # Cultural context
-    profile = get_country_profile(country_code)
-    country_fragment = get_domain_insights("country_profiles")
-    if country_fragment:
-        parts.append(country_fragment)
+    # Use targeted selection if we have enough context
+    if business_type and question:
+        from backend.context.rag_selector import select_rag_articles
+        selection = select_rag_articles(
+            business_type=business_type,
+            question=question,
+            demographics=demographics,
+            has_country=bool(country_code),
+        )
+        domains = selection.domains_selected
 
-    # Consumer psychology (always included)
-    consumer = get_domain_insights("consumer_psychology")
-    if consumer:
-        parts.append(consumer)
+        # Add vendor-specific domain if simulation_type is vendor
+        if simulation_type == "vendor" and "negotiation_psychology" not in domains:
+            domains.append("negotiation_psychology")
 
-    # Behavioral economics
-    behavioral = get_domain_insights("behavioral_economics")
-    if behavioral:
-        parts.append(behavioral)
+        for domain in domains:
+            fragment = get_domain_insights(domain)
+            if fragment:
+                parts.append(fragment)
+    else:
+        # Legacy fallback: load core domains when no context available
+        for domain in ["country_profiles", "consumer_psychology",
+                       "simulation_methodology", "digital_twins"]:
+            fragment = get_domain_insights(domain)
+            if fragment:
+                parts.append(fragment)
 
-    # Review bias correction (always included)
-    review = get_domain_insights("review_bias")
-    if review:
-        parts.append(review)
-
-    # Personality models
-    personality = get_domain_insights("personality_models")
-    if personality:
-        parts.append(personality)
-
-    # Simulation methodology
-    methodology = get_domain_insights("simulation_methodology")
-    if methodology:
-        parts.append(methodology)
-
-    # Vendor-specific
-    if simulation_type == "vendor":
-        negotiation = get_domain_insights("negotiation_psychology")
-        if negotiation:
-            parts.append(negotiation)
+        if simulation_type == "vendor":
+            negotiation = get_domain_insights("negotiation_psychology")
+            if negotiation:
+                parts.append(negotiation)
 
     return "\n\n---\n\n".join(parts)
 

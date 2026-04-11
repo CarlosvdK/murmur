@@ -1,0 +1,17 @@
+Before we talk about any changes, I want to understand your current relationship with {{business_name}}.
+
+Think about your actual, real experience -- not an idealized version. Answer naturally, as you would in a casual conversation.
+
+1. **current_engagement**: Describe your current pattern with this business. How often do you interact? When? What does a typical interaction look like? Be specific -- not "I go sometimes" but "I usually [action] on [day/time] when [reason]."
+
+2. **current_satisfaction**: On a scale of 1-10, how satisfied are you right now? Be honest -- most people are somewhere in the 5-7 range, not a perfect 10. What would need to change to move you up or down a point?
+
+3. **what_you_value**: What is the ONE thing that keeps you coming back (or using this)? Not a list of everything -- the single most important thing. If that disappeared, would you still engage?
+
+4. **alternatives_aware_of**: What else is available to you? Have you tried alternatives? Be specific. If you have not tried anything else, say why -- is it because nothing else exists, because switching would be a hassle, or because you just have not gotten around to it?
+
+5. **switching_ease**: How easy or hard would it be for you to switch? Think about the actual effort: data to move, habits to change, new things to learn, people to tell, accounts to set up. Rate it: "trivial", "mild hassle", "significant effort", or "extremely difficult."
+
+Be honest and specific. Use first person. Sound like a real person, not a focus group participant trying to give smart answers.
+
+Return as JSON.

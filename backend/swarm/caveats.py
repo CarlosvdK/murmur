@@ -1,11 +1,11 @@
 """
-Caveat Generator — produces contextual warnings for simulation results.
+Caveat Generator -- produces contextual warnings for simulation results.
 
 Draws from A/B testing theory (docs/ab-testing-theory/) to surface
 statistically-grounded caveats. Every simulation result must include
 at least the baseline caveats (self-selection, not-causation).
 
-This is NOT about being pessimistic — it's about being honest.
+This is NOT about being pessimistic -- it's about being honest.
 A caveat like "your personas can't simulate the gap between saying
 they'd use a loyalty card and actually using it" makes our product
 MORE trustworthy, not less.
@@ -29,6 +29,7 @@ class Caveat:
 
 # Keywords that suggest the user is reacting to extreme recent performance
 RTM_TRIGGER_PATTERNS = [
+    # General business patterns
     r"sales (have been|are) (down|dropping|terrible|awful|bad|low)",
     r"(terrible|awful|bad|worst|lowest) (month|week|quarter|year|period)",
     r"(lost|losing) customers",
@@ -36,6 +37,17 @@ RTM_TRIGGER_PATTERNS = [
     r"(foot traffic|visits|bookings) (down|dropped|declining)",
     r"(best|highest|record|amazing) (month|week|quarter|sales)",
     r"(suddenly|recently) (worse|better|dropped|improved)",
+    # SaaS / tech patterns
+    r"churn (rate|is) (up|increasing|high|rising)",
+    r"MRR (down|dropping|declining)",
+    r"DAU (down|declining|dropping)",
+    r"ARR (down|declining)",
+    r"NPS (dropped|declining|low)",
+    r"conversion (rate|is) (down|low|declining)",
+    r"CAC (up|increasing|rising)",
+    r"LTV (down|declining)",
+    r"retention (down|declining|dropping)",
+    r"engagement (down|declining|dropping)",
 ]
 
 # Keywords suggesting novelty/new feature adoption
@@ -43,12 +55,22 @@ NOVELTY_PATTERNS = [
     r"(new|launch|introduce|add|start|create) .*(app|feature|product|service|menu item|loyalty|program|card|system)",
     r"(loyalty card|loyalty program|rewards|membership|subscription)",
     r"(mobile app|online ordering|delivery service|website)",
+    r"(new|launch|release|ship) .*(feature|update|integration|api|dashboard|module|version|tier|plan)",
+    r"(beta|alpha|early access|waitlist)",
+    r"(redesign|rebrand|pivot|reposition)",
+    r"(new location|new branch|expansion|franchise)",
+    r"(hire|staffing|team expansion)",
 ]
 
 # Keywords suggesting opt-in/adherence-dependent outcomes
 ADHERENCE_PATTERNS = [
     r"(loyalty card|loyalty program|rewards|membership|app|sign.?up|subscribe|opt.?in|register)",
     r"(would .* use|would .* sign up|would .* join|would .* download)",
+    r"(would .* subscribe|would .* upgrade|would .* renew|would .* onboard)",
+    r"(free trial|freemium|demo|pilot|proof of concept)",
+    r"(newsletter|email list|notification|push notification)",
+    r"(referral|refer a friend|invite|share)",
+    r"(training|onboarding|setup|implementation)",
 ]
 
 # Keywords suggesting price changes
@@ -56,6 +78,37 @@ PRICE_PATTERNS = [
     r"(raise|increase|lower|reduce|change) .*(price|cost|fee|rate)",
     r"(more expensive|cheaper|discount|surcharge|markup)",
     r"\d+%",
+    r"(subscription|monthly|annual|per seat|per user|per license) .*(price|cost|fee)",
+    r"(tier|plan|package) .*(change|update|restructure)",
+    r"(free to paid|monetize|paywall)",
+    r"(bundle|unbundle|add-on|upsell)",
+    r"(contract|renewal|renegotiate)",
+]
+
+# Keywords about competitors and competitive positioning
+COMPETITION_PATTERNS = [
+    r"(competitor|competing|rival|alternative) .*(launch|offer|price|feature|enter|expand)",
+    r"(switch|switching|migrate|migrating) to .*(competitor|rival|alternative|another)",
+    r"(losing|lost) .*(to|customers to) .*(competitor|rival|another)",
+    r"(compete|differentiate|stand out|unique selling|USP|moat|defensib)",
+    r"(market share|marketshare) .*(lost|losing|declining|down|shrinking)",
+    r"(new entrant|new player|new competitor|copycat|clone)",
+    r"(price war|undercutting|undercut|race to bottom)",
+    r"(they|competitor|rival) .*(cheaper|better|faster|launched|released|offer)",
+]
+
+# Keywords about new channels or distribution changes
+CHANNEL_PATTERNS = [
+    r"(online|e-?commerce|web|digital) .*(store|shop|presence|channel|sales)",
+    r"(delivery|takeout|take-out|curbside|pickup|pick-up|drive-thru|drive-through)",
+    r"(marketplace|amazon|etsy|shopify|uber eats|doordash|grubhub|instacart)",
+    r"(social media|instagram|tiktok|facebook|youtube) .*(sell|shop|store|channel)",
+    r"(wholesale|B2B|retail|DTC|direct.to.consumer)",
+    r"(pop-up|pop up|kiosk|vending|mobile unit|food truck)",
+    r"(app store|play store|mobile app|PWA|progressive web app)",
+    r"(affiliate|partner|reseller|distributor|broker|agent)",
+    r"(open|launch|expand|start) .*(channel|location|branch|market|region|country)",
+    r"(omnichannel|multi-?channel|cross-?channel)",
 ]
 
 
@@ -89,7 +142,7 @@ def generate_caveats(
         message=(
             "These are simulated reactions from AI-generated personas, not real customers. "
             "Use this to identify concerns you hadn't considered and pressure-test your "
-            "thinking — not as proof that a decision will work."
+            "thinking -- not as proof that a decision will work."
         ),
         severity="info",
         source="Topic 6: Causation vs Correlation",
@@ -102,7 +155,7 @@ def generate_caveats(
         message=(
             "Our personas are asked directly and must respond. In reality, many customers "
             "would simply not notice or not care about this change. The responses here "
-            "represent customers who DO have an opinion — the silent majority may differ."
+            "represent customers who DO have an opinion -- the silent majority may differ."
         ),
         severity="info",
         source="Topic 4: Attrition & Adherence",
@@ -133,7 +186,7 @@ def generate_caveats(
             message=(
                 "When something is new, customers pay more attention to it. "
                 "Our personas react to the idea as if hearing it for the first time. "
-                "In practice, initial enthusiasm often fades — real adoption is typically "
+                "In practice, initial enthusiasm often fades -- real adoption is typically "
                 "lower than stated interest."
             ),
             severity="warning",
@@ -144,7 +197,7 @@ def generate_caveats(
     if _matches_any(question, ADHERENCE_PATTERNS):
         caveats.append(Caveat(
             type="adherence_gap",
-            title="Saying they'd use it ≠ actually using it",
+            title="Saying they'd use it does not equal actually using it",
             message=(
                 "This question involves something customers would need to actively "
                 "opt into or use regularly. There's a well-documented gap between "
@@ -170,11 +223,44 @@ def generate_caveats(
             source="Behavioral economics research on hypothetical bias",
         ))
 
+    # Competition caveat
+    if _matches_any(question, COMPETITION_PATTERNS):
+        caveats.append(Caveat(
+            type="competitive_context",
+            title="Competitor reactions are hard to simulate",
+            message=(
+                "Our personas can tell you how they feel about your offering versus "
+                "what they know of competitors, but they cannot predict what competitors "
+                "will do next. Competitive dynamics are fluid -- a rival could match your "
+                "move, undercut you, or ignore you entirely. Treat competitive insights "
+                "as a snapshot of current perception, not a strategic forecast."
+            ),
+            severity="warning",
+            source="Competitive strategy limitations in simulation",
+        ))
+
+    # Channel caveat
+    if _matches_any(question, CHANNEL_PATTERNS):
+        caveats.append(Caveat(
+            type="channel_adoption",
+            title="New channels face discovery and habit barriers",
+            message=(
+                "Adding a new channel (online, delivery, marketplace) sounds simple, "
+                "but customers need to discover it, trust it, and change their habits. "
+                "Personas react to the concept in isolation -- they cannot account for "
+                "the friction of finding your new channel, learning the interface, or "
+                "breaking their current routine. Real adoption curves are slower than "
+                "stated interest suggests."
+            ),
+            severity="warning",
+            source="Topic 4: Channel adoption and habit formation",
+        ))
+
     # Small sample warning (Topic 2)
     if persona_count < 12:
         caveats.append(Caveat(
             type="small_sample",
-            title="Small persona count — results less reliable",
+            title="Small persona count -- results less reliable",
             message=(
                 f"This simulation used only {persona_count} personas. "
                 "With fewer than 12, individual outlier responses have outsized "
@@ -200,7 +286,7 @@ def generate_caveats(
                 source="Topic 2: Evaluating Tests",
             ))
 
-    # Profile quality warning (Topic 4 — shared profile dependency)
+    # Profile quality warning (Topic 4 -- shared profile dependency)
     profile_length = len(business.description or "") + len(business.customer_description or "")
     if profile_length < 100:
         caveats.append(Caveat(

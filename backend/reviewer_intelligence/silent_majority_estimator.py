@@ -77,14 +77,16 @@ def estimate_silent_majority(
 
     guidance = (
         f"Generate {int(base_proportion * 100)}% of the swarm as silent majority personas. "
-        "These people have NEVER written a review. They do not think in terms of star ratings. "
-        "They are moderately satisfied but not enthusiastic. They are more price-sensitive "
-        "than the vocal minority suggests. They would not describe themselves as 'regulars' "
-        "even if they come regularly -- it is just part of their routine. "
-        "When asked about a price increase, they will not say 'I understand costs go up.' "
-        "They will say 'Hmm, that is getting a bit much' or 'I might try somewhere else.' "
+        "These people have NEVER written a review or posted feedback online. They do not "
+        "think in terms of star ratings or NPS scores. They are moderately satisfied but "
+        "not enthusiastic. They are more price-sensitive than the vocal minority suggests. "
+        "They would not describe themselves as 'loyal customers' even if they engage "
+        "regularly -- it is just part of their routine or default behavior. "
+        "When asked about a change, they will not say 'I understand why you need to do this.' "
+        "They will say 'Hmm, that is a bit much' or 'I might look at other options.' "
         "Their responses should be shorter, less articulate, and more gut-reaction than "
-        "the enthusiastic reviewers."
+        "the enthusiastic reviewers. They are busy people with limited attention for any "
+        "single business or service in their life."
     )
 
     confidence = (
