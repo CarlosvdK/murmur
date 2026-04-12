@@ -87,96 +87,134 @@ def detect_question_type(question: str) -> str:
 # Which domains are relevant for which question types
 DOMAIN_RELEVANCE = {
     "pricing": {
-        "consumer_psychology": 1.0,    # loss aversion, anchoring, mental accounting
-        "behavioral_economics": 1.0,   # framing, defaults, herd behavior
-        "country_profiles": 0.8,       # price fairness sensitivity by culture
-        "simulation_methodology": 0.6, # confidence calibration
-        "qualitative_interview_methodology": 0.5,  # interview calibration
-        "review_bias": 0.4,            # price mentions in reviews
-        "digital_twins": 0.5,          # stated vs revealed preference gap
+        "consumer_psychology": 1.0,
+        "pricing_psychology": 1.0,     # price elasticity, reference prices, fairness
+        "behavioral_economics": 1.0,
+        "country_profiles": 0.8,
+        "persuasion_tactics": 0.8,
+        "loyalty_retention": 0.6,      # price-driven churn
+        "simulation_methodology": 0.6,
+        "qualitative_interview_methodology": 0.5,
+        "retail_customer_behavior": 0.5,
+        "review_bias": 0.4,
+        "digital_twins": 0.5,
+        "b2b_buying_behavior": 0.3,
         "personality_models": 0.3,
         "decision_making": 0.4,
         "negotiation_psychology": 0.2,
     },
     "feature": {
-        "digital_twins": 1.0,          # simulation fidelity for product evaluation
-        "decision_making": 1.0,        # diffusion of innovations, adoption curves
-        "consumer_psychology": 0.7,    # status quo bias, loss aversion for feature removal
-        "personality_models": 0.6,     # openness predicts early adoption
+        "digital_twins": 1.0,
+        "decision_making": 1.0,
+        "innovation_adoption": 0.9,
+        "consumer_psychology": 0.7,
+        "digital_experience": 0.7,
+        "persuasion_tactics": 0.8,
+        "personality_models": 0.6,
         "simulation_methodology": 0.5,
         "qualitative_interview_methodology": 0.5,
+        "service_quality": 0.4,
         "behavioral_economics": 0.4,
         "country_profiles": 0.3,
         "review_bias": 0.2,
-        "negotiation_psychology": 0.1,
     },
     "operations": {
-        "consumer_psychology": 0.8,    # habit formation, convenience
+        "service_quality": 0.9,
+        "consumer_psychology": 0.8,
+        "retail_customer_behavior": 0.7,
+        "digital_experience": 0.6,
         "simulation_methodology": 0.6,
         "qualitative_interview_methodology": 0.5,
-        "country_profiles": 0.5,       # cultural work-life norms
+        "persuasion_tactics": 0.8,
+        "country_profiles": 0.5,
         "behavioral_economics": 0.4,
         "digital_twins": 0.4,
         "review_bias": 0.3,
-        "personality_models": 0.2,
         "decision_making": 0.3,
-        "negotiation_psychology": 0.1,
     },
     "retention": {
-        "consumer_psychology": 1.0,    # loyalty stages, switching behavior
-        "behavioral_economics": 0.8,   # defaults, endowment effect
-        "digital_twins": 0.7,          # stated vs revealed gap on loyalty intent
-        "decision_making": 0.6,        # innovation adoption = churn risk
-        "personality_models": 0.5,     # conscientiousness predicts loyalty
+        "loyalty_retention": 1.0,
+        "consumer_psychology": 1.0,
+        "behavioral_economics": 0.8,
+        "service_quality": 0.7,
+        "digital_twins": 0.7,
+        "persuasion_tactics": 0.8,
+        "decision_making": 0.6,
+        "personality_models": 0.5,
         "simulation_methodology": 0.5,
         "qualitative_interview_methodology": 0.5,
+        "innovation_adoption": 0.4,
         "country_profiles": 0.4,
         "review_bias": 0.3,
-        "negotiation_psychology": 0.2,
     },
     "brand": {
-        "consumer_psychology": 0.8,    # perceived value, social proof
-        "personality_models": 0.7,     # brand personality alignment
-        "decision_making": 0.6,        # adoption of new identity
+        "consumer_psychology": 0.8,
+        "personality_models": 0.7,
+        "retail_customer_behavior": 0.6,
+        "decision_making": 0.6,
+        "persuasion_tactics": 0.8,
         "digital_twins": 0.5,
-        "country_profiles": 0.5,       # cultural brand perception
+        "country_profiles": 0.5,
         "qualitative_interview_methodology": 0.5,
+        "digital_experience": 0.4,
         "behavioral_economics": 0.4,
         "simulation_methodology": 0.4,
         "review_bias": 0.3,
-        "negotiation_psychology": 0.1,
     },
     "general": {
         "consumer_psychology": 0.8,
         "simulation_methodology": 0.7,
         "digital_twins": 0.6,
+        "persuasion_tactics": 0.8,
         "qualitative_interview_methodology": 0.5,
         "behavioral_economics": 0.5,
+        "service_quality": 0.5,
         "country_profiles": 0.5,
+        "digital_experience": 0.4,
+        "retail_customer_behavior": 0.4,
         "personality_models": 0.4,
+        "loyalty_retention": 0.3,
+        "innovation_adoption": 0.3,
         "review_bias": 0.3,
         "decision_making": 0.3,
-        "negotiation_psychology": 0.1,
     },
 }
 
 # Industry-specific domain boosts
 INDUSTRY_BOOSTS = {
-    # B2B and vendor-facing businesses benefit from negotiation psychology
-    "b2b_services": {"negotiation_psychology": +0.5, "review_bias": -0.3},
-    "consulting": {"negotiation_psychology": +0.4, "review_bias": -0.2},
-    "logistics": {"negotiation_psychology": +0.4, "review_bias": -0.3},
-    "wholesale": {"negotiation_psychology": +0.4, "review_bias": -0.2},
-    "manufacturing": {"negotiation_psychology": +0.3, "review_bias": -0.3},
-    # Online businesses have different review dynamics
-    "saas": {"digital_twins": +0.3, "review_bias": -0.2},
-    "ecommerce": {"behavioral_economics": +0.2},
-    "app": {"digital_twins": +0.3, "decision_making": +0.2},
-    # Physical businesses benefit from review bias research
-    "restaurant": {"review_bias": +0.3},
-    "cafe": {"review_bias": +0.3},
-    "barbershop": {"review_bias": +0.2},
-    "hotel": {"review_bias": +0.3},
+    # B2B
+    "b2b_services": {"negotiation_psychology": +0.5, "b2b_buying_behavior": +0.5, "review_bias": -0.3},
+    "consulting": {"negotiation_psychology": +0.4, "b2b_buying_behavior": +0.4, "review_bias": -0.2},
+    "logistics": {"negotiation_psychology": +0.4, "b2b_buying_behavior": +0.3, "review_bias": -0.3},
+    "wholesale": {"negotiation_psychology": +0.4, "b2b_buying_behavior": +0.3, "review_bias": -0.2},
+    "manufacturing": {"negotiation_psychology": +0.3, "b2b_buying_behavior": +0.3, "review_bias": -0.3},
+    # Technology
+    "saas": {"digital_twins": +0.3, "digital_experience": +0.3, "innovation_adoption": +0.3, "review_bias": -0.2},
+    "ecommerce": {"behavioral_economics": +0.2, "digital_experience": +0.3, "convenience_friction": +0.2},
+    "app": {"digital_twins": +0.3, "digital_experience": +0.3, "innovation_adoption": +0.3, "onboarding_first_impressions": +0.2},
+    # Food & Drink
+    "restaurant": {"food_hospitality_psychology": +0.8, "review_bias": +0.3, "group_decision_making": +0.3, "pricing_presentation": +0.3},
+    "cafe": {"food_hospitality_psychology": +0.7, "review_bias": +0.3, "seasonal_temporal_effects": +0.3},
+    # Health & Wellness
+    "barbershop": {"review_bias": +0.2, "trust_credibility": +0.2},
+    "gym": {"fitness_wellness_retention": +0.8, "onboarding_first_impressions": +0.3},
+    "yoga": {"fitness_wellness_retention": +0.4},
+    "spa": {"luxury_premium_psychology": +0.3, "service_quality": +0.2},
+    # Healthcare
+    "healthcare_clinic": {"healthcare_patient_behavior": +0.8, "trust_credibility": +0.4, "complaint_feedback_behavior": +0.3},
+    "dental": {"healthcare_patient_behavior": +0.7, "trust_credibility": +0.4},
+    "veterinary": {"healthcare_patient_behavior": +0.3},
+    # Hospitality
+    "hotel": {"food_hospitality_psychology": +0.3, "review_bias": +0.3, "seasonal_temporal_effects": +0.3},
+    # Retail
+    "clothing": {"retail_customer_behavior": +0.3, "generational_demographics": +0.2},
+    "grocery": {"retail_customer_behavior": +0.3, "pricing_presentation": +0.2},
+    # Education
+    "education": {"innovation_adoption": +0.3, "onboarding_first_impressions": +0.3},
+    "tutoring": {"onboarding_first_impressions": +0.2},
+    # Luxury
+    "jewelry": {"luxury_premium_psychology": +0.5},
+    "fine_dining": {"luxury_premium_psychology": +0.4, "food_hospitality_psychology": +0.3},
 }
 
 # Map all business types to their base type for boost lookup
@@ -215,7 +253,7 @@ def select_rag_articles(
     business_type: str,
     question: str,
     demographics: dict | None = None,
-    max_domains: int = 5,
+    max_domains: int = 8,
     has_country: bool = False,
 ) -> RAGSelection:
     """Select the most relevant research domains for this simulation.
@@ -250,6 +288,11 @@ def select_rag_articles(
         base_scores.get("simulation_methodology", 0), 0.5
     )
 
+    # Always include persuasion_tactics (stated-vs-revealed calibration)
+    base_scores["persuasion_tactics"] = max(
+        base_scores.get("persuasion_tactics", 0), 0.7
+    )
+
     # Sort by score and take top N
     ranked = sorted(base_scores.items(), key=lambda x: x[1], reverse=True)
 
@@ -258,6 +301,16 @@ def select_rag_articles(
     selected = selected[:max_domains]
 
     domains = [d for d, _ in selected]
+
+    # Ensure industry-specific domains from boosts make the cut
+    # (replace the lowest-scoring generic domain if needed)
+    for boost_domain in boosts:
+        if boost_domain not in domains and boosts[boost_domain] >= 0.5:
+            # This is a high-priority industry domain that got pushed out
+            if len(domains) >= max_domains:
+                domains[-1] = boost_domain  # replace lowest scorer
+            else:
+                domains.append(boost_domain)
     reasoning_parts = [f"{d} ({s:.1f})" for d, s in selected]
 
     selection = RAGSelection(

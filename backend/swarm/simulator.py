@@ -130,6 +130,16 @@ def _build_depth_prompt() -> str:
     return _load_prompt("interview_turn3_depth.txt")
 
 
+def _build_ab_compare_prompt(question: str) -> str:
+    """Build Turn 4 (A/B comparison) prompt from interview_ab_compare.txt.
+
+    Only used for non-A/B questions (no explicit variant_a/variant_b) to
+    compare the proposed change against the status quo.
+    """
+    template = _load_prompt("interview_ab_compare.txt")
+    return template.replace("{{question}}", question)
+
+
 # ---------------------------------------------------------------------------
 # JSON response parsing
 # ---------------------------------------------------------------------------
@@ -248,17 +258,21 @@ async def _interview_persona_focus_group(
     model: str,
     context_narrative: str | None = None,
     on_turn_progress: Optional[Callable[[str, str], None]] = None,
+    ab_compare: bool = True,
 ) -> dict:
-    """Conduct a 3-turn focus group interview with a single persona.
+    """Conduct a multi-turn focus group interview with a single persona.
 
     The entire interview is one atomic operation -- the semaphore is acquired
-    once and held for all 3 turns. This keeps the conversation coherent and
+    once and held for all turns. This keeps the conversation coherent and
     avoids interleaving turns with other personas under rate limiting.
 
     Turns:
         1. Warmup  -- establish current relationship with the business
         2. Core    -- present the question / change and get reaction
         3. Depth   -- forward-looking behavioral prediction
+        4. A/B Compare (optional) -- compare change vs status quo
+           Only runs when ab_compare=True AND the question is NOT already
+           an explicit A/B comparison (variant_a and variant_b are both None).
 
     Returns a dict with per-turn data plus backward-compatible top-level
     fields (reaction, reasoning, sentiment, preference, preference_strength)
@@ -328,6 +342,26 @@ async def _interview_persona_focus_group(
         t3_text = t3.content[0].text
         depth_data = _parse_json_response(t3_text, "turn 3 depth")
 
+        # -- Turn 4: A/B Comparison (optional) ---------------------------------
+        ab_comparison_data = None
+        if ab_compare and variant_a is None and variant_b is None:
+            logger.info("Interviewing persona: %s (turn 4 ab_compare)", persona.name)
+            if on_turn_progress:
+                on_turn_progress(persona.name, "ab_compare")
+
+            ab_compare_prompt = _build_ab_compare_prompt(question)
+            messages.append({"role": "assistant", "content": t3_text})
+            messages.append({"role": "user", "content": ab_compare_prompt})
+
+            t4 = await client.messages.create(
+                model=model,
+                max_tokens=512,
+                system=system,
+                messages=messages,
+            )
+            t4_text = t4.content[0].text
+            ab_comparison_data = _parse_json_response(t4_text, "turn 4 ab_compare")
+
     # -- Assemble result ------------------------------------------------------
     # Top-level sentiment comes from the core turn for backward compat with
     # the impact estimator.
@@ -337,7 +371,7 @@ async def _interview_persona_focus_group(
     except (TypeError, ValueError):
         sentiment = 0.0
 
-    return {
+    result = {
         "persona_name": persona.name,
         # Per-turn data
         "warmup": warmup_data,
@@ -350,6 +384,11 @@ async def _interview_persona_focus_group(
         "preference": core_data.get("preference"),
         "preference_strength": core_data.get("preference_strength"),
     }
+
+    if ab_comparison_data is not None:
+        result["ab_comparison"] = ab_comparison_data
+
+    return result
 
 
 # ---------------------------------------------------------------------------
@@ -366,6 +405,7 @@ async def run_simulation(
     on_progress: Optional[Callable[[str, int], None]] = None,
     context_narrative: str | None = None,
     focus_group: bool = True,
+    ab_compare: bool = True,
 ) -> List[dict]:
     """Run the question through all personas in parallel.
 
@@ -400,6 +440,7 @@ async def run_simulation(
                 client, semaphore, persona, business, question,
                 variant_a, variant_b, settings.model_name, context_narrative,
                 on_turn_progress=turn_progress,
+                ab_compare=ab_compare,
             )
         else:
             result = await _interview_persona(

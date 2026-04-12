@@ -24,9 +24,10 @@ export default function TopNav() {
   }
 
   return (
-    <header className="sticky top-0 z-50 flex h-12 items-center border-b border-[#E5E2DC] bg-white px-6">
+    <header className="sticky top-0 z-50 flex h-20 items-center border-b border-[#E5E2DC] bg-white px-6">
       {/* Logo */}
-      <a href="/app" className="mr-8 text-lg font-bold text-black">
+      <a href="/app" className="mr-8 flex items-center gap-2 text-lg font-bold text-black">
+        <img src="/murmur-logo.png" alt="" className="h-[72px] w-[72px] rounded-xl" />
         Murmur
       </a>
 

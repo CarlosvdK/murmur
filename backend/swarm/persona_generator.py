@@ -121,9 +121,12 @@ async def _generate_freeform(
 
     logger.info("Generating %d personas (freeform) for '%s'", persona_count, business.name)
 
+    # Scale max_tokens based on persona count (~400 tokens per persona + buffer)
+    # 15 personas = 8500, 35 = 18500, 75 = 38500
+    tokens_needed = min(max(4096, persona_count * 500 + 1000), 64000)
     response = await client.messages.create(
         model=settings.model_name,
-        max_tokens=4096,
+        max_tokens=tokens_needed,
         system="You are a customer persona generator. Return valid JSON only -- an array of persona objects. No markdown, no explanation, just the JSON array.",
         messages=[{"role": "user", "content": prompt}],
     )
@@ -193,9 +196,10 @@ async def _generate_from_manifest(
     # Append the batch specs after the template
     prompt += "\n\n" + batch_instruction
 
+    tokens_needed = min(max(8192, manifest.total_count * 500 + 1000), 64000)
     response = await client.messages.create(
         model=settings.model_name,
-        max_tokens=8192,
+        max_tokens=tokens_needed,
         system=(
             f"You are generating {manifest.total_count} customer personas for a business "
             "simulation. Each persona has a FIXED structured profile that you must not "

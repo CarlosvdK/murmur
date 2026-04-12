@@ -22,6 +22,9 @@ interface CIChartProps {
   impactLabel?: string;
   effectSize?: string;
   nullHypothesis?: string;
+  pPositive?: number;
+  pNegative?: number;
+  upsideVsDownside?: string;
 }
 
 export default function CIChart({
@@ -33,6 +36,9 @@ export default function CIChart({
   impactLabel = "Estimated impact",
   effectSize,
   nullHypothesis = "No change",
+  pPositive,
+  pNegative,
+  upsideVsDownside,
 }: CIChartProps) {
   // Calculate positions on the bar
   const barMin = Math.min(ciLow - 3, -5);
@@ -172,22 +178,43 @@ export default function CIChart({
         <span>best case</span>
       </div>
 
-      {/* Hypothesis test result */}
-      {rejectNull && (
-        <div className={`mt-4 rounded-xl px-4 py-2.5 ${isPositive ? "bg-green-50" : "bg-red-50"}`}>
-          <p className={`text-xs font-medium ${isPositive ? "text-green-700" : "text-red-700"}`}>
-            The confidence interval does not include zero -- this change would likely have a{" "}
-            {isPositive ? "positive" : "negative"} effect even in conservative scenarios.
-          </p>
+      {/* Probability breakdown */}
+      {pPositive !== undefined && pNegative !== undefined && (
+        <div className="mt-4 rounded-xl border border-[#E5E2DC] px-4 py-3">
+          {/* Probability bar */}
+          <div className="mb-2 flex h-3 overflow-hidden rounded-full">
+            <div className="bg-legacy-teal transition-all" style={{ width: `${pPositive * 100}%` }} title={`${Math.round(pPositive * 100)}% positive`} />
+            <div className="bg-legacy-red transition-all" style={{ width: `${pNegative * 100}%` }} title={`${Math.round(pNegative * 100)}% negative`} />
+          </div>
+          <div className="flex justify-between text-[10px]">
+            <span className="font-medium text-legacy-teal">{Math.round(pPositive * 100)}% chance positive</span>
+            <span className="font-medium text-legacy-red">{Math.round(pNegative * 100)}% chance negative</span>
+          </div>
+          {upsideVsDownside && (
+            <p className="mt-2 text-xs text-gray-600">{upsideVsDownside}</p>
+          )}
         </div>
       )}
-      {!rejectNull && (
-        <div className="mt-4 rounded-xl bg-amber-50 px-4 py-2.5">
-          <p className="text-xs font-medium text-amber-700">
-            The confidence interval crosses zero -- we cannot rule out that this change
-            has no meaningful effect. Consider testing with a small group first.
-          </p>
-        </div>
+
+      {/* Fallback for old data without probabilities */}
+      {pPositive === undefined && (
+        <>
+          {rejectNull && (
+            <div className={`mt-4 rounded-xl px-4 py-2.5 ${isPositive ? "bg-green-50" : "bg-red-50"}`}>
+              <p className={`text-xs font-medium ${isPositive ? "text-green-700" : "text-red-700"}`}>
+                The confidence interval does not include zero -- this change would likely have a{" "}
+                {isPositive ? "positive" : "negative"} effect.
+              </p>
+            </div>
+          )}
+          {!rejectNull && (
+            <div className="mt-4 rounded-xl bg-amber-50 px-4 py-2.5">
+              <p className="text-xs font-medium text-amber-700">
+                The confidence interval crosses zero -- consider testing with a small group first.
+              </p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

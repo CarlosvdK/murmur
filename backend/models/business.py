@@ -12,9 +12,13 @@ class BusinessCreate(BaseModel):
     location: Optional[str] = None
     years_open: Optional[str] = None
 
+    # Online vs physical
+    is_online_only: Optional[bool] = None
+
     # Step 2: Customer relationship signals
     customer_description: Optional[str] = None
-    business_role: Optional[str] = None  # habit|daily_need|treat|social|convenience|destination
+    business_role: Optional[list[str] | str] = None  # what the business IS to customers (up to 2)
+    business_not_role: Optional[list[str]] = None  # what the business is NOT (up to 2)
     visit_frequency: Optional[str] = None  # daily|weekly|monthly|occasional|mixed
     busy_days: Optional[list[str]] = None
     busy_times: Optional[list[str]] = None
@@ -53,6 +57,10 @@ class BusinessCreate(BaseModel):
     first_visit_reasons: Optional[list[str]] = None
     seasonal_patterns: Optional[list[str]] = None
     customer_community: Optional[str] = None
+    customer_discovery: Optional[list[str]] = None
+    nearby_anchors: Optional[list[str]] = None
+    competitor_advantage: Optional[list[str]] = None
+    location_advantage: Optional[str] = None
     opening_hours: Optional[dict] = None
     google_business_url: Optional[str] = None
     tripadvisor_url: Optional[str] = None
@@ -62,11 +70,11 @@ class BusinessCreate(BaseModel):
     prior_change_went: Optional[str] = None
     anything_else: Optional[str] = None
     # Customer demographics (v2.0)
-    customer_age_distribution: Optional[list[str]] = None
+    customer_age_distribution: Optional[dict[str, int] | list[str]] = None
     customer_income_bracket: Optional[str] = None
     average_transaction_value: Optional[float] = None
     customer_gender_split: Optional[str] = None
-    local_vs_visitor_ratio: Optional[str] = None
+    local_vs_visitor_ratio: Optional[dict[str, int] | str] = None
     digital_savviness: Optional[str] = None
     price_range: Optional[str] = None
 
@@ -80,7 +88,8 @@ class Business(BaseModel):
     customer_description: Optional[str] = None
     location: Optional[str] = None
     years_open: Optional[str] = None
-    business_role: Optional[str] = None
+    business_role: Optional[list[str] | str] = None
+    business_not_role: Optional[list[str]] = None
     visit_frequency: Optional[str] = None
     busy_days: Optional[list[str]] = None
     busy_times: Optional[list[str]] = None
@@ -110,6 +119,10 @@ class Business(BaseModel):
     first_visit_reasons: Optional[list[str]] = None
     seasonal_patterns: Optional[list[str]] = None
     customer_community: Optional[str] = None
+    customer_discovery: Optional[list[str]] = None
+    nearby_anchors: Optional[list[str]] = None
+    competitor_advantage: Optional[list[str]] = None
+    location_advantage: Optional[str] = None
     opening_hours: Optional[dict] = None
     google_business_url: Optional[str] = None
     tripadvisor_url: Optional[str] = None
@@ -119,11 +132,11 @@ class Business(BaseModel):
     prior_change_went: Optional[str] = None
     anything_else: Optional[str] = None
     # Customer demographics (v2.0)
-    customer_age_distribution: Optional[list[str]] = None
+    customer_age_distribution: Optional[dict[str, int] | list[str]] = None
     customer_income_bracket: Optional[str] = None
     average_transaction_value: Optional[float] = None
     customer_gender_split: Optional[str] = None
-    local_vs_visitor_ratio: Optional[str] = None
+    local_vs_visitor_ratio: Optional[dict[str, int] | str] = None
     digital_savviness: Optional[str] = None
     price_range: Optional[str] = None
     created_at: datetime
@@ -138,7 +151,8 @@ class BusinessSnapshot(BaseModel):
     customer_description: Optional[str] = None
     location: Optional[str] = None
     years_open: Optional[str] = None
-    business_role: Optional[str] = None
+    business_role: Optional[list[str] | str] = None
+    business_not_role: Optional[list[str]] = None
     visit_frequency: Optional[str] = None
     customer_value_drivers: Optional[list[str]] = None
     customer_social_context: Optional[list[str]] = None
@@ -148,10 +162,10 @@ class BusinessSnapshot(BaseModel):
     area_feel: Optional[str] = None
     additional_customer_notes: Optional[str] = None
     # Customer demographics (v2.0)
-    customer_age_distribution: Optional[list[str]] = None
+    customer_age_distribution: Optional[dict[str, int] | list[str]] = None
     customer_income_bracket: Optional[str] = None
     average_transaction_value: Optional[float] = None
     customer_gender_split: Optional[str] = None
-    local_vs_visitor_ratio: Optional[str] = None
+    local_vs_visitor_ratio: Optional[dict[str, int] | str] = None
     digital_savviness: Optional[str] = None
     price_range: Optional[str] = None

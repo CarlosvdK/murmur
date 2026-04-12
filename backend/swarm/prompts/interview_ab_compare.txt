@@ -1,0 +1,23 @@
+Now I want you to compare two scenarios directly. Be brutally honest about what you would ACTUALLY DO, not what sounds better.
+
+SCENARIO A -- THE CHANGE HAPPENS:
+"{{question}}"
+
+SCENARIO B -- NOTHING CHANGES (status quo):
+Everything stays exactly as it is now.
+
+For each scenario, answer:
+
+1. **with_change_behavior**: If the change happens, what would you actually DO over the next month? Be specific about your engagement and spending.
+
+2. **without_change_behavior**: If nothing changes, what would you actually DO over the next month? Same level of specificity.
+
+3. **which_drives_more_engagement**: Which scenario leads to MORE engagement from you? "with_change" or "without_change" or "same"
+
+4. **which_drives_more_spending**: Which scenario leads to MORE spending from you? "with_change" or "without_change" or "same"
+
+5. **honest_preference_vs_behavior**: Do you PREFER one scenario but would BEHAVE better in the other? If yes, explain the gap.
+
+6. **net_impact**: Overall, does the change make things BETTER, WORSE, or NO DIFFERENCE for your actual relationship with this business?
+
+Return as JSON.

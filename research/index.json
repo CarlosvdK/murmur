@@ -2,7 +2,7 @@
   "last_updated": "2026-04-10",
   "total_papers": 25,
   "hofstede_countries": 69,
-  "domains_with_prompts": 9,
+  "domains_with_prompts": 32,
   "domain_relevance": {
     "consumer_psychology": {
       "industry_relevance": ["all"],
@@ -53,6 +53,116 @@
       "industry_relevance": ["all"],
       "question_relevance": ["all"],
       "description": "Focus group methodology, laddering, cognitive interviewing, stated-revealed gap calibration"
+    },
+    "persuasion_tactics": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["pricing", "feature", "retention", "brand", "operations", "general"],
+      "description": "Counterintuitive marketing tactics that work despite negative stated preferences: scarcity, long-copy, restriction, defaults, personal tone, visual micro-optimization"
+    },
+    "pricing_psychology": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["pricing"],
+      "description": "Price elasticity, reference prices, fairness, charm pricing, price-quality inference, bundling, subscription pricing, dynamic pricing"
+    },
+    "retail_customer_behavior": {
+      "industry_relevance": ["food_drink", "retail", "health_wellness"],
+      "question_relevance": ["pricing", "operations", "feature", "general"],
+      "description": "In-store decisions, atmosphere effects, wait times, assortment, switching, word-of-mouth, service recovery"
+    },
+    "digital_experience": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["feature", "operations", "brand", "general"],
+      "description": "Page speed, mobile vs desktop, form friction, social proof, email marketing, cart abandonment, trust signals, notifications"
+    },
+    "service_quality": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["operations", "feature", "retention", "general"],
+      "description": "SERVQUAL, customer effort, service failure recovery, queue management, employee interaction, subscription retention, NPS, omnichannel"
+    },
+    "b2b_buying_behavior": {
+      "industry_relevance": ["b2b", "consulting", "logistics", "wholesale"],
+      "question_relevance": ["pricing", "feature", "retention", "general"],
+      "description": "Buying centers, switching costs, B2B trust, price sensitivity, vendor selection, enterprise sales cycles"
+    },
+    "loyalty_retention": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["retention", "pricing", "feature"],
+      "description": "CLV, loyalty programs, churn signals, win-back strategies, habitual vs intentional loyalty, satisfaction-loyalty disconnect"
+    },
+    "innovation_adoption": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["feature", "brand", "operations"],
+      "description": "TAM, diffusion curves, feature adoption, innovation resistance, network effects, platform switching costs"
+    },
+    "food_hospitality_psychology": {
+      "industry_relevance": ["food_drink", "hospitality"],
+      "question_relevance": ["pricing", "operations", "feature"],
+      "description": "Menu design, tipping, table turnover, atmosphere, food presentation, online ordering"
+    },
+    "healthcare_patient_behavior": {
+      "industry_relevance": ["healthcare"],
+      "question_relevance": ["operations", "feature", "retention"],
+      "description": "Patient satisfaction, health literacy, communication, no-shows, telemedicine"
+    },
+    "fitness_wellness_retention": {
+      "industry_relevance": ["health_wellness"],
+      "question_relevance": ["retention", "pricing", "feature"],
+      "description": "Gym membership decay, habit formation, group fitness, gamification"
+    },
+    "seasonal_temporal_effects": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["operations", "pricing", "general"],
+      "description": "Seasonal demand, day-of-week, decision fatigue, holiday spending, weather effects"
+    },
+    "social_media_community": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["brand", "feature", "general"],
+      "description": "Social media influence, UGC, brand communities, influencer effectiveness, viral content"
+    },
+    "generational_demographics": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["general", "feature", "brand", "pricing"],
+      "description": "Gen Z, Millennials, Boomers, gender differences, family decision making"
+    },
+    "trust_credibility": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["brand", "general", "feature"],
+      "description": "Trust building, brand trust, transparency, crisis communication, pricing fairness"
+    },
+    "luxury_premium_psychology": {
+      "industry_relevance": ["retail", "hospitality"],
+      "question_relevance": ["pricing", "brand"],
+      "description": "Veblen goods, scarcity, premium signaling, brand dilution, experiential luxury"
+    },
+    "convenience_friction": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["operations", "feature", "general"],
+      "description": "Friction barriers, self-service, delivery speed, payment friction, location convenience"
+    },
+    "complaint_feedback_behavior": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["operations", "retention", "general"],
+      "description": "Complaint typology, silent unhappy customers, voice/exit/loyalty, online complaints"
+    },
+    "onboarding_first_impressions": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["feature", "operations", "retention"],
+      "description": "First impressions, peak-end rule, onboarding, free trials, mere exposure effect"
+    },
+    "environmental_ethical_consumer": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["brand", "pricing", "general"],
+      "description": "Green behavior, attitude-behavior gap, CSR effects, local vs global brands"
+    },
+    "pricing_presentation": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["pricing"],
+      "description": "Decoy effect, dollar sign removal, comparative pricing, PWYW, subscription framing"
+    },
+    "group_decision_making": {
+      "industry_relevance": ["all"],
+      "question_relevance": ["general", "pricing", "operations"],
+      "description": "Household decisions, couples, group dining, committees, children influence"
     }
   },
   "by_domain": {

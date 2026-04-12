@@ -234,7 +234,7 @@ export default function SettingsPage() {
           setLocationNeighbourhood(b.location_neighbourhood || ""); setLocationCountry(b.location_country || "");
           setYearsOpen(b.years_open || ""); setDescription(b.description || "");
           setCustomerDescription(b.customer_description || "");
-          setBusinessRole(b.business_role || ""); setVisitFrequency(b.visit_frequency || "");
+          setBusinessRole(Array.isArray(b.business_role) ? b.business_role[0] || "" : b.business_role || ""); setVisitFrequency(b.visit_frequency || "");
           setBusyDays(b.busy_days || []); setBusyTimes(b.busy_times || []);
           setValueDrivers(b.customer_value_drivers || []);
           setSocialContext(b.customer_social_context || []);

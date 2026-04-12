@@ -203,6 +203,9 @@ export default function ResultsReport({
               impactLabel={impactData.revenue.impact_label || "Estimated impact"}
               effectSize={impactData.effect_size}
               nullHypothesis={impactData.null_hypothesis || "No change"}
+              pPositive={(impactData as Record<string, unknown>).p_positive as number | undefined}
+              pNegative={(impactData as Record<string, unknown>).p_negative as number | undefined}
+              upsideVsDownside={(impactData as Record<string, unknown>).upside_vs_downside as string | undefined}
             />
           )}
 
@@ -357,26 +360,47 @@ export default function ResultsReport({
           )}
 
           {/* Research sources */}
-          {ragSelection && ragSelection.domains && ragSelection.domains.length > 0 && (
+          {ragSelection && (
             <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
               <div className="mb-3 flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-gray-400" />
-                <h4 className="text-xs font-medium uppercase tracking-wider text-gray-400">Research Sources</h4>
+                <h4 className="text-xs font-medium uppercase tracking-wider text-gray-400">
+                  Research Sources
+                  {(ragSelection as Record<string, unknown>).method === "vector_search" && (
+                    <span className="ml-2 text-[9px] text-gray-300">semantic match</span>
+                  )}
+                </h4>
               </div>
-              <div className="flex flex-wrap gap-1.5">
-                {ragSelection.domains.map((domain) => (
-                  <span
-                    key={domain}
-                    className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
-                  >
-                    {DOMAIN_LABELS[domain] || domain}
-                  </span>
-                ))}
-              </div>
-              {ragSelection.question_type && ragSelection.question_type !== "general" && (
-                <p className="mt-2 text-[10px] text-gray-400">
-                  Question classified as: {ragSelection.question_type}
-                </p>
+              {/* Vector search: show section-level matches with similarity */}
+              {(ragSelection as Record<string, unknown>).sections && (
+                <div className="flex flex-wrap gap-1.5">
+                  {((ragSelection as Record<string, unknown>).sections as { domain: string; title: string; similarity: number }[]).map((section, i) => (
+                    <span
+                      key={i}
+                      className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
+                    >
+                      {section.title}
+                      {section.similarity > 0 && (
+                        <span className="ml-1 text-gray-300">
+                          {Math.round(section.similarity * 100)}%
+                        </span>
+                      )}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {/* Fallback: show domain names (keyword selector) */}
+              {ragSelection.domains && !((ragSelection as Record<string, unknown>).sections) && (
+                <div className="flex flex-wrap gap-1.5">
+                  {ragSelection.domains.map((domain) => (
+                    <span
+                      key={domain}
+                      className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
+                    >
+                      {DOMAIN_LABELS[domain] || domain}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
           )}

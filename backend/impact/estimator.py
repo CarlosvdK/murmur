@@ -313,6 +313,7 @@ class CustomerImpact:
     retention_probability: float  # 0 to 1
     visit_change_pct: float       # e.g. -20 means 20% fewer visits
     spend_change_pct: float       # e.g. +10 means 10% more per visit (price increase)
+    effective_sentiment: Optional[float] = None  # sentiment after behavioral adjustment
 
 
 @dataclass
@@ -408,6 +409,12 @@ class ImpactReport:
     alternative_hypothesis: str = "Change occurs"
     reject_null: bool = False  # True if CI does not contain 0
     effect_size: str = "unknown"  # "negligible", "small", "medium", "large"
+
+    # Probability estimates
+    p_positive: float = 0.5       # probability the outcome is positive (0-1)
+    p_negative: float = 0.5       # probability the outcome is negative (0-1)
+    p_negligible: float = 0.0     # probability the effect is negligible (<2%)
+    upside_vs_downside: str = ""  # plain-English: "More likely positive than negative"
 
     # Revenue model metadata (optional, for new callers)
     revenue_model: str = "per_visit"
@@ -549,13 +556,57 @@ def estimate_impact(
     leave_count = 0
 
     sentiments = []
+    effective_sentiments = []
     for r in responses:
         sent = float(r.get("sentiment", 0))
         sentiments.append(sent)
         name = r.get("persona_name", "Unknown")
 
-        retention = _sentiment_to_retention(sent, switching_cost=switching_cost)
-        engagement_change = _sentiment_to_engagement_change(sent, revenue_model=model_key)
+        # Extract behavioral signals from rich focus group data
+        raw = r.get("raw", {}) or r
+        core = raw.get("core", {}) or r.get("core", {}) or {}
+        depth = raw.get("depth", {}) or r.get("depth", {}) or {}
+        ab = raw.get("ab_comparison", {}) or r.get("ab_comparison", {}) or {}
+
+        # Start with raw sentiment
+        effective_sent = sent
+        adjustments = []
+
+        # Adjust based on predicted actual action
+        predicted = str(core.get("predicted_actual_action", "")).lower()
+        if any(w in predicted for w in ["stay", "keep", "continue", "still", "won't leave", "wouldn't switch"]):
+            if effective_sent < -0.1:
+                adjustments.append(f"predicted_action='{predicted}' caps negativity")
+            effective_sent = max(effective_sent, -0.1)
+
+        # Adjust based on behavioral prediction
+        net_change = str(depth.get("net_behavior_change", "")).lower()
+        if "more" in net_change or "increase" in net_change:
+            if effective_sent < 0.1:
+                adjustments.append(f"net_behavior_change='{net_change}' lifts to 0.1")
+            effective_sent = max(effective_sent, 0.1)
+        elif "same" in net_change:
+            if effective_sent < 0.0:
+                adjustments.append(f"net_behavior_change='{net_change}' lifts to 0.0")
+            effective_sent = max(effective_sent, 0.0)
+
+        # Adjust based on A/B comparison
+        net_impact = str(ab.get("net_impact", "")).lower()
+        if "better" in net_impact:
+            if effective_sent < 0.15:
+                adjustments.append(f"ab_comparison.net_impact='{net_impact}' lifts to 0.15")
+            effective_sent = max(effective_sent, 0.15)
+
+        if adjustments:
+            logger.info(
+                "Persona %s: sentiment %.2f -> effective_sent %.2f (%s)",
+                name, sent, effective_sent, "; ".join(adjustments),
+            )
+
+        effective_sentiments.append(effective_sent)
+
+        retention = _sentiment_to_retention(effective_sent, switching_cost=switching_cost)
+        engagement_change = _sentiment_to_engagement_change(effective_sent, revenue_model=model_key)
 
         if retention > 0.8:
             action = "stay"
@@ -583,11 +634,19 @@ def estimate_impact(
             retention_probability=round(retention, 2),
             visit_change_pct=round(engagement_change, 1),
             spend_change_pct=spend_change,
+            effective_sentiment=round(effective_sent, 2) if effective_sent != sent else None,
         ))
 
     # --- Revenue estimate ---
     avg_sentiment = sum(sentiments) / n
+    avg_effective_sentiment = sum(effective_sentiments) / n
     std_sentiment = math.sqrt(sum((s - avg_sentiment) ** 2 for s in sentiments) / max(n - 1, 1))
+
+    if avg_effective_sentiment != avg_sentiment:
+        logger.info(
+            "Behavioral adjustment: avg_sentiment=%.3f -> avg_effective_sentiment=%.3f",
+            avg_sentiment, avg_effective_sentiment,
+        )
 
     # Point estimate: weighted combination of retention, engagement change, and spend change
     avg_retention = sum(s.retention_probability for s in segments) / n
@@ -646,36 +705,99 @@ def estimate_impact(
         impact_label=impact_label,
     )
 
-    # --- Decision framework (from Topic 1) ---
-    if ci_low > 0:
-        # Even worst case is positive
+    # --- Decision framework ---
+    # Uses expected value analysis + practical significance thresholds
+    # Based on:
+    # - Kohavi et al. "Trustworthy Online Controlled Experiments" (2020)
+    # - Topic 1 (Simonsohn): CI-based 3-outcome framework
+    # - MDE (Minimum Detectable Effect) from power analysis
+
+    # Calculate expected value: EV = P(positive) * avg_upside + P(negative) * avg_downside
+    ci_half = max((ci_high - ci_low) / 2, 0.1)
+    z_zero = -point_estimate / (ci_half / 1.96)
+    _p_pos = 1 / (1 + math.exp(-1.7 * (-z_zero)))
+    _p_neg = 1 - _p_pos
+    avg_upside = max(point_estimate + ci_half * 0.5, 0) if _p_pos > 0 else 0
+    avg_downside = min(point_estimate - ci_half * 0.5, 0) if _p_neg > 0 else 0
+    expected_value = _p_pos * avg_upside + _p_neg * abs(avg_downside) * -1
+
+    # Practical significance: is the effect large enough to matter?
+    # A +1.5% improvement is statistically real but practically irrelevant
+    # for most businesses. Threshold depends on effort/cost.
+    PRACTICAL_THRESHOLD = 3.0  # minimum % change worth acting on
+
+    if ci_low > PRACTICAL_THRESHOLD:
+        # Strong positive: even worst case exceeds practical threshold
         decision = "proceed"
         decision_reasoning = (
-            f"Even in the worst case scenario ({ci_low:+.1f}%), the outcome is still positive. "
-            f"The upside ({ci_high:+.1f}%) significantly outweighs the risk."
+            f"Strong positive signal. Even the worst case ({ci_low:+.1f}%) exceeds the "
+            f"practical significance threshold of {PRACTICAL_THRESHOLD}%. The expected "
+            f"outcome ({point_estimate:+.1f}%) is clearly worth pursuing."
         )
-    elif ci_high < 0:
-        # Even best case is negative
+    elif ci_low > 0:
+        # Positive but small: check if the effect is practically meaningful
+        if point_estimate > PRACTICAL_THRESHOLD:
+            decision = "proceed"
+            decision_reasoning = (
+                f"Positive signal with meaningful expected impact ({point_estimate:+.1f}%). "
+                f"The worst case ({ci_low:+.1f}%) is still positive, though the effect "
+                f"could be small. Worth implementing if costs are low."
+            )
+        else:
+            decision = "test_first"
+            decision_reasoning = (
+                f"Statistically positive ({ci_low:+.1f}% to {ci_high:+.1f}%) but the "
+                f"expected effect ({point_estimate:+.1f}%) is small enough that "
+                f"implementation costs could outweigh the benefit. Test first to confirm "
+                f"the effect is worth the investment."
+            )
+    elif ci_high < -PRACTICAL_THRESHOLD:
+        # Strong negative
         decision = "avoid"
         decision_reasoning = (
-            f"Even in the best case scenario ({ci_high:+.1f}%), the outcome is still negative. "
-            f"The downside risk is not worth it."
+            f"Strong negative signal. Even the best case ({ci_high:+.1f}%) shows meaningful "
+            f"downside. Expected outcome: {point_estimate:+.1f}%. Not worth the risk."
         )
-    elif ci_high > abs(ci_low) * 1.5:
-        # Upside is much bigger than downside
+    elif ci_high < 0:
+        # Negative but weak
+        decision = "avoid"
+        decision_reasoning = (
+            f"Likely negative ({point_estimate:+.1f}%) with no realistic upside scenario. "
+            f"Best case is {ci_high:+.1f}% which is not enough to justify the change."
+        )
+    elif _p_pos > 0.70:
+        # More than 70% chance of positive -- lean proceed but test
         decision = "caution"
         decision_reasoning = (
-            f"The worst case ({ci_low:+.1f}%) is a manageable loss, "
-            f"while the best case ({ci_high:+.1f}%) is a significant gain. "
-            f"The upside outweighs the downside, but consider testing with a small group first."
+            f"Likely positive ({_p_pos:.0%} probability of upside) but there is a "
+            f"{_p_neg:.0%} chance of downside. Expected value: {expected_value:+.1f}%. "
+            f"The odds favor this change but consider a limited rollout first."
+        )
+    elif _p_pos > 0.55:
+        # Slightly more likely positive
+        decision = "test_first"
+        decision_reasoning = (
+            f"Slightly more upside ({_p_pos:.0%}) than downside ({_p_neg:.0%}), "
+            f"but too close to call with confidence. Expected value: {expected_value:+.1f}%. "
+            f"A real test with a subset of customers would resolve the uncertainty."
+        )
+    elif _p_neg > 0.70:
+        # More than 70% chance of negative -- lean avoid
+        decision = "caution"
+        decision_reasoning = (
+            f"More likely negative ({_p_neg:.0%} chance of downside) than positive "
+            f"({_p_pos:.0%}). Expected value: {expected_value:+.1f}%. "
+            f"The odds are against this change, but if the potential upside is important "
+            f"to your strategy, a small-scale test could be worthwhile."
         )
     else:
         # Genuinely uncertain
         decision = "test_first"
         decision_reasoning = (
-            f"The range of outcomes is wide: from {ci_low:+.1f}% to {ci_high:+.1f}%. "
-            f"We can not confidently say this will help or hurt. "
-            f"Test with a small subset of customers before committing fully."
+            f"Genuinely uncertain: {_p_pos:.0%} chance of upside, {_p_neg:.0%} chance of "
+            f"downside. Expected value: {expected_value:+.1f}%. The range of outcomes "
+            f"({ci_low:+.1f}% to {ci_high:+.1f}%) is too wide to recommend for or against. "
+            f"The only way to know is to test with real customers."
         )
 
     # Use impact_type-aware language (not always "revenue")
@@ -729,6 +851,33 @@ def estimate_impact(
     null_hyp = f"No change in {metric_word}"
     alt_hyp = f"{metric_word.capitalize()} changes as a result of this decision"
 
+    # Probability estimates using CI position relative to zero
+    # Model as approximately normal: point_estimate is the mean, CI width / 2 is ~2 std devs
+    ci_half_width = max((ci_high - ci_low) / 2, 0.1)
+    # z-score of zero relative to our distribution
+    z_zero = -point_estimate / (ci_half_width / 1.96)
+    # Approximate P(positive) using sigmoid approximation of normal CDF
+    # P(X > 0) = 1 - CDF(0) where CDF(0) = sigmoid(z_zero * 1.7)
+    p_positive = round(1 / (1 + math.exp(-1.7 * (-z_zero))), 2)
+    p_negative = round(1 - p_positive, 2)
+    # P(negligible) = area within -2% to +2%
+    z_low = (-2 - point_estimate) / (ci_half_width / 1.96)
+    z_high = (2 - point_estimate) / (ci_half_width / 1.96)
+    p_neg_low = 1 / (1 + math.exp(-1.7 * z_low))
+    p_neg_high = 1 / (1 + math.exp(-1.7 * z_high))
+    p_negligible = round(max(p_neg_high - p_neg_low, 0), 2)
+
+    if p_positive > 0.7:
+        upside_text = f"Likely positive ({int(p_positive * 100)}% chance of upside). Range: {ci_low:+.1f}% to {ci_high:+.1f}%."
+    elif p_positive > 0.55:
+        upside_text = f"Slightly more likely positive than negative ({int(p_positive * 100)}% upside vs {int(p_negative * 100)}% downside). Range: {ci_low:+.1f}% to {ci_high:+.1f}%."
+    elif p_negative > 0.7:
+        upside_text = f"Likely negative ({int(p_negative * 100)}% chance of downside). Range: {ci_low:+.1f}% to {ci_high:+.1f}%."
+    elif p_negative > 0.55:
+        upside_text = f"Slightly more likely negative than positive ({int(p_negative * 100)}% downside vs {int(p_positive * 100)}% upside). Range: {ci_low:+.1f}% to {ci_high:+.1f}%."
+    else:
+        upside_text = f"Too close to call ({int(p_positive * 100)}% upside vs {int(p_negative * 100)}% downside). Range: {ci_low:+.1f}% to {ci_high:+.1f}%."
+
     return ImpactReport(
         revenue=revenue,
         customers_likely_stay=stay_count,
@@ -749,6 +898,10 @@ def estimate_impact(
         alternative_hypothesis=alt_hyp,
         reject_null=reject_null,
         effect_size=effect_size,
+        p_positive=p_positive,
+        p_negative=p_negative,
+        p_negligible=p_negligible,
+        upside_vs_downside=upside_text,
     )
 
 

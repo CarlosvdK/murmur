@@ -39,6 +39,68 @@ def build_rag_context(workspace_data: dict, target: str = "workspace") -> str:
         )
         sections[section].append(line)
 
+    # Add new market and competition context (not yet in schema)
+    if workspace_data.get("business_not_role"):
+        val = workspace_data["business_not_role"]
+        if isinstance(val, list):
+            sections.setdefault("CUSTOMER PROFILE", []).append(
+                f"Business is explicitly NOT: {', '.join(val)}. Personas should not be motivated by these reasons."
+            )
+
+    if workspace_data.get("is_online_only"):
+        sections.setdefault("BUSINESS IDENTITY", []).append(
+            "This is an online-only business with no physical location."
+        )
+
+    if workspace_data.get("customer_discovery"):
+        val = workspace_data["customer_discovery"]
+        if isinstance(val, list) and val:
+            sections.setdefault("MARKET CONTEXT", []).append(
+                f"Customer discovery channels: {', '.join(val)}"
+            )
+
+    if workspace_data.get("nearby_anchors"):
+        val = workspace_data["nearby_anchors"]
+        if isinstance(val, list) and val:
+            label = "Traffic drivers" if workspace_data.get("is_online_only") else "Nearby traffic drivers"
+            sections.setdefault("MARKET CONTEXT", []).append(
+                f"{label}: {', '.join(val)}"
+            )
+
+    if workspace_data.get("competitor_advantage"):
+        val = workspace_data["competitor_advantage"]
+        if isinstance(val, list) and val:
+            sections.setdefault("MARKET CONTEXT", []).append(
+                f"Competitor advantages (what they do better): {', '.join(val)}. "
+                "Personas should be aware of these alternatives and may reference them."
+            )
+
+    if workspace_data.get("location_advantage"):
+        sections.setdefault("MARKET CONTEXT", []).append(
+            f"Location/market position: {workspace_data['location_advantage']}"
+        )
+
+    if workspace_data.get("prior_changes"):
+        val = workspace_data["prior_changes"]
+        if isinstance(val, list) and val:
+            change_lines = []
+            for ch in val:
+                if isinstance(ch, dict) and ch.get("change"):
+                    parts = [f"Change: {ch['change']}"]
+                    if ch.get("year"):
+                        parts.append(f"(in {ch['year']})")
+                    if ch.get("outcome"):
+                        parts.append(f"-- Outcome: {ch['outcome']}")
+                    if ch.get("metrics"):
+                        parts.append(f"-- Metrics: {ch['metrics']}")
+                    change_lines.append(" ".join(parts))
+            if change_lines:
+                sections.setdefault("CHANGE HISTORY", []).append(
+                    "REAL PAST CHANGES (use these to calibrate predictions -- "
+                    "real outcomes from this business are more valuable than general research):"
+                )
+                sections["CHANGE HISTORY"].extend(change_lines)
+
     # Add Hofstede cultural profile if country known
     country = workspace_data.get("location_country")
     if country:

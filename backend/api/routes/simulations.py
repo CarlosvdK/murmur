@@ -335,35 +335,23 @@ async def _run_pipeline(
             logger.warning("Survey RAG builder failed (non-fatal): %s", e)
 
         try:
-            from research.rag_library import get_simulation_context
             country = (workspace_data or {}).get("location_country", "")
-            research_context = get_simulation_context(
-                country_code=country or "DEFAULT",
-                simulation_type="consumer",
-                business_type=business.type,
+            # Try vector search first, fall back to keyword selector
+            from backend.context.vector_rag import search_research_with_fallback
+            rag_result = await search_research_with_fallback(
                 question=question,
-                demographics={
-                    "age": business.customer_age_distribution,
-                    "income": business.customer_income_bracket,
-                    "digital": business.digital_savviness,
-                },
+                business_type=business.type,
+                country_code=country,
+                max_chars=6000,
             )
-            logger.info("Research context: %d chars for country=%s, type=%s",
-                        len(research_context), country, business.type)
-            # Store which research domains were selected (for frontend display)
-            try:
-                from backend.context.rag_selector import select_rag_articles
-                rag_meta = select_rag_articles(
-                    business_type=business.type, question=question,
-                    has_country=bool(country),
-                )
-                _update_sim(sim_id, rag_selection={
-                    "domains": rag_meta.domains_selected,
-                    "question_type": rag_meta.question_type,
-                    "reasoning": rag_meta.selection_reasoning,
-                })
-            except Exception:
-                pass
+            research_context = rag_result.get("context", "")
+            logger.info("Research context (%s): %d chars for type=%s",
+                        rag_result.get("method", "unknown"), len(research_context), business.type)
+            # Store RAG metadata for frontend
+            _update_sim(sim_id, rag_selection={
+                "sections": rag_result.get("sections_used", []),
+                "method": rag_result.get("method", "unknown"),
+            })
         except Exception as e:
             logger.warning("Research library failed (non-fatal): %s", e)
 
@@ -386,7 +374,7 @@ async def _run_pipeline(
             context_narrative = context.filtered_narrative or None
 
             # Persist context data
-            _update_sim(sim_id, context_data=context.model_dump())
+            _update_sim(sim_id, context_data=context.model_dump(mode="json"))
 
             logger.info(
                 "Context gathered: %d/%d tools succeeded, %.1fs, narrative=%d chars",
@@ -416,7 +404,7 @@ async def _run_pipeline(
         if profile_context:
             enriched_parts.append(profile_context)
         if research_context:
-            enriched_parts.append(research_context[:4000])
+            enriched_parts.append(research_context[:6000])
         if context_narrative:
             enriched_parts.append(context_narrative)
         if enriched_parts:
@@ -509,6 +497,27 @@ async def _run_pipeline(
             context_narrative=context_narrative,
         )
 
+        # Step 3.5: Research override check
+        research_override = None
+        try:
+            from backend.swarm.research_override import apply_research_override
+            research_override = await apply_research_override(
+                question=question,
+                aggregation_result=result_data,
+                persona_responses=responses,
+                business_type=business.type,
+            )
+            if research_override and research_override.get("override_applied"):
+                result_data["research_override"] = research_override
+                logger.info(
+                    "Research override applied: tactic=%s, conflict=%s",
+                    research_override.get("tactic_detected"),
+                    research_override.get("conflict_level"),
+                )
+                emit_sse("research", "Checking published research against customer feedback...")
+        except Exception as e:
+            logger.warning("Research override failed (non-fatal): %s", e)
+
         # Step 4.5: Impact estimation
         impact = estimate_impact(responses, question, business_type=business.type)
         impact_data = {
@@ -535,6 +544,10 @@ async def _run_pipeline(
             "alternative_hypothesis": impact.alternative_hypothesis,
             "reject_null": impact.reject_null,
             "effect_size": impact.effect_size,
+            "p_positive": impact.p_positive,
+            "p_negative": impact.p_negative,
+            "p_negligible": impact.p_negligible,
+            "upside_vs_downside": impact.upside_vs_downside,
         }
 
         # Step 5: Generate caveats
