@@ -28,6 +28,8 @@ if _prod_url:
 _allowed_origins.append("https://murmurdynamics.com")
 _allowed_origins.append("https://www.murmurdynamics.com")
 _allowed_origins.append("https://murmur-production-fbb0.up.railway.app")
+_allowed_origins.append("https://murmur-lemon.vercel.app")
+_allowed_origins.append("https://murmur-k6kp3h1ny-carlosvdks-projects.vercel.app")
 
 app.add_middleware(
     CORSMiddleware,
