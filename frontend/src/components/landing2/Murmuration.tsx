@@ -99,47 +99,8 @@ export default function Murmuration() {
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
-    // Mouse tracking via raycaster
-    const raycaster = new THREE.Raycaster();
-    const mouseNDC = new THREE.Vector2();
-    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-    const intersectPt = new THREE.Vector3();
-    let mouseWorld = { x: 99999, z: 99999 };
-
-    const onMouseMove = (e: MouseEvent) => {
-      const rect = el.getBoundingClientRect();
-      mouseNDC.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseNDC.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mouseNDC, camera);
-      if (raycaster.ray.intersectPlane(plane, intersectPt)) {
-        mouseWorld = { x: intersectPt.x, z: intersectPt.z };
-      }
-    };
-
-    const onMouseLeave = () => {
-      mouseWorld = { x: 99999, z: 99999 };
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      const rect = el.getBoundingClientRect();
-      const touch = e.touches[0];
-      mouseNDC.x = ((touch.clientX - rect.left) / rect.width) * 2 - 1;
-      mouseNDC.y = -((touch.clientY - rect.top) / rect.height) * 2 + 1;
-      raycaster.setFromCamera(mouseNDC, camera);
-      if (raycaster.ray.intersectPlane(plane, intersectPt)) {
-        mouseWorld = { x: intersectPt.x, z: intersectPt.z };
-      }
-    };
-
-    const onTouchEnd = () => {
-      mouseWorld = { x: 99999, z: 99999 };
-    };
-
     let count = 0;
     let animationId = 0;
-
-    const HOVER_RADIUS = 700;
-    const HOVER_STRENGTH = 140;
 
     const animate = () => {
       animationId = requestAnimationFrame(animate);
@@ -154,20 +115,11 @@ export default function Murmuration() {
           const baseX = ix * SEPARATION - (AMOUNTX * SEPARATION) / 2;
           const baseZ = iy * SEPARATION - (AMOUNTY * SEPARATION) / 2;
 
-          // Wave sweeping front to back -- slow and gentle
-          let yVal =
+          // Wave sweeping front to back
+          const yVal =
             Math.sin((iy * 0.4) + count * 0.8) * 45 +
             Math.sin((ix * 0.3) + count * 0.5) * 25 +
             Math.cos((ix * 0.2 + iy * 0.2) + count * 0.4) * 20;
-
-          // Mouse hover -- lift dots near cursor
-          const dx = baseX - mouseWorld.x;
-          const dz = baseZ - mouseWorld.z;
-          const dist = Math.sqrt(dx * dx + dz * dz);
-          if (dist < HOVER_RADIUS) {
-            const t = 1 - dist / HOVER_RADIUS;
-            yVal += HOVER_STRENGTH * t * t;
-          }
 
           arr[arrIdx + 1] = yVal;
           i++;
@@ -185,8 +137,6 @@ export default function Murmuration() {
       renderer.setSize(w(), h());
     };
 
-    el.addEventListener("mousemove", onMouseMove);
-    el.addEventListener("mouseleave", onMouseLeave);
     el.addEventListener("touchmove", onTouchMove, { passive: true });
     el.addEventListener("touchend", onTouchEnd);
     window.addEventListener("resize", handleResize);
@@ -196,10 +146,6 @@ export default function Murmuration() {
 
     return () => {
       window.removeEventListener("resize", handleResize);
-      el.removeEventListener("mousemove", onMouseMove);
-      el.removeEventListener("mouseleave", onMouseLeave);
-      el.removeEventListener("touchmove", onTouchMove);
-      el.removeEventListener("touchend", onTouchEnd);
 
       if (sceneRef.current) {
         cancelAnimationFrame(sceneRef.current.animationId);
