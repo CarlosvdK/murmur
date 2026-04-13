@@ -432,9 +432,9 @@ export default function SettingsPage() {
                 <button onClick={() => { setBannerDismissed(true); localStorage.setItem("murmur_settings_banner_dismissed", "1"); }} className="absolute right-3 top-3 text-gray-400 hover:text-black">x</button>
                 <p className="text-sm font-medium text-black">The more you fill in, the more accurate Murmur&apos;s simulations become.</p>
                 <div className="mt-2 space-y-1 text-xs text-gray-500">
-                  <p>Basic info -- general reactions</p>
-                  <p>Customer profile -- specific behaviour patterns</p>
-                  <p>Local area + context -- full simulation accuracy</p>
+                  <p>Basic info: general reactions</p>
+                  <p>Customer profile: specific behaviour patterns</p>
+                  <p>Local area + context: full simulation accuracy</p>
                 </div>
               </div>
             )}
@@ -449,14 +449,14 @@ export default function SettingsPage() {
                   {autofillLoading ? "Researching..." : "Find & auto-fill"}
                 </button>
               </div>
-              <p className="mt-2 text-[10px] text-gray-300">Accepts: Website URL -- Google Maps link -- Google Business Profile URL</p>
+              <p className="mt-2 text-[10px] text-gray-300">Accepts: Website URL, Google Maps link, Google Business Profile URL</p>
 
               {/* Autofill confirmation */}
               {autofillResult && (
                 <div className="mt-4 rounded-lg border border-[#E5E2DC] bg-gray-50 p-4">
                   {Object.keys(autofillResult.found).length > 0 ? (
                     <>
-                      <p className="mb-3 text-sm font-medium text-black">We found your business -- does this look right?</p>
+                      <p className="mb-3 text-sm font-medium text-black">We found your business. Does this look right?</p>
                       <div className="space-y-1.5 text-sm">
                         {Object.entries(autofillResult.found).map(([k, v]) => (
                           <div key={k} className="flex items-start gap-2">
@@ -500,7 +500,7 @@ export default function SettingsPage() {
                 <h3 className="font-semibold text-black">Business profile</h3>
                 {business && <span className="rounded-full bg-green-50 px-2 py-0.5 text-[10px] font-medium text-green-600">Active</span>}
               </div>
-              <p className="mb-4 text-sm text-gray-500">{name || "No business"}{type ? ` -- ${ALL_TYPE_OPTIONS.find((o) => o.value === type)?.label || type}` : ""}{locationCity ? ` in ${locationCity}` : ""}</p>
+              <p className="mb-4 text-sm text-gray-500">{name || "No business"}{type ? ` (${ALL_TYPE_OPTIONS.find((o) => o.value === type)?.label || type}` : ""}{locationCity ? ` in ${locationCity}` : ""}</p>
               <p className="text-xs text-gray-400">Edit the sections below to update your business profile. Changes improve simulation accuracy.</p>
             </div>
 
@@ -549,7 +549,7 @@ export default function SettingsPage() {
                     <div><input value={locationNeighbourhood} onChange={(e) => setLocationNeighbourhood(e.target.value)} placeholder="Neighbourhood" className="w-full rounded-lg border border-[#E5E2DC] px-3 py-2 text-sm focus:border-brand-blue focus:outline-none" /></div>
                     <div className="sm:col-span-2"><input value={locationCountry} onChange={(e) => setLocationCountry(e.target.value)} placeholder="Country" className="w-full rounded-lg border border-[#E5E2DC] px-3 py-2 text-sm focus:border-brand-blue focus:outline-none" /></div>
                   </div>
-                  <p className="mt-1 text-[10px] text-gray-300">Filled automatically from search above -- edit if needed</p>
+                  <p className="mt-1 text-[10px] text-gray-300">Filled automatically from search above. Edit if needed</p>
                 </div>
 
                 {/* Change 6: Location setting */}
@@ -568,7 +568,7 @@ export default function SettingsPage() {
                     <GenButton label="Generate from my business details" loading={genLoading === "description"} onClick={handleGenDescription} />
                   </div>
                   <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="w-full rounded-lg border border-[#E5E2DC] px-3 py-2 text-sm focus:border-brand-blue focus:outline-none" />
-                  {genLoading === null && description && <p className="text-[10px] text-gray-300">AI generated -- edit to make it yours</p>}
+                  {genLoading === null && description && <p className="text-[10px] text-gray-300">AI generated. Edit to make it yours</p>}
                 </div>
 
                 <div><label className="mb-1 block text-xs text-gray-500">Website</label>
@@ -653,9 +653,9 @@ export default function SettingsPage() {
                 <div><label className="mb-2 block text-xs text-gray-500">Do most customers know each other?</label>
                   <p className="mb-1 text-[10px] text-gray-300">Community businesses amplify both positive and negative reactions through word of mouth</p>
                   <div className="flex flex-wrap gap-1.5">{[
-                    { v: "community", l: "Yes -- real community, regulars interact" },
-                    { v: "some", l: "Some do -- small groups" },
-                    { v: "not_really", l: "Not really -- mostly strangers" },
+                    { v: "community", l: "Yes: real community, regulars interact" },
+                    { v: "some", l: "Some do: small groups" },
+                    { v: "not_really", l: "Not really: mostly strangers" },
                     { v: "anonymous", l: "Completely anonymous" },
                   ].map((o) => <Chip key={o.v} label={o.l} active={customerCommunity === o.v} onClick={() => setCustomerCommunity(o.v)} />)}</div></div>
               </div>
@@ -678,8 +678,8 @@ export default function SettingsPage() {
                   <div className="flex flex-wrap gap-1.5">{TRANSPORT_MODES.map((t) => <Chip key={t.value} label={t.label} active={customerTransport.includes(t.value)} onClick={() => toggleArr(customerTransport, t.value, setCustomerTransport)} />)}</div></div>
                 <div><label className="mb-2 block text-xs text-gray-500">Parking available nearby?</label>
                   <div className="flex flex-wrap gap-1.5">{[
-                    { v: "free", l: "Yes -- free parking" }, { v: "paid", l: "Yes -- paid parking" },
-                    { v: "limited", l: "Limited / street only" }, { v: "none", l: "No -- pedestrian/transport only" },
+                    { v: "free", l: "Yes: free parking" }, { v: "paid", l: "Yes: paid parking" },
+                    { v: "limited", l: "Limited / street only" }, { v: "none", l: "No: pedestrian/transport only" },
                   ].map((o) => <Chip key={o.v} label={o.l} active={hasParking === o.v} onClick={() => setHasParking(o.v)} />)}</div></div>
               </div>
             </SectionComp>

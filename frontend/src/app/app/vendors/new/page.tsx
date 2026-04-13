@@ -56,7 +56,7 @@ export default function NewVendorPage() {
         <div className="mb-4 rounded-xl border border-brand-orange/15 bg-brand-orange/5 p-4">
           <p className="text-sm text-gray-600">The more you share about this vendor, the better Murmur can predict how they&apos;ll respond to any request or conversation.</p>
           <p className="mt-2 text-xs italic text-gray-400">
-            These fields power predictions for any vendor question -- discounts, delivery terms, exclusivity, switching, capacity increases, contract renewals, and more.
+            These fields power predictions for any vendor question, discounts, delivery terms, exclusivity, switching, capacity increases, contract renewals, and more.
           </p>
         </div>
 
@@ -103,7 +103,7 @@ export default function NewVendorPage() {
           </FormSection>
 
           {/* SECTION 3: Commercial relationship */}
-          <FormSection title="Contract and relationship details" subtitle="shapes predictions for any question you ask about this vendor" whyItMatters="Commercial context affects how this vendor would respond to any request -- not just price, but delivery, exclusivity, capacity, and terms">
+          <FormSection title="Contract and relationship details" subtitle="shapes predictions for any question you ask about this vendor" whyItMatters="Commercial context affects how this vendor would respond to any request, not just price, but delivery, exclusivity, capacity, and terms">
             <FormField label="How long have you worked together?" name="tenure_vendor" type="select" options={[
               { value: "<6m", label: "Less than 6 months" }, { value: "6-12m", label: "6-12 months" },
               { value: "1-3y", label: "1-3 years" }, { value: "3-10y", label: "3-10 years" },
@@ -111,12 +111,12 @@ export default function NewVendorPage() {
             ]} whyItMatters="Longer relationships have different negotiation dynamics" value={form.tenure_vendor} onChange={(v) => set("tenure_vendor", v)} />
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField label="Annual spend (approximate)" name="annual_spend_vendor" type="number" placeholder="e.g. 24000"
-                whyItMatters="Affects how much flexibility this vendor is likely to show on any request -- not just price, but delivery terms, lead times, exclusivity, and prioritisation" value={form.annual_spend_vendor} onChange={(v) => set("annual_spend_vendor", v)} />
+                whyItMatters="Affects how much flexibility this vendor is likely to show on any request, not just price, but delivery terms, lead times, exclusivity, and prioritisation" value={form.annual_spend_vendor} onChange={(v) => set("annual_spend_vendor", v)} />
               <FormField label="Payment terms" name="payment_terms" type="select" options={[
                 { value: "net7", label: "Net 7" }, { value: "net14", label: "Net 14" }, { value: "net30", label: "Net 30" },
                 { value: "net60", label: "Net 60" }, { value: "delivery", label: "On delivery" },
                 { value: "advance", label: "In advance" },
-              ]} whyItMatters="Vendors balance multiple factors when responding to requests. Current terms give context for what they might offer in return for different asks -- price, speed, priority, exclusivity." value={form.payment_terms} onChange={(v) => set("payment_terms", v)} />
+              ]} whyItMatters="Vendors balance multiple factors when responding to requests. Current terms give context for what they might offer in return for different asks, price, speed, priority, exclusivity." value={form.payment_terms} onChange={(v) => set("payment_terms", v)} />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <FormField label="Contract type" name="contract_type" type="select" options={[
@@ -127,12 +127,12 @@ export default function NewVendorPage() {
                 whyItMatters="Renewal windows are when leverage is highest" value={form.contract_renewal_date} onChange={(v) => set("contract_renewal_date", v)} />
             </div>
             <FormField label="Alternative vendors available?" name="has_alternatives" type="select" options={[
-              { value: "several", label: "Yes -- several ready" }, { value: "disruptive", label: "Yes -- but switching would be disruptive" },
-              { value: "sole", label: "No -- essentially sole supplier" }, { value: "not_looked", label: "Haven't looked yet" },
-            ]} whyItMatters="Alternatives affect how much flexibility a vendor shows on any request -- the more options you have, the more willing they are to accommodate" value={form.has_alternatives} onChange={(v) => set("has_alternatives", v)} />
+              { value: "several", label: "Yes, several ready" }, { value: "disruptive", label: "Yes, but switching would be disruptive" },
+              { value: "sole", label: "No, essentially sole supplier" }, { value: "not_looked", label: "Haven't looked yet" },
+            ]} whyItMatters="Alternatives affect how much flexibility a vendor shows on any request, the more options you have, the more willing they are to accommodate" value={form.has_alternatives} onChange={(v) => set("has_alternatives", v)} />
             <FormField label="How critical are they?" name="criticality_score" type="slider"
-              options={{ left: "Not critical -- easy to replace", right: "Mission critical" }}
-              whyItMatters="How critical a vendor is affects how you'd both approach any difficult conversation -- whether it's about delivery speed, quality issues, exclusivity, or costs"
+              options={{ left: "Not critical, easy to replace", right: "Mission critical" }}
+              whyItMatters="How critical a vendor is affects how you'd both approach any difficult conversation, whether it's about delivery speed, quality issues, exclusivity, or costs"
               value={form.criticality_score} onChange={(v) => set("criticality_score", v)} />
           </FormSection>
 
@@ -156,8 +156,8 @@ export default function NewVendorPage() {
               </div>
             )}
             <FormField label="Have you ever successfully asked for something and got it?" name="has_negotiated" type="chips" multi={false}
-              formatHint="Better pricing, faster delivery, more flexibility, priority treatment, extended terms -- anything"
-              whyItMatters="Knowing they've said yes before -- and in what circumstances -- predicts what they're likely to agree to next time"
+              formatHint="Better pricing, faster delivery, more flexibility, priority treatment, extended terms, anything"
+              whyItMatters="Knowing they've said yes before, and in what circumstances, predicts what they're likely to agree to next time"
               options={[
               { value: "yes", label: "Yes" }, { value: "no", label: "No" }, { value: "never_tried", label: "Never tried" },
             ]} value={form.has_negotiated} onChange={(v) => set("has_negotiated", v)} />
@@ -172,9 +172,9 @@ export default function NewVendorPage() {
           </FormSection>
 
           {/* SECTION 5: Relationship dynamics */}
-          <FormSection title="Relationship dynamics" subtitle="most directly powers the digital twin" whyItMatters="This section shapes predictions for any request you make of this vendor -- not just negotiations. It affects how they'd respond to any conversation.">{/* Description */}
-            <p className="text-xs text-gray-400 -mt-2 mb-3">This is the section that most directly powers the digital twin. It&apos;s not just about negotiations -- it shapes predictions for any request you make of this vendor.</p>
-            <FormField label="Their communication style" name="communication_style" type="chips" whyItMatters="Critical for predicting how they'll respond to any request -- not just price. Someone who goes quiet under pressure will react differently to a delivery complaint than someone who's direct." options={[
+          <FormSection title="Relationship dynamics" subtitle="most directly powers the digital twin" whyItMatters="This section shapes predictions for any request you make of this vendor, not just negotiations. It affects how they'd respond to any conversation.">{/* Description */}
+            <p className="text-xs text-gray-400 -mt-2 mb-3">This is the section that most directly powers the digital twin. It&apos;s not just about negotiations, it shapes predictions for any request you make of this vendor.</p>
+            <FormField label="Their communication style" name="communication_style" type="chips" whyItMatters="Critical for predicting how they'll respond to any request, not just price. Someone who goes quiet under pressure will react differently to a delivery complaint than someone who's direct." options={[
               { value: "responsive", label: "Very responsive" }, { value: "slow", label: "Slow to respond" },
               { value: "direct", label: "Direct" }, { value: "formal", label: "Formal" },
               { value: "casual", label: "Casual and friendly" }, { value: "hard_reach", label: "Hard to get hold of" },
@@ -182,26 +182,26 @@ export default function NewVendorPage() {
               { value: "quiet_pressure", label: "Goes quiet when under pressure" },
             ]} value={form.communication_style} onChange={(v) => set("communication_style", v)} />
             <FormField label="How do they handle difficult conversations or requests?" name="price_discussion_style" type="textarea" rows={2}
-              placeholder='e.g. "Usually says no at first then comes around after a second conversation" or "Very direct -- gives a clear answer fast" or "Avoids the conversation and goes quiet"' value={form.price_discussion_style} onChange={(v) => set("price_discussion_style", v)} />
-            <FormField label="What motivates them to keep your business?" name="vendor_motivation" type="chips" whyItMatters="What they value shapes how they respond to everything -- a vendor who values long relationships will respond differently to a difficult conversation than one who's purely transactional" options={[
+              placeholder='e.g. "Usually says no at first then comes around after a second conversation" or "Very direct, gives a clear answer fast" or "Avoids the conversation and goes quiet"' value={form.price_discussion_style} onChange={(v) => set("price_discussion_style", v)} />
+            <FormField label="What motivates them to keep your business?" name="vendor_motivation" type="chips" whyItMatters="What they value shapes how they respond to everything, a vendor who values long relationships will respond differently to a difficult conversation than one who's purely transactional" options={[
               { value: "volume", label: "Volume" }, { value: "prompt_payment", label: "Prompt payment" },
               { value: "long_relationship", label: "Long relationship" }, { value: "referrals", label: "Referrals" },
               { value: "prestige", label: "Prestige" }, { value: "not_sure", label: "Not sure" },
             ]} value={form.vendor_motivation} onChange={(v) => set("vendor_motivation", v)} />
             <FormField label="Relationship notes" name="vendor_relationship_notes" type="textarea" rows={3}
-              placeholder='e.g. "Jan is very relationship-focused -- always calls before price changes"'
+              placeholder='e.g. "Jan is very relationship-focused, always calls before price changes"'
               value={form.vendor_relationship_notes} onChange={(v) => set("vendor_relationship_notes", v)} />
           </FormSection>
 
           {/* SECTION 6: Market context */}
-          <FormSection title="Market and risk context" whyItMatters="Market context shapes what requests are realistic -- if the whole sector is under pressure, asking for a discount lands differently than in a stable market">
-            <FormField label="Market competitiveness" name="market_competitiveness" type="select" whyItMatters="Competition affects how easily you could switch vendors, which shapes how much flexibility they'll show on any request -- pricing, delivery, exclusivity, or terms" options={[
-              { value: "very_competitive", label: "Very competitive -- many alternatives" },
+          <FormSection title="Market and risk context" whyItMatters="Market context shapes what requests are realistic, if the whole sector is under pressure, asking for a discount lands differently than in a stable market">
+            <FormField label="Market competitiveness" name="market_competitiveness" type="select" whyItMatters="Competition affects how easily you could switch vendors, which shapes how much flexibility they'll show on any request, pricing, delivery, exclusivity, or terms" options={[
+              { value: "very_competitive", label: "Very competitive, many alternatives" },
               { value: "moderate", label: "Moderately competitive" },
-              { value: "few", label: "Few alternatives -- niche market" },
+              { value: "few", label: "Few alternatives, niche market" },
               { value: "monopoly", label: "Near monopoly" },
             ]} value={form.market_competitiveness} onChange={(v) => set("market_competitiveness", v)} />
-            <FormField label="Market-wide pressures in this category" name="price_trend" type="select" whyItMatters="Market context shapes what requests are realistic -- cost increases, supply shortages, new regulations, labour issues all affect what a vendor can offer" options={[
+            <FormField label="Market-wide pressures in this category" name="price_trend" type="select" whyItMatters="Market context shapes what requests are realistic, cost increases, supply shortages, new regulations, labour issues all affect what a vendor can offer" options={[
               { value: "rising_significant", label: "Significant increases" }, { value: "rising_slight", label: "Slight increases" },
               { value: "stable", label: "Stable" }, { value: "falling", label: "Prices falling" }, { value: "unsure", label: "Not sure" },
             ]} value={form.price_trend} onChange={(v) => set("price_trend", v)} />

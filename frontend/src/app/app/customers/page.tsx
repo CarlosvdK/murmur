@@ -127,7 +127,7 @@ export default function CustomersPage() {
             <div className="mx-auto mt-4 max-w-lg rounded-lg border border-[#E5E2DC] bg-white px-5 py-4 text-left">
               <p className="text-sm font-medium text-black">Best for high-value, personal relationships</p>
               <p className="mt-1 text-xs leading-relaxed text-gray-500">
-                Customer twins are most useful when you have a smaller customer base where each relationship matters -- think fewer than 100 clients who make up the bulk of your revenue and you communicate with personally. Consulting firms, agencies, B2B suppliers, private practices, luxury services, and similar businesses get the most value here. If you have thousands of anonymous customers, the Simulation tab is a better fit.
+                Customer twins are most useful when you have a smaller customer base where each relationship matters, think fewer than 100 clients who make up the bulk of your revenue and you communicate with personally. Consulting firms, agencies, B2B suppliers, private practices, luxury services, and similar businesses get the most value here. If you have thousands of anonymous customers, the Simulation tab is a better fit.
               </p>
             </div>
             <button onClick={() => router.push("/app/customers/new")}
