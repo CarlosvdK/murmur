@@ -87,20 +87,21 @@ export default function ProductPillars() {
 
         <div className="space-y-20">
           {PILLARS.map((p, i) => (
-            <SectionReveal key={p.label} delay={0.1}>
-              <div className={`grid items-center gap-10 lg:grid-cols-2 ${i % 2 === 1 ? "lg:direction-rtl" : ""}`}>
+            <div key={p.label} className={`grid items-center gap-10 lg:grid-cols-2 ${i % 2 === 1 ? "lg:direction-rtl" : ""}`}>
                 {/* Image side */}
-                <div className={`overflow-hidden rounded-2xl ${i % 2 === 1 ? "lg:order-2" : ""}`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={p.image}
-                    alt={p.label}
-                    className="w-full rounded-2xl object-cover"
-                  />
-                </div>
+                <SectionReveal delay={0.05} className={i % 2 === 1 ? "lg:order-2" : ""}>
+                  <div className="overflow-hidden rounded-2xl shadow-xl shadow-black/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.image}
+                      alt={p.label}
+                      className="w-full max-h-[400px] rounded-2xl object-cover"
+                    />
+                  </div>
+                </SectionReveal>
 
                 {/* Content side */}
-                <div className={i % 2 === 1 ? "lg:order-1" : ""}>
+                <SectionReveal delay={0.2} className={i % 2 === 1 ? "lg:order-1" : ""}>
                   <div
                     className="mb-4 h-1 w-12 rounded-full"
                     style={{ backgroundColor: p.color }}
@@ -147,9 +148,8 @@ export default function ProductPillars() {
                     <p className="text-xs font-medium text-gray-400">Best for</p>
                     <p className="text-sm text-gray-600">{p.best}</p>
                   </div>
-                </div>
+                </SectionReveal>
               </div>
-            </SectionReveal>
           ))}
         </div>
       </div>
