@@ -90,13 +90,14 @@ export default function ProductPillars() {
             <div key={p.label} className={`grid items-center gap-10 lg:grid-cols-2 ${i % 2 === 1 ? "lg:direction-rtl" : ""}`}>
                 {/* Image side */}
                 <SectionReveal delay={0.05} className={i % 2 === 1 ? "lg:order-2" : ""}>
-                  <div className="overflow-hidden rounded-2xl shadow-xl shadow-black/10">
+                  <div className="relative overflow-hidden rounded-2xl shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={p.image}
                       alt={p.label}
-                      className="w-full max-h-[400px] rounded-2xl object-cover"
+                      className="w-full max-h-[400px] rounded-2xl object-cover object-top"
                     />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-black/25 to-transparent" />
                   </div>
                 </SectionReveal>
 
