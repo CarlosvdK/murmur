@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { listBusinesses, listSimulations, listContacts } from "@/lib/api";
+import Tutorial from "@/components/shell/Tutorial";
 
 export default function AppHome() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [stats, setStats] = useState({ simulations: 0, customers: 0, vendors: 0, twins: 0 });
 
   const fetchStats = () => {
@@ -33,6 +35,10 @@ export default function AppHome() {
         } else {
           setReady(true);
           fetchStats();
+          // Show tutorial on first visit
+          if (!localStorage.getItem("murmur_tutorial_seen")) {
+            setTimeout(() => setShowTutorial(true), 500);
+          }
           const interval = setInterval(fetchStats, 30000);
           return () => clearInterval(interval);
         }
@@ -55,6 +61,7 @@ export default function AppHome() {
       href: "/app/simulate",
       image: "/simulation.png",
       label: "Simulate",
+      tutId: "card-simulate",
       color: "brand-blue",
       borderHover: "hover:border-brand-blue",
       desc: "Generate a diverse panel of AI customers tailored to your business and ask them any question. Get honest reactions, sentiment analysis, and a go/no-go recommendation backed by behavioural science.",
@@ -64,6 +71,7 @@ export default function AppHome() {
       href: "/app/customers",
       image: "/customer_twin.png",
       label: "Customer Twins",
+      tutId: "card-customers",
       color: "brand-orange",
       borderHover: "hover:border-brand-orange",
       desc: "Build a digital twin of each high-value customer from your real conversations. Upload WhatsApp, email, or meeting notes and ask the twin how they would react to pricing changes, new offerings, or difficult conversations.",
@@ -73,6 +81,7 @@ export default function AppHome() {
       href: "/app/vendors",
       image: "/vendor_twin.png",
       label: "Vendor Twins",
+      tutId: "card-vendors",
       color: "brand-pink",
       borderHover: "hover:border-brand-pink",
       desc: "Create digital twins of your suppliers and partners from correspondence history. Predict their negotiation style, anticipate counter-offers, and prepare for every meeting with data-backed intelligence.",
@@ -81,6 +90,13 @@ export default function AppHome() {
   ];
 
   return (
+    <>
+    {showTutorial && (
+      <Tutorial onComplete={() => {
+        setShowTutorial(false);
+        localStorage.setItem("murmur_tutorial_seen", "true");
+      }} />
+    )}
     <div className="overflow-y-auto p-8 lg:p-12">
       <div className="mx-auto max-w-6xl">
         <h1 className="mb-1 text-3xl font-bold text-black">
@@ -113,6 +129,7 @@ export default function AppHome() {
           {cards.map((card) => (
             <a
               key={card.label}
+              data-tut={card.tutId}
               href={card.href}
               className={`group flex flex-col overflow-hidden rounded-2xl border border-[#E5E2DC] bg-white transition-all hover:-translate-y-1 ${card.borderHover} hover:shadow-lg`}
             >
@@ -152,5 +169,6 @@ export default function AppHome() {
         </div>
       </div>
     </div>
+    </>
   );
 }

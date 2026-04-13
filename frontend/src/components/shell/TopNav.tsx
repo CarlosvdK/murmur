@@ -42,6 +42,7 @@ export default function TopNav() {
           return (
             <div key={tab.label} className="group relative flex h-full items-center">
               <a
+                data-tut={`nav-${tab.label.toLowerCase()}`}
                 href={isSoon ? undefined : tab.href}
                 className={`relative flex h-full items-center px-4 text-sm font-medium transition-colors ${
                   isActive
