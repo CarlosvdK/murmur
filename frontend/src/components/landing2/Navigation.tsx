@@ -68,16 +68,16 @@ export default function Navigation() {
           {/* Desktop CTAs */}
           <div className="hidden items-center gap-3 md:flex">
             <a
-              href="/login"
+              href="/signup"
               className="text-sm text-murmur-warm-grey transition-colors hover:text-murmur-ink"
             >
-              Sign in
+              Create account
             </a>
             <a
-              href="/signup"
+              href="/login"
               className="rounded-full bg-black px-5 py-2 text-sm font-bold text-white transition-all hover:opacity-80 hover:scale-[1.02]"
             >
-              Try free
+              Sign in
             </a>
           </div>
 
@@ -128,18 +128,18 @@ export default function Navigation() {
               </a>
             ))}
             <a
-              href="/login"
+              href="/signup"
               onClick={() => setMobileOpen(false)}
               className="mt-4 text-lg text-murmur-warm-grey"
             >
-              Sign in
+              Create account
             </a>
             <a
-              href="/signup"
+              href="/login"
               onClick={() => setMobileOpen(false)}
               className="mt-4 rounded-full bg-murmur-amber px-8 py-3 text-lg font-semibold text-white"
             >
-              Try free
+              Sign in
             </a>
           </motion.div>
         )}

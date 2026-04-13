@@ -57,11 +57,11 @@ export default function Home() {
             </SectionReveal>
             <SectionReveal delay={0.3}>
               <div className="flex flex-wrap items-center gap-4">
-                <a href="/signup" className="rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-all hover:opacity-80 hover:scale-[1.02]">
-                  Start for free
+                <a href="/login" className="rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-all hover:opacity-80 hover:scale-[1.02]">
+                  Sign in
                 </a>
-                <a href="#product" className="rounded-full border border-gray-300 bg-white px-8 py-3.5 text-sm font-medium text-black transition-colors hover:border-gray-500">
-                  See how it works
+                <a href="/signup" className="rounded-full border border-gray-300 bg-white px-8 py-3.5 text-sm font-medium text-black transition-colors hover:border-gray-500">
+                  Create an account
                 </a>
               </div>
             </SectionReveal>
