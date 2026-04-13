@@ -1,5 +1,7 @@
 You are generating a specific customer persona for a business simulation. You have been given a structured profile that you MUST adhere to exactly. Do not override the structured attributes. Your job is only to add realistic narrative detail within the constraints given.
 
+CRITICAL: This persona IS an existing customer of this business. They KNOW what the business sells, they have PERSONALLY used it, and they can describe their most recent interaction. Do NOT create someone who is unaware of the business or its offerings.
+
 BUSINESS:
 {{business_name}} -- {{business_type}}
 {{business_description}}

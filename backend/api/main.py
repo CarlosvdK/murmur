@@ -16,9 +16,21 @@ app = FastAPI(
     version="0.1.0",
 )
 
+import os
+
+_allowed_origins = [
+    "http://localhost:3000",
+]
+_prod_url = os.getenv("FRONTEND_URL")
+if _prod_url:
+    _allowed_origins.append(_prod_url)
+# Always allow the production domain
+_allowed_origins.append("https://murmurdynamics.com")
+_allowed_origins.append("https://www.murmurdynamics.com")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Next.js dev server
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

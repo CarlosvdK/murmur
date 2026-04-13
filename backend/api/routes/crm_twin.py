@@ -4,8 +4,10 @@ import logging
 from datetime import datetime, timezone
 from uuid import UUID
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
 
+from backend.config import get_settings
 from backend.models.crm import TwinQueryRequest, TwinQueryResponse
 from backend.crm.correspondence_processor import process_correspondence
 from backend.crm.twin_engine import query_twin
@@ -17,6 +19,50 @@ from backend.db.client import get_supabase
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/crm/twin", tags=["crm-twin"])
+
+
+async def _web_search_for_twin(question: str) -> str:
+    """Run a Brave web search relevant to the twin question. Returns insight text or empty string."""
+    settings = get_settings()
+    if not settings.brave_search_api_key:
+        return ""
+
+    try:
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                "https://api.search.brave.com/res/v1/web/search",
+                headers={"X-Subscription-Token": settings.brave_search_api_key},
+                params={"q": question, "count": 6, "freshness": "py"},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+
+        results = []
+        for item in data.get("web", {}).get("results", [])[:6]:
+            results.append(f"- {item.get('title', '')}: {item.get('description', '')}")
+
+        if not results:
+            return ""
+
+        # Use Claude to extract relevant insight
+        from anthropic import AsyncAnthropic
+        ai = AsyncAnthropic(api_key=settings.anthropic_api_key)
+        resp = await ai.messages.create(
+            model=settings.model_name,
+            max_tokens=300,
+            system=(
+                "Extract the most relevant insight from these search results "
+                "for someone preparing for a conversation with a contact. "
+                "One paragraph, max 3 sentences. If nothing is relevant, "
+                "say 'No relevant findings.'"
+            ),
+            messages=[{"role": "user", "content": f"Question: {question}\n\nResults:\n" + "\n".join(results)}],
+        )
+        insight = resp.content[0].text.strip()
+        return "" if "no relevant" in insight.lower() else insight
+    except Exception as e:
+        logger.warning("Web search for twin query failed (non-fatal): %s", e)
+        return ""
 
 
 
@@ -185,10 +231,39 @@ async def ask_twin(
 
     signals = corr_result.data[0]["extracted_signals"]
 
+    # Enrich with RAG research + cultural/psychological profile
+    research_context = ""
+    cultural_context = ""
+    try:
+        from backend.context.vector_rag import search_research_with_fallback
+        country = contact_row.get("country", "")
+        rag_result = await search_research_with_fallback(
+            question=data.question,
+            business_type="",  # twin queries are contact-level, not business-level
+            country_code=country,
+            max_chars=3000,
+        )
+        research_context = rag_result.get("context", "")
+    except Exception as e:
+        logger.warning("RAG lookup for twin query failed (non-fatal): %s", e)
+
+    try:
+        from backend.context.profile_builder import build_cultural_profile
+        country = contact_row.get("country", "")
+        if country:
+            cultural_context = build_cultural_profile(country)
+    except Exception as e:
+        logger.warning("Cultural profile for twin query failed (non-fatal): %s", e)
+
+    web_context = await _web_search_for_twin(data.question)
+
     result = await query_twin(
         question=data.question,
         contact_name=contact_row["full_name"],
         extracted_signals=signals,
+        research_context=research_context or None,
+        cultural_context=cultural_context or None,
+        web_context=web_context or None,
     )
 
     # Store twin query in DB

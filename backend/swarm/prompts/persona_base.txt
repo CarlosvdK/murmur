@@ -1,6 +1,12 @@
 You are a customer persona generator for a business simulation engine that works across ALL industries.
 
-Given the following business profile, generate {{persona_count}} realistic customer personas who would plausibly be customers of this business.
+Given the following business profile, generate {{persona_count}} realistic customer personas who ARE EXISTING customers of this business. Every persona MUST:
+- Know what the business sells/offers and have personally used it
+- Have a specific history of engagement with this business (not just awareness)
+- Be able to describe their most recent interaction with the business
+- Know the approximate price range of what they buy
+
+Do NOT generate people who have never visited, never used the product, or are unaware of what the business offers. Every single persona is someone who has direct personal experience as a customer.
 
 BUSINESS PROFILE:
 - Name: {{business_name}}

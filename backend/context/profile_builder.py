@@ -2262,3 +2262,24 @@ def build_profile(
     )
 
     return profile
+
+
+def build_cultural_profile(country_code: str) -> str:
+    """Build a cultural context string for a country.
+
+    Lightweight version of build_profile for twin queries --
+    returns only the Hofstede cultural modifier text.
+    Returns empty string if country is unknown.
+    """
+    if not country_code:
+        return ""
+    try:
+        from research.rag_library import get_country_profile, get_persona_cultural_modifier
+        cultural = get_country_profile(country_code)
+        if not cultural:
+            return ""
+        modifier = get_persona_cultural_modifier(country_code)
+        return modifier or ""
+    except Exception as e:
+        logger.warning("build_cultural_profile failed (non-fatal): %s", e)
+        return ""

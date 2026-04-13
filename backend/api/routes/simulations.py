@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+import random
 import time
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
@@ -35,6 +36,25 @@ router = APIRouter(prefix="/simulations", tags=["simulations"])
 # Ephemeral in-memory stores -- runtime-only state for live SSE streaming.
 _simulation_progress: dict[UUID, SimulationProgress] = {}
 _simulation_queues: dict[UUID, asyncio.Queue] = {}
+
+# Progress message libraries
+_progress_verbs = [
+    "Interviewing", "Listening to", "Talking with", "Hearing from",
+    "Consulting", "Checking in with", "Getting insights from",
+    "Having a chat with", "Understanding", "Learning from",
+]
+_thinking_messages = [
+    "Analysing your business profile...",
+    "Reading through your survey responses...",
+    "Building a picture of your customer base...",
+    "Cross-referencing with published research...",
+    "Studying your competitive landscape...",
+    "Reviewing behavioral science literature...",
+    "Calibrating for your market context...",
+    "Loading cultural and demographic data...",
+    "Preparing the simulation environment...",
+    "Setting up customer archetypes...",
+]
 
 
 # ---------------------------------------------------------------------------
@@ -215,6 +235,90 @@ def _store_result(result: SimulationResult):
 # Routes
 # ---------------------------------------------------------------------------
 
+class ClarifyingQuestionsRequest(BaseModel):
+    business_id: str
+    question: str
+
+
+@router.post("/clarifying-questions")
+async def generate_clarifying_questions(
+    data: ClarifyingQuestionsRequest,
+    user_id: UUID = Depends(get_current_user_id),
+):
+    """Generate smart clarifying questions using Claude + business profile."""
+    db = get_supabase()
+
+    # Get business profile
+    biz = (
+        db.table("businesses")
+        .select("*")
+        .eq("id", data.business_id)
+        .eq("user_id", str(user_id))
+        .maybe_single()
+        .execute()
+    )
+    if not biz.data:
+        return {"questions": []}
+
+    row = biz.data
+    metadata = row.get("metadata") or {}
+    merged = {**row, **metadata}
+
+    # Build the FULL survey context -- same as what the simulation uses
+    try:
+        from backend.survey.rag_builder import build_rag_context
+        profile_text = build_rag_context(merged)
+    except Exception:
+        profile_text = f"Business: {merged.get('name', 'Unknown')} ({merged.get('type', 'unknown')})\nDescription: {merged.get('description', 'Not provided')}"
+
+    try:
+        from anthropic import AsyncAnthropic
+        settings = get_settings()
+        client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+
+        response = await client.messages.create(
+            model=settings.model_name,
+            max_tokens=600,
+            messages=[{
+                "role": "user",
+                "content": (
+                    f"You are preparing to simulate customer reactions to a business decision. "
+                    f"Before running the simulation, generate 3 clarifying questions that would "
+                    f"make the simulation more accurate.\n\n"
+                    f"BUSINESS PROFILE:\n{profile_text}\n\n"
+                    f"USER'S QUESTION:\n{data.question}\n\n"
+                    f"RULES:\n"
+                    f"- Reference specific details from the business profile (their competitors, "
+                    f"their customer demographics, their past changes, etc.)\n"
+                    f"- Do NOT ask for information already provided in the question\n"
+                    f"- Ask for concrete numbers, past outcomes, and competitor data\n"
+                    f"- Each question should be 1 sentence, with a short hint in italics\n"
+                    f"- Focus on information that would change the simulation outcome\n\n"
+                    f"Return ONLY valid JSON:\n"
+                    f'[{{"question": "...", "hint": "..."}}, ...]'
+                ),
+            }],
+        )
+
+        import json
+        raw = response.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+            raw = raw.strip()
+        questions = json.loads(raw)
+        return {"questions": questions[:3]}
+
+    except Exception as e:
+        logger.warning("Clarifying question generation failed: %s", e)
+        return {"questions": [
+            {"question": "Can you describe the specific change you are considering?", "hint": "The more detail, the better the simulation"},
+            {"question": "What triggered this idea?", "hint": "Understanding the motivation helps frame the simulation"},
+            {"question": "Do you have any relevant data -- sales numbers, customer feedback, competitor info?", "hint": "Even rough numbers improve accuracy"},
+        ]}
+
+
 @router.post("/", response_model=Simulation)
 async def create_simulation(
     data: SimulationCreate,
@@ -334,12 +438,48 @@ async def _run_pipeline(
         except Exception as e:
             logger.warning("Survey RAG builder failed (non-fatal): %s", e)
 
+        # Step 0.2: Interpret the question in business context
+        interpretation = None
+        interpreted_question = question  # fallback to raw question
+        try:
+            from backend.swarm.question_interpreter import interpret_question
+            emit_sse("context", random.choice([
+                "Understanding your question...",
+                "Analysing what you are really asking...",
+                "Interpreting your question in context...",
+            ]))
+            interpretation = await interpret_question(
+                question=question,
+                business_name=business.name,
+                business_type=business.type,
+                survey_context=survey_context,
+            )
+            if interpretation:
+                interpreted_question = interpretation.interpreted_question
+                logger.info(
+                    "Question interpreted: '%s' -> '%s' (type=%s, affected=%s, %d%% customers)",
+                    question[:50], interpreted_question[:50],
+                    interpretation.question_type,
+                    interpretation.affected_product,
+                    interpretation.estimated_affected_customers_pct,
+                )
+                _update_sim(sim_id, question_interpretation={
+                    "interpreted": interpretation.interpreted_question,
+                    "type": interpretation.question_type,
+                    "affected_product": interpretation.affected_product,
+                    "is_core": interpretation.is_core_product,
+                    "affected_pct": interpretation.estimated_affected_customers_pct,
+                    "framing": interpretation.framing_instruction,
+                })
+        except Exception as e:
+            logger.warning("Question interpretation failed (non-fatal): %s", e)
+
         try:
             country = (workspace_data or {}).get("location_country", "")
-            # Try vector search first, fall back to keyword selector
+            # Use INTERPRETED question for better semantic search
             from backend.context.vector_rag import search_research_with_fallback
             rag_result = await search_research_with_fallback(
-                question=question,
+                question=interpreted_question,  # interpreted, not raw
                 business_type=business.type,
                 country_code=country,
                 max_chars=6000,
@@ -362,8 +502,9 @@ async def _run_pipeline(
         if settings.context_enabled:
             _update_sim(sim_id, status=SimulationStatus.GATHERING_CONTEXT.value)
             progress.status = SimulationStatus.GATHERING_CONTEXT
-            progress.step = "Researching market context..."
-            emit_sse("context", "Researching market context...")
+            ctx_msg = random.choice(_thinking_messages)
+            progress.step = ctx_msg
+            emit_sse("context", ctx_msg)
 
             def on_context_progress(msg: str):
                 progress.step = msg
@@ -407,6 +548,12 @@ async def _run_pipeline(
             enriched_parts.append(research_context[:6000])
         if context_narrative:
             enriched_parts.append(context_narrative)
+        # Inject question interpretation context so personas understand the framing
+        if interpretation and interpretation.key_context_for_personas:
+            enriched_parts.append(
+                f"QUESTION CONTEXT:\n{interpretation.key_context_for_personas}\n"
+                f"Framing: {interpretation.framing_instruction}"
+            )
         if enriched_parts:
             context_narrative = "\n\n---\n\n".join(enriched_parts)
             logger.info("Enriched context: %d chars total (survey=%d, profile=%d, research=%d, agents=%d)",
@@ -451,8 +598,14 @@ async def _run_pipeline(
         # Step 1: Generate personas
         _update_sim(sim_id, status=SimulationStatus.GENERATING_PERSONAS.value)
         progress.status = SimulationStatus.GENERATING_PERSONAS
-        progress.step = "Generating customer personas..."
-        emit_sse("personas", "Generating customer personas...")
+        msg = random.choice([
+            "Building your customer profiles...",
+            "Creating realistic customer personas...",
+            "Assembling a diverse customer panel...",
+            "Recruiting simulated customers for your business...",
+        ])
+        progress.step = msg
+        emit_sse("personas", msg)
 
         personas = await generate_personas(
             business, persona_count, context_narrative=context_narrative,
@@ -468,18 +621,30 @@ async def _run_pipeline(
         # Step 2: Interview all personas
         _update_sim(sim_id, status=SimulationStatus.SIMULATING.value)
         progress.status = SimulationStatus.SIMULATING
-        progress.step = "Interviewing customers..."
-        emit_sse("simulation", "Interviewing customers...")
+        sim_msg = random.choice([
+            "Starting customer interviews...",
+            "Beginning focus group sessions...",
+            "Gathering customer perspectives...",
+            "Running customer simulation...",
+        ])
+        progress.step = sim_msg
+        emit_sse("simulation", sim_msg)
 
         def on_progress(persona_name: str, count: int):
             progress.current_persona = persona_name
             progress.personas_interviewed = count
-            progress.step = f"Talking to {persona_name}..."
+            # If the simulator already sends a full message (contains turn info), use it directly
+            if "(" in persona_name:
+                progress.step = persona_name
+                emit_sse("simulation", persona_name)
+            else:
+                verb = random.choice(_progress_verbs)
+                progress.step = f"{verb} {persona_name}..."
+                emit_sse("simulation", f"{verb} {persona_name}...")
             progress.elapsed_seconds = time.monotonic() - start
-            emit_sse("simulation", f"Talking to {persona_name}...")
 
         responses = await run_simulation(
-            personas, business, question, variant_a, variant_b,
+            personas, business, interpreted_question, variant_a, variant_b,
             on_progress=on_progress, context_narrative=context_narrative,
         )
 
@@ -489,11 +654,18 @@ async def _run_pipeline(
         # Step 3: Aggregate
         _update_sim(sim_id, status=SimulationStatus.AGGREGATING.value)
         progress.status = SimulationStatus.AGGREGATING
-        progress.step = "Synthesising customer feedback..."
-        emit_sse("aggregation", "Synthesising customer feedback...")
+        agg_msg = random.choice([
+            "Synthesising customer feedback...",
+            "Analysing patterns across all interviews...",
+            "Identifying themes and consensus...",
+            "Comparing stated vs actual behaviour predictions...",
+            "Building the final report...",
+        ])
+        progress.step = agg_msg
+        emit_sse("aggregation", agg_msg)
 
         result_data = await aggregate_responses(
-            business, question, responses, variant_a, variant_b,
+            business, interpreted_question, responses, variant_a, variant_b,
             context_narrative=context_narrative,
         )
 
@@ -502,7 +674,7 @@ async def _run_pipeline(
         try:
             from backend.swarm.research_override import apply_research_override
             research_override = await apply_research_override(
-                question=question,
+                question=interpreted_question,
                 aggregation_result=result_data,
                 persona_responses=responses,
                 business_type=business.type,
@@ -519,7 +691,7 @@ async def _run_pipeline(
             logger.warning("Research override failed (non-fatal): %s", e)
 
         # Step 4.5: Impact estimation
-        impact = estimate_impact(responses, question, business_type=business.type)
+        impact = estimate_impact(responses, interpreted_question, business_type=business.type)
         impact_data = {
             "revenue": {
                 "point_estimate_pct": impact.revenue.point_estimate_pct,
@@ -593,6 +765,12 @@ async def _run_pipeline(
                     or v.get("text")
                     or v.get("response")
                     or v.get("reaction")
+                    or v.get("stated_reaction")
+                    or v.get("what_they_said")
+                    or v.get("core_reaction")
+                    or v.get("summary")
+                    or v.get("insight")
+                    or str(v.get("contrast", ""))
                     or ""
                 )
                 if pname or quote:

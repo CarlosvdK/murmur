@@ -30,12 +30,15 @@ IMPORTANT FRAMING:
 COMMUNICATION PROFILE:
 {profile}
 
+{research_context}
+
 When answering:
 1. Lead with the direct answer
 2. Cite specific patterns from the communication data
-3. Name the uncertainty clearly
-4. Give concrete preparation recommendations
-5. End with confidence level: High/Medium/Low
+3. Where relevant, ground your answer in the behavioural research and cultural context provided -- but do NOT simply list research findings, weave them naturally into your reasoning
+4. Name the uncertainty clearly
+5. Give concrete preparation recommendations
+6. End with confidence level: High/Medium/Low
 
 Return JSON:
 {{
@@ -53,10 +56,16 @@ async def query_twin(
     contact_name: str,
     extracted_signals: dict,
     recent_activities: Optional[list[dict]] = None,
+    research_context: Optional[str] = None,
+    cultural_context: Optional[str] = None,
+    web_context: Optional[str] = None,
 ) -> dict:
     """Ask a question about a contact's likely behaviour.
 
     Returns a structured response with answer, confidence, and caveats.
+    research_context: RAG research from behavioural science library.
+    cultural_context: Psychological/cultural profile for the contact's country/industry.
+    web_context: Live web search results relevant to the question.
     """
     settings = get_settings()
     client = AsyncAnthropic(api_key=settings.anthropic_api_key)
@@ -85,7 +94,18 @@ async def query_twin(
 
     profile = "\n".join(profile_parts)
 
+    # Build research context block
+    research_block_parts = []
+    if cultural_context:
+        research_block_parts.append(f"CULTURAL & PSYCHOLOGICAL CONTEXT:\n{cultural_context}")
+    if research_context:
+        research_block_parts.append(f"BEHAVIOURAL RESEARCH:\n{research_context}")
+    if web_context:
+        research_block_parts.append(f"LIVE WEB INTELLIGENCE:\n{web_context}")
+    research_block = "\n\n".join(research_block_parts) if research_block_parts else ""
+
     system = TWIN_SYSTEM_PROMPT.replace("{profile}", profile)
+    system = system.replace("{research_context}", research_block)
 
     response = await client.messages.create(
         model=settings.model_name,

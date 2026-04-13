@@ -434,7 +434,7 @@ async def run_simulation(
         if focus_group:
             def turn_progress(name: str, turn: str) -> None:
                 if on_progress:
-                    on_progress(f"Interviewing {name} ({turn})...", completed_count)
+                    on_progress(f"{name} ({turn})", completed_count)
 
             result = await _interview_persona_focus_group(
                 client, semaphore, persona, business, question,
