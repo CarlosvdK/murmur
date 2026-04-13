@@ -16,13 +16,11 @@ export default function AccuracySection() {
             The science
           </p>
           <h2 className="mb-6 text-4xl font-black leading-[1.05] tracking-[-0.025em] text-black sm:text-5xl lg:text-6xl">
-            Built on research,
-            <br />
-            not vibes
+            Built on research
           </h2>
           <p className="text-xl leading-relaxed text-gray-500">
             Murmur does not prompt-engineer its way to answers. The architecture
-            encodes peer-reviewed findings into every step -- from persona generation
+            encodes peer-reviewed findings into every step: from persona generation
             to interview design to impact estimation.
           </p>
         </SectionReveal>
@@ -37,7 +35,7 @@ export default function AccuracySection() {
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
                 Murphy et al. (2005) found people overstate their intentions by 28%. Every
                 Murmur persona reports both what they would say and what they would actually
-                do -- and the aggregation corrects for the difference.
+                do, and the aggregation corrects for the difference.
               </p>
             </div>
           </SectionReveal>
@@ -49,8 +47,8 @@ export default function AccuracySection() {
               </p>
               <p className="mt-3 text-base font-semibold text-black">Industry behaviour profiles</p>
               <p className="mt-2 text-sm leading-relaxed text-gray-500">
-                Each simulation loads industry-specific norms -- decision speed, switching cost,
-                loyalty drivers, price sensitivity -- so a gym member behaves differently from
+                Each simulation loads industry-specific norms (decision speed, switching cost,
+                loyalty drivers, price sensitivity) so a gym member behaves differently from
                 a SaaS subscriber.
               </p>
             </div>
@@ -74,7 +72,7 @@ export default function AccuracySection() {
         <SectionReveal className="mx-auto mt-12 max-w-2xl text-center">
           <p className="text-lg leading-relaxed text-gray-500">
             Every result includes confidence intervals and caveats. When the signal
-            is weak, we say so. A simulation reduces risk -- it does not replace judgment.
+            is weak, we say so. A simulation reduces risk, it does not replace judgment.
           </p>
         </SectionReveal>
       </div>

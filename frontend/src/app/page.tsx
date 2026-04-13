@@ -52,7 +52,7 @@ export default function Home() {
               </p>
               <p className="mb-10 max-w-lg text-base leading-relaxed text-gray-400">
                 Powered by behavioural science, cultural psychology, and live market
-                intelligence -- not guesswork.
+                intelligence, not guesswork.
               </p>
             </SectionReveal>
             <SectionReveal delay={0.3}>
@@ -66,13 +66,9 @@ export default function Home() {
               </div>
             </SectionReveal>
             <SectionReveal delay={0.4}>
-              <div className="mt-10 flex flex-wrap gap-6 text-xs text-gray-400">
-                <span>Simulate decisions across your customer base</span>
-                <span className="hidden sm:inline">|</span>
-                <span>Build digital twins from WhatsApp, email, and meeting notes</span>
-                <span className="hidden sm:inline">|</span>
-                <span>Prepare for negotiations with vendor intelligence</span>
-              </div>
+              <p className="mt-10 text-xs text-gray-400">
+                No credit card required. Your first simulation is free.
+              </p>
             </SectionReveal>
           </div>
           <SectionReveal delay={0.3}>

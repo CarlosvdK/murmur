@@ -9,7 +9,7 @@ const QUOTES = [
     tool: "Simulation",
   },
   {
-    text: "Before a contract renewal I asked the twin how my client would react to a scope change. It flagged that their response times had been slowing -- I adjusted my approach and kept the account.",
+    text: "Before a contract renewal I asked the twin how my client would react to a scope change. It flagged that their response times had been slowing, so I adjusted my approach and kept the account.",
     author: "Agency director, Amsterdam",
     tool: "Customer twin",
   },
@@ -24,7 +24,7 @@ const QUOTES = [
     tool: "Vendor twin",
   },
   {
-    text: "It feels like having a conversation with your own customers -- but at midnight when you are actually making the decision.",
+    text: "It feels like having a conversation with your own customers, but at midnight when you are actually making the decision.",
     author: "Cafe owner, Dublin",
     tool: "Simulation",
   },

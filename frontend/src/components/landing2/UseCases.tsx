@@ -7,7 +7,7 @@ const CASES = [
     type: "Restaurant",
     tool: "Simulate",
     q: "Should I raise weekend prices by 15%?",
-    result: "Regulars accepting -- Lunch crowd at risk",
+    result: "Regulars accepting. Lunch crowd at risk",
   },
   {
     type: "Consulting firm",
@@ -19,7 +19,7 @@ const CASES = [
     type: "B2B supplier",
     tool: "Vendor twin",
     q: "Will our main supplier accept 60-day payment terms?",
-    result: "Likely to counter with 45 days -- prepare volume commitment",
+    result: "Likely to counter with 45 days: prepare volume commitment",
   },
   {
     type: "Barber Shop",
@@ -31,25 +31,25 @@ const CASES = [
     type: "Design agency",
     tool: "Customer twin",
     q: "Is this client at risk of churning?",
-    result: "Response time increasing, formality rising -- schedule a check-in",
+    result: "Response time increasing, formality rising: schedule a check-in",
   },
   {
     type: "Gym",
     tool: "Simulate",
     q: "Would members accept a 10% price increase?",
-    result: "Loyal members accepting -- At-risk: casual users",
+    result: "Loyal members accepting. At-risk: casual users",
   },
   {
     type: "E-commerce",
     tool: "Simulate",
     q: "Would free shipping over $50 increase average order?",
-    result: "Under-35s strongly influenced -- older segments indifferent",
+    result: "Under-35s strongly influenced: older segments indifferent",
   },
   {
     type: "Private practice",
     tool: "Customer twin",
     q: "How should I communicate my new cancellation policy?",
-    result: "Frame as availability improvement, not penalty -- matches their values",
+    result: "Frame as availability improvement, not penalty: matches their values",
   },
   {
     type: "Retailer",
@@ -80,7 +80,7 @@ export default function UseCases() {
           </h2>
         </SectionReveal>
 
-        {/* Cards grid -- horizontal scroll on mobile */}
+        {/* Cards grid: horizontal scroll on mobile */}
         <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory md:grid md:grid-cols-3 md:overflow-visible md:pb-0">
           {CASES.map((c, i) => (
             <SectionReveal key={`${c.type}-${c.tool}`} delay={i * 0.04}>
@@ -109,7 +109,7 @@ export default function UseCases() {
 
         <SectionReveal className="mt-12 text-center">
           <p className="text-sm text-murmur-warm-grey">
-            Murmur works for any business -- from solo consultants to multi-location retailers.
+            Murmur works for any business, from solo consultants to multi-location retailers.
           </p>
           <a
             href="/signup"

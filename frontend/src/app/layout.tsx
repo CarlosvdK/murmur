@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Murmur -- Customer Simulation for Small Businesses",
+  title: "Murmur | Customer Simulation for Small Businesses",
   description:
     "Ask any question about your customers. Get honest, nuanced feedback from simulated customers tailored to your business.",
 };
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" style={{ fontSize: "15px" }}>
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"

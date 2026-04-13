@@ -11,17 +11,17 @@ const STEPS = [
   {
     num: "02",
     title: "We gather intelligence",
-    desc: "Before generating anything, Murmur researches your market, your area, your competitors, and published behavioural science. The result is grounded in your actual situation -- not a generic model.",
+    desc: "Before generating anything, Murmur researches your market, your area, your competitors, and published behavioural science. The result is grounded in your actual situation. Not a generic model.",
   },
   {
     num: "03",
     title: "Your customers come to life",
-    desc: "For simulations: a diverse panel of AI customers is generated -- each with their own personality, habits, and loyalty level. For twins: your real conversations are analysed to build a digital copy of each relationship.",
+    desc: "For simulations, a diverse panel of AI customers is generated, each with their own personality, habits, and loyalty level. For twins, your real conversations are analysed to build a digital copy of each relationship.",
   },
   {
     num: "04",
     title: "Ask anything, get honest answers",
-    desc: "Ask your simulated customers or digital twins any question. They respond in their own voice with honest reactions, not what they think you want to hear. You see themes, tension points, and a clear recommendation -- with caveats about what we don't know.",
+    desc: "Ask your simulated customers or digital twins any question. They respond in their own voice with honest reactions, not what they think you want to hear. You see themes, tension points, and a clear recommendation, with caveats about what we don't know.",
   },
 ];
 

@@ -63,7 +63,7 @@ export default function TrustBar() {
             value={225}
             suffix=""
             title="Research sections"
-            desc="Behavioural science embedded via semantic search -- from pricing psychology to negotiation dynamics."
+            desc="Behavioural science embedded via semantic search: from pricing psychology to negotiation dynamics."
           />
         </SectionReveal>
         <SectionReveal delay={0.2}>

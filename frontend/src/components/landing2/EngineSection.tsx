@@ -7,11 +7,11 @@ import SectionReveal from "./SectionReveal";
 const POINTS = [
   {
     title: "Context-first, not prompt-first",
-    body: "Before generating anything, Murmur runs up to 8 intelligence tools in parallel -- competitor analysis, local demographics, pricing benchmarks, social sentiment, and more. The AI only speaks after it understands your world.",
+    body: "Before generating anything, Murmur runs up to 8 intelligence tools in parallel: competitor analysis, local demographics, pricing benchmarks, social sentiment, and more. The AI only speaks after it understands your world.",
   },
   {
     title: "Structured personas, not random generation",
-    body: "Personas are not freely imagined by the AI. Each one is anchored to a fixed demographic spec -- age, income, visit frequency, price sensitivity -- derived from review data and industry norms. The AI adds personality within those constraints, not the other way around.",
+    body: "Personas are not freely imagined by the AI. Each one is anchored to a fixed demographic spec (age, income, visit frequency, price sensitivity) derived from review data and industry norms. The AI adds personality within those constraints, not the other way around.",
   },
   {
     title: "Twins grow smarter over time",

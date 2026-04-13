@@ -41,7 +41,7 @@ const RESPONSES = [
 const THEMES = [
   { text: "Regulars tolerate increases due to habit and switching cost", type: "positive" },
   { text: "Lunch crowd has nearby alternatives and is price-elastic", type: "warning" },
-  { text: "Occasional visitors unaffected -- too infrequent to notice", type: "neutral" },
+  { text: "Occasional visitors unaffected: too infrequent to notice", type: "neutral" },
 ];
 
 export default function LiveDemo() {
@@ -116,7 +116,7 @@ export default function LiveDemo() {
           <div className="flex items-center justify-between border-b border-murmur-border bg-white px-6 py-3">
             <div className="flex items-center gap-3">
               <span className="rounded-full bg-murmur-amber/10 px-3 py-1 text-xs font-medium text-murmur-amber">
-                Tony&apos;s Taco Truck -- East Austin, TX
+                Tony&apos;s Taco Truck, East Austin, TX
               </span>
               <span className="text-xs text-gray-400">15 personas</span>
             </div>
@@ -160,7 +160,7 @@ export default function LiveDemo() {
                 ))}
               </div>
               <p className="mt-4 text-[10px] text-gray-400">
-                55% silent majority -- 30% regulars -- 15% occasional
+                55% silent majority, 30% regulars, 15% occasional
               </p>
             </div>
 
@@ -276,7 +276,7 @@ export default function LiveDemo() {
               <div>
                 <p className="text-sm font-medium text-murmur-ink">
                   Most regulars would absorb the increase due to habit and switching cost.
-                  Your price-sensitive lunch crowd is the risk -- they have nearby alternatives
+                  Your price-sensitive lunch crowd is the risk: they have nearby alternatives
                   and would reduce frequency rather than leave entirely.
                 </p>
                 <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
