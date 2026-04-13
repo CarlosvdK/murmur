@@ -6,16 +6,20 @@ import SectionReveal from "./SectionReveal";
 
 const POINTS = [
   {
-    title: "Built from real-world context, not assumptions",
-    body: "Before generating a single simulated customer, Murmur gathers real intelligence about your business, your market, and your area. The simulation reflects your actual situation -- not a generic version of it.",
+    title: "Context-first, not prompt-first",
+    body: "Before generating anything, Murmur runs up to 8 intelligence tools in parallel -- competitor analysis, local demographics, pricing benchmarks, social sentiment, and more. The AI only speaks after it understands your world.",
   },
   {
-    title: "Diverse customers, including the ones who never speak up",
-    body: "Most feedback tools only capture the loudest voices. Murmur deliberately includes the customers who never leave reviews, never complain, and quietly make decisions. They're often the ones who matter most.",
+    title: "Structured personas, not random generation",
+    body: "Personas are not freely imagined by the AI. Each one is anchored to a fixed demographic spec -- age, income, visit frequency, price sensitivity -- derived from review data and industry norms. The AI adds personality within those constraints, not the other way around.",
   },
   {
-    title: "Honest about what it doesn't know",
-    body: "Every simulation includes clear caveats. If the signal is weak, we say so. If a real test would give you more confidence, we recommend it. We reduce risk -- we don't replace judgment.",
+    title: "Twins grow smarter over time",
+    body: "Every conversation you upload adds to the twin's pattern model. Early queries work from basic profile data. After 50+ messages, the twin can predict response style, objection patterns, and negotiation tendencies with high confidence.",
+  },
+  {
+    title: "Designed to be wrong sometimes",
+    body: "We calibrate for honesty, not optimism. If the data is thin, the confidence drops. If personas disagree, you see the tension. If a real test would give better answers, we tell you. Murmur is a preparation tool, not an oracle.",
   },
 ];
 
@@ -24,9 +28,9 @@ export default function EngineSection() {
   const reduced = useReducedMotion();
 
   return (
-    <section className="px-8 py-28 lg:px-16 xl:px-24">
+    <section className="bg-[#F5F3EF] px-6 py-28 lg:px-12 xl:px-20">
       {/* REVERSED: diagram LEFT, text RIGHT */}
-      <div className="mx-auto grid max-w-7xl gap-16 lg:grid-cols-2">
+      <div className="mx-auto grid max-w-[1400px] gap-16 lg:grid-cols-2">
         {/* Left: diagram */}
         <SectionReveal className="flex items-center justify-center">
           <div className="w-full max-w-sm">
@@ -91,7 +95,7 @@ export default function EngineSection() {
                     {point.title}
                   </span>
                   <span className="mt-1 shrink-0 text-lg text-gray-400">
-                    {openIdx === i ? "−" : "+"}
+                    {openIdx === i ? "\u2212" : "+"}
                   </span>
                 </button>
                 <AnimatePresence>

@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import ChatInterface from "@/components/simulate2/ChatInterface";
 import RightSidebar from "@/components/simulate2/RightSidebar";
-import { listBusinesses } from "@/lib/api";
+import { listBusinesses, listSimulations } from "@/lib/api";
 
 export default function SimulatePage() {
   const router = useRouter();
@@ -26,6 +26,23 @@ export default function SimulatePage() {
       .catch(() => {
         router.replace("/onboarding");
       });
+
+    // Load past simulations from database
+    listSimulations()
+      .then((sims) => {
+        const past = sims
+          .filter((s) => s.status === "completed")
+          .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+          .slice(0, 20)
+          .map((s) => ({
+            id: s.id,
+            question: s.question,
+            verdict: "completed",
+            date: new Date(s.created_at).toLocaleDateString(),
+          }));
+        setHistory(past);
+      })
+      .catch(() => {});
   }, [router]);
 
   const handleSimComplete = (sim: { id: string; question: string; verdict: string }) => {

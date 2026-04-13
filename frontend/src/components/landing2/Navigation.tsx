@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const NAV_LINKS = [
+  { label: "Product", href: "#product" },
   { label: "How it works", href: "#how-it-works" },
   { label: "Use cases", href: "#use-cases" },
   { label: "Accuracy", href: "#accuracy" },
@@ -34,9 +35,11 @@ export default function Navigation() {
         }`}
       >
         <div className="mx-auto flex h-16 w-full max-w-none items-center justify-between px-6">
-          {/* Wordmark */}
-          <a href="/" className="font-serif-display text-2xl text-murmur-ink">
-            Murmur
+          {/* Logo + Wordmark */}
+          <a href="/" className="flex items-center gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/murmur-logo.png" alt="Murmur" className="h-8 w-8" />
+            <span className="font-serif-display text-2xl text-murmur-ink">Murmur</span>
           </a>
 
           {/* Desktop nav */}

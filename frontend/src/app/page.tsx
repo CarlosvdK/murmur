@@ -1,7 +1,9 @@
 import Navigation from "@/components/landing2/Navigation";
+import RotatingWord from "@/components/landing2/RotatingWord";
 import HeroDemoCard from "@/components/landing2/HeroDemoCard";
 import TrustBar from "@/components/landing2/TrustBar";
 import ProblemSection from "@/components/landing2/ProblemSection";
+import ProductPillars from "@/components/landing2/ProductPillars";
 import HowItWorks from "@/components/landing2/HowItWorks";
 import LiveDemo from "@/components/landing2/LiveDemo";
 import EngineSection from "@/components/landing2/EngineSection";
@@ -17,11 +19,9 @@ export default function Home() {
     <div className="bg-[#F5F3EF]">
       <Navigation />
 
-      {/* HERO -- bird murmuration + gradient accents on eggshell */}
-      <section className="relative min-h-[90vh] overflow-hidden px-8 pb-20 pt-32 lg:px-16 xl:px-24">
+      {/* HERO -- eggshell */}
+      <section className="relative min-h-[90vh] overflow-hidden px-6 pb-20 pt-32 lg:px-12 xl:px-20">
         <Murmuration />
-
-        {/* Soft glow blob */}
         <div
           className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
           style={{
@@ -30,79 +30,87 @@ export default function Home() {
             background: "radial-gradient(ellipse, rgba(68,140,253,0.08) 0%, rgba(255,141,228,0.04) 40%, transparent 70%)",
           }}
         />
-
-        <div className="relative z-10 grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="relative z-10 mx-auto max-w-[1400px] grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <SectionReveal>
               <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-orange px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white">
-                Customer intelligence for small businesses
+                The new age of customer intelligence
               </span>
             </SectionReveal>
-
             <SectionReveal delay={0.1}>
-              <h1 className="mb-8 text-[clamp(48px,8vw,96px)] font-black leading-[0.95] tracking-[-0.03em] text-black">
-                Know how your
+              <h1 className="mb-8 text-[clamp(44px,7vw,88px)] font-black leading-[0.95] tracking-[-0.03em] text-black">
+                Your customers,
                 <br />
-                customers will{" "}
-                <span className="text-brand-orange">react.</span>
+                <RotatingWord />
               </h1>
             </SectionReveal>
-
             <SectionReveal delay={0.2}>
-              <p className="mb-10 max-w-lg text-xl leading-relaxed text-gray-500">
-                Murmur builds a real simulation of your customer base and asks
-                them your question. Honest feedback from people who actually
-                know your business.
+              <p className="mb-6 max-w-lg text-xl leading-relaxed text-gray-500">
+                Murmur is the CRM that thinks. Run a full customer simulation
+                before making any business decision. Build digital twins of your
+                most important customers and vendors from your real conversations.
+              </p>
+              <p className="mb-10 max-w-lg text-base leading-relaxed text-gray-400">
+                Powered by behavioural science, cultural psychology, and live market
+                intelligence -- not guesswork.
               </p>
             </SectionReveal>
-
             <SectionReveal delay={0.3}>
               <div className="flex flex-wrap items-center gap-4">
-                <a
-                  href="/login"
-                  className="rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-all hover:opacity-80 hover:scale-[1.02]"
-                >
-                  Sign in
+                <a href="/signup" className="rounded-full bg-black px-8 py-3.5 text-sm font-bold text-white transition-all hover:opacity-80 hover:scale-[1.02]">
+                  Start for free
                 </a>
-                <a
-                  href="/signup"
-                  className="rounded-full border border-gray-300 bg-white px-8 py-3.5 text-sm font-medium text-black transition-colors hover:border-gray-500"
-                >
-                  Create an account
+                <a href="#product" className="rounded-full border border-gray-300 bg-white px-8 py-3.5 text-sm font-medium text-black transition-colors hover:border-gray-500">
+                  See how it works
                 </a>
               </div>
             </SectionReveal>
-
             <SectionReveal delay={0.4}>
-              <p className="mt-10 text-xs text-gray-400">
-                Trusted by restaurant owners, barbers, and shop owners in 15
-                cities
-              </p>
+              <div className="mt-10 flex flex-wrap gap-6 text-xs text-gray-400">
+                <span>Simulate decisions across your customer base</span>
+                <span className="hidden sm:inline">|</span>
+                <span>Build digital twins from WhatsApp, email, and meeting notes</span>
+                <span className="hidden sm:inline">|</span>
+                <span>Prepare for negotiations with vendor intelligence</span>
+              </div>
             </SectionReveal>
           </div>
-
           <SectionReveal delay={0.3}>
             <HeroDemoCard />
           </SectionReveal>
         </div>
       </section>
 
-      {/* TRUST BAR -- vivid gradient band */}
+      {/* TRUST BAR -- gradient */}
       <TrustBar />
 
+      {/* PROBLEM -- white */}
       <ProblemSection />
+
+      {/* PRODUCT PILLARS -- eggshell */}
+      <ProductPillars />
+
+      {/* HOW IT WORKS -- white */}
       <HowItWorks />
 
+      {/* LIVE DEMO -- white (handled internally) */}
       <div id="demo">
         <LiveDemo />
       </div>
 
+      {/* ENGINE -- eggshell */}
       <EngineSection />
+
+      {/* USE CASES -- white */}
       <UseCases />
+
+      {/* ACCURACY -- eggshell */}
       <AccuracySection />
+
+      {/* TESTIMONIALS -- white */}
       <Testimonials />
 
-      {/* FINAL CTA -- gradient band */}
+      {/* FINAL CTA -- gradient */}
       <FinalCTA />
     </div>
   );

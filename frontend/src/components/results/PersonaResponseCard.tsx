@@ -27,6 +27,7 @@ const AVATAR_COLORS = [
 ];
 
 function avatarColor(name: string): string {
+  if (!name) return AVATAR_COLORS[0];
   return AVATAR_COLORS[name.charCodeAt(0) % AVATAR_COLORS.length];
 }
 
@@ -97,9 +98,9 @@ export default function PersonaResponseCard({ response }: Props) {
       <div className="mb-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
-            className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white ${avatarColor(response.persona_name)}`}
+            className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white ${avatarColor(response.persona_name || "")}`}
           >
-            {response.persona_name[0]}
+            {(response.persona_name || "?")[0]}
           </div>
           <span className="font-medium text-gray-900">
             {response.persona_name}

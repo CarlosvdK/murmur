@@ -366,15 +366,18 @@ export default function ResultsReport({
                 <BookOpen className="h-4 w-4 text-gray-400" />
                 <h4 className="text-xs font-medium uppercase tracking-wider text-gray-400">
                   Research Sources
-                  {(ragSelection as Record<string, unknown>).method === "vector_search" && (
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {(ragSelection as any)?.method === "vector_search" && (
                     <span className="ml-2 text-[9px] text-gray-300">semantic match</span>
                   )}
                 </h4>
               </div>
               {/* Vector search: show section-level matches with similarity */}
-              {(ragSelection as Record<string, unknown>).sections && (
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {(ragSelection as any)?.sections && (
                 <div className="flex flex-wrap gap-1.5">
-                  {((ragSelection as Record<string, unknown>).sections as { domain: string; title: string; similarity: number }[]).map((section, i) => (
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                  {((ragSelection as any).sections as { domain: string; title: string; similarity: number }[]).map((section: { domain: string; title: string; similarity: number }, i: number) => (
                     <span
                       key={i}
                       className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
@@ -390,7 +393,8 @@ export default function ResultsReport({
                 </div>
               )}
               {/* Fallback: show domain names (keyword selector) */}
-              {ragSelection.domains && !((ragSelection as Record<string, unknown>).sections) && (
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {ragSelection.domains && !(ragSelection as any)?.sections && (
                 <div className="flex flex-wrap gap-1.5">
                   {ragSelection.domains.map((domain) => (
                     <span

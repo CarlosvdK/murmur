@@ -27,17 +27,20 @@ function AnimatedStatCard({
 }
 
 function StaticStatCard({
+  value,
   title,
   desc,
 }: {
+  value: string;
   title: string;
   desc: string;
 }) {
   return (
     <div className="rounded-2xl bg-white/90 p-8 backdrop-blur-sm">
       <p className="mb-4 text-5xl font-black tracking-tight text-black lg:text-6xl">
-        {title}
+        {value}
       </p>
+      <p className="mb-2 text-sm font-semibold text-murmur-ink">{title}</p>
       <p className="text-sm leading-relaxed text-murmur-warm-grey">{desc}</p>
     </div>
   );
@@ -45,34 +48,36 @@ function StaticStatCard({
 
 export default function TrustBar() {
   return (
-    <section className="grad-c-animate px-8 py-20 lg:px-16 xl:px-24">
+    <section className="grad-c-animate px-6 py-20 lg:px-12 xl:px-20">
       <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <SectionReveal>
           <AnimatedStatCard
-            value={85}
-            suffix=" - 92%"
-            title="Synthetic-organic parity"
-            desc="Measured across thematic overlap, depth and qualitative alignment"
+            value={86}
+            suffix="%"
+            title="Backtest accuracy"
+            desc="Predicted the correct outcome in 30 of 35 published A/B test cases."
           />
         </SectionReveal>
         <SectionReveal delay={0.1}>
           <AnimatedStatCard
-            value={21}
-            suffix="+"
-            title="Peer-reviewed papers"
-            desc="Incl. Science Magazine, The Atlantic, SAGE Journals"
+            value={225}
+            suffix=""
+            title="Research sections"
+            desc="Behavioural science embedded via semantic search -- from pricing psychology to negotiation dynamics."
           />
         </SectionReveal>
         <SectionReveal delay={0.2}>
           <StaticStatCard
-            title="$2 - 60"
-            desc="Per interview, versus $100+ with traditional research agencies. No recruitment fees, no scheduling overhead."
+            value="3"
+            title="Intelligence layers"
+            desc="Customer simulation, individual customer twins, and vendor twins. One platform for every decision."
           />
         </SectionReveal>
         <SectionReveal delay={0.3}>
           <StaticStatCard
-            title="60s"
-            desc="Average time from question to full customer feedback report. No waiting for participants."
+            value="0"
+            title="Raw data stored"
+            desc="Twins extract communication patterns only. Correspondence is processed in memory and immediately deleted."
           />
         </SectionReveal>
       </div>

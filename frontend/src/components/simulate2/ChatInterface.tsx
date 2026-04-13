@@ -11,6 +11,7 @@ import {
   PersonaResponseData,
   CaveatData,
 } from "@/lib/api";
+import ResultsReport from "@/components/results/ResultsReport";
 
 const EXAMPLES = [
   "What if I raised prices by 15%?",
@@ -33,6 +34,12 @@ interface SimEntry {
   result?: SimulationResult;
   responses?: PersonaResponseData[];
   caveats?: CaveatData[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  impact?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  demographics?: any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ragSelection?: any;
   clarifyingQuestions?: ClarifyingQuestion[];
   clarifyingAnswers?: string[];
   originalQuestion?: string;
@@ -44,76 +51,34 @@ interface Props {
   onSimulationComplete?: (sim: { id: string; question: string; verdict: string }) => void;
 }
 
-const VERDICT_CONFIG: Record<string, { bg: string; text: string; label: string }> = {
-  proceed: { bg: "bg-green-50", text: "text-green-700", label: "Looks good to proceed" },
-  caution: { bg: "bg-amber-50", text: "text-amber-700", label: "Proceed with caution" },
-  avoid: { bg: "bg-red-50", text: "text-red-700", label: "Evidence suggests avoid" },
-  test_first: { bg: "bg-blue-50", text: "text-blue-700", label: "Test with a small group first" },
-};
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api";
 
-/**
- * Generate clarifying questions based on the user's question.
- *
- * Research-backed design principles:
- * - Anchoring (Tversky & Kahneman 1974): Ask for concrete numbers/baselines to
- *   prevent the simulation from defaulting to optimistic assumptions.
- * - Base rate neglect (Bar-Hillel 1980): Ask about prior change outcomes to ground
- *   predictions in what actually happened, not what might happen.
- * - Reference class forecasting (Kahneman & Lovallo 1993): Ask about competitors
- *   and industry norms to calibrate against external reference classes.
- * - Stated vs revealed preference gap (NeurIPS 2025 synthetic user findings):
- *   Ask about observed behaviour, not just intentions, to reduce optimistic skew.
- */
-function generateClarifyingQuestions(question: string): ClarifyingQuestion[] {
-  const q = question.toLowerCase();
-  const questions: ClarifyingQuestion[] = [];
+async function fetchClarifyingQuestions(businessId: string, question: string): Promise<ClarifyingQuestion[]> {
+  try {
+    const { createClient } = await import("@/lib/supabase/client");
+    const supabase = createClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (session?.access_token) {
+      headers["Authorization"] = `Bearer ${session.access_token}`;
+    }
 
-  // Always start with the baseline anchor -- grounds the simulation in reality
-  if (q.includes("price") || q.includes("cost") || q.includes("charge") || q.includes("fee")) {
-    questions.push(
-      { question: "What is your current pricing, and what would the new pricing be?", hint: "Concrete numbers help -- e.g. 'Coffee is 3.50 EUR, thinking of 4.00 EUR'" },
-      { question: "Have you made a similar change before? What actually happened?", hint: "Real outcomes from past changes are the strongest signal we can use" },
-      { question: "What do your nearest competitors charge for similar products?", hint: "e.g. 'The cafe two doors down charges 3.80 EUR for a similar coffee'" },
-    );
-  } else if (q.includes("open") || q.includes("hour") || q.includes("close") || q.includes("sunday") || q.includes("weekend")) {
-    questions.push(
-      { question: "What are your current opening hours and what change are you considering?", hint: "e.g. 'Currently Mon-Sat 8-6, thinking about adding Sundays 10-4'" },
-      { question: "Have customers actually asked for this, or is it a hunch?", hint: "Observed demand (messages, complaints, queues) is stronger than assumed demand" },
-      { question: "What would the additional staffing cost be?", hint: "Even a rough estimate helps us weigh customer benefit vs. cost" },
-    );
-  } else if (q.includes("menu") || q.includes("product") || q.includes("service") || q.includes("offering") || q.includes("add")) {
-    questions.push(
-      { question: "Describe the specific product or service you would add.", hint: "The more specific the better -- 'oat milk smoothies' not just 'new drinks'" },
-      { question: "What evidence do you have that customers want this?", hint: "Requests, social media mentions, what competitors sell that you don't" },
-      { question: "What would you need to stop or reduce to make room for this?", hint: "Trade-offs matter -- every addition has a cost (time, space, focus)" },
-    );
-  } else if (q.includes("loyalty") || q.includes("card") || q.includes("reward") || q.includes("membership")) {
-    questions.push(
-      { question: "What specific programme are you considering?", hint: "e.g. 'Buy 10 get 1 free', 'points per euro', 'paid membership'" },
-      { question: "What percentage of your customers are regulars vs. one-time visitors?", hint: "Loyalty programmes mainly affect regulars -- knowing the split matters" },
-      { question: "Have you tried any form of customer retention before?", hint: "Past attempts (even informal ones like discounts) give us calibration data" },
-    );
-  } else if (q.includes("location") || q.includes("move") || q.includes("expand") || q.includes("second")) {
-    questions.push(
-      { question: "Where would the new location be, and how far is it from your current one?", hint: "Distance affects whether you split your customer base or reach new ones" },
-      { question: "What is your current customer catchment area?", hint: "e.g. 'Most customers live within 10 minutes walking distance'" },
-      { question: "Would you keep the original location running as-is?", hint: "Cannibalization risk is real if both locations serve the same area" },
-    );
-  } else if (q.includes("rebrand") || q.includes("rename") || q.includes("redesign") || q.includes("renovate")) {
-    questions.push(
-      { question: "What specifically would change, and what would stay the same?", hint: "e.g. 'New logo and interior, same menu and staff'" },
-      { question: "Why are you considering this change now?", hint: "Understanding the trigger helps us simulate customer reactions more accurately" },
-      { question: "How long have your regular customers been coming?", hint: "Long-time regulars may react very differently to change than newer customers" },
-    );
-  } else {
-    questions.push(
-      { question: "Can you describe the specific change you are considering?", hint: "The more detail you give, the more realistic the simulation will be" },
-      { question: "What triggered this idea -- a problem you are solving or an opportunity you spotted?", hint: "This helps us frame the simulation around the right customer concerns" },
-      { question: "Do you have any data that might be relevant? Sales numbers, customer complaints, competitor moves?", hint: "Even rough numbers significantly improve simulation accuracy" },
-    );
+    const resp = await fetch(`${API_BASE}/simulations/clarifying-questions`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ business_id: businessId, question }),
+    });
+    if (!resp.ok) throw new Error("Failed");
+    const data = await resp.json();
+    return data.questions || [];
+  } catch {
+    // Fallback if API fails
+    return [
+      { question: "Can you describe the specific change you are considering?", hint: "The more detail, the better the simulation" },
+      { question: "What triggered this idea?", hint: "Understanding the motivation helps frame the simulation" },
+      { question: "Do you have any relevant data?", hint: "Even rough numbers improve accuracy" },
+    ];
   }
-
-  return questions;
 }
 
 export default function ChatInterface({ businessId, personaCount = 12, onSimulationComplete }: Props) {
@@ -137,16 +102,22 @@ export default function ChatInterface({ businessId, personaCount = 12, onSimulat
     setInput("");
 
     const entryId = Date.now().toString();
-    const clarifyingQuestions = generateClarifyingQuestions(question);
+    // Show the question immediately with a loading state
     const entry: SimEntry = {
       id: entryId,
       question,
       originalQuestion: question,
       status: "clarifying",
-      clarifyingQuestions,
+      clarifyingQuestions: [],
       clarifyingAnswers: [],
     };
     setThread((prev) => [...prev, entry]);
+
+    // Fetch AI-generated clarifying questions from the backend
+    const clarifyingQuestions = await fetchClarifyingQuestions(businessId!, question);
+    setThread((prev) =>
+      prev.map((e) => e.id === entryId ? { ...e, clarifyingQuestions } : e)
+    );
     setActiveClarifyId(entryId);
     setClarifyingIdx(0);
     setClarifyingInput("");
@@ -242,25 +213,23 @@ export default function ChatInterface({ businessId, personaCount = 12, onSimulat
           );
 
           if (prog.status === "completed") {
-            const [result, responses, caveats] = await Promise.all([
+            const [result, responses, caveats, impact, demographics] = await Promise.all([
               getSimulationResult(simId),
               getSimulationResponses(simId).catch(() => []),
               getSimulationCaveats(simId).catch(() => []),
+              fetch(`${API_BASE}/simulations/${simId}/impact`).then(r => r.ok ? r.json() : null).catch(() => null),
+              fetch(`${API_BASE}/simulations/${simId}/demographics`).then(r => r.ok ? r.json() : null).catch(() => null),
             ]);
 
             setThread((prev) =>
               prev.map((e) =>
                 e.id === simId
-                  ? { ...e, status: "done", result, responses, caveats }
+                  ? { ...e, status: "done", result, responses, caveats, impact, demographics }
                   : e
               )
             );
 
             if (onSimulationComplete) {
-              const impact = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api"}/simulations/${simId}/impact`
-              ).then((r) => r.json()).catch(() => null);
-
               onSimulationComplete({
                 id: simId,
                 question: entry.originalQuestion || entry.question,
@@ -383,84 +352,14 @@ export default function ChatInterface({ businessId, personaCount = 12, onSimulat
 
                 {/* Results */}
                 {entry.status === "done" && entry.result && (
-                  <div className="space-y-4">
-                    <div className="rounded-2xl border border-[#E5E2DC] bg-white p-6">
-                      <div className="mb-4">
-                        <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${
-                          VERDICT_CONFIG[entry.result.confidence_score]?.bg || "bg-gray-100"
-                        } ${VERDICT_CONFIG[entry.result.confidence_score]?.text || "text-gray-600"}`}>
-                          {VERDICT_CONFIG[entry.result.confidence_score]?.label || entry.result.confidence_score}
-                        </span>
-                      </div>
-                      <p className="text-lg font-semibold text-black">{entry.result.summary}</p>
-                      {entry.result.recommendation && (
-                        <p className="mt-3 text-sm leading-relaxed text-gray-500">
-                          {entry.result.recommendation}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Persona voices */}
-                    {entry.responses && entry.responses.length > 0 && (
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                          Customer voices
-                        </h4>
-                        {entry.responses.slice(0, 4).map((r, i) => (
-                          <div
-                            key={i}
-                            className={`rounded-xl border bg-white p-4 ${
-                              r.sentiment > 0.3
-                                ? "border-l-4 border-l-green-400 border-[#E5E2DC]"
-                                : r.sentiment < -0.3
-                                  ? "border-l-4 border-l-red-400 border-[#E5E2DC]"
-                                  : "border-l-4 border-l-amber-400 border-[#E5E2DC]"
-                            }`}
-                          >
-                            <div className="mb-1 flex items-center gap-2">
-                              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-blue text-[10px] font-bold text-white">
-                                {r.persona_name[0]}
-                              </div>
-                              <span className="text-sm font-medium text-black">{r.persona_name}</span>
-                            </div>
-                            <p className="text-sm italic text-gray-600">
-                              &ldquo;{r.reaction.slice(0, 200)}&rdquo;
-                            </p>
-                          </div>
-                        ))}
-                        {entry.responses.length > 4 && (
-                          <p className="text-xs text-gray-400">
-                            + {entry.responses.length - 4} more responses
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Caveats */}
-                    {entry.caveats && entry.caveats.length > 0 && (
-                      <div className="space-y-2">
-                        <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                          Important caveats
-                        </h4>
-                        {entry.caveats.slice(0, 3).map((c, i) => (
-                          <div key={i} className={`rounded-xl border p-4 ${
-                            c.severity === "warning" ? "border-amber-200 bg-amber-50" : "border-[#E5E2DC] bg-gray-50"
-                          }`}>
-                            <p className={`text-xs font-medium ${c.severity === "warning" ? "text-amber-700" : "text-gray-600"}`}>{c.title}</p>
-                            <p className={`mt-1 text-sm ${c.severity === "warning" ? "text-amber-600" : "text-gray-500"}`}>{c.message}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {!entry.caveats?.length && entry.result.confidence_reasoning && (
-                      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-                        <p className="text-xs font-medium text-amber-700">Note</p>
-                        <p className="mt-1 text-sm text-amber-600">
-                          {entry.result.confidence_reasoning}
-                        </p>
-                      </div>
-                    )}
+                  <div className="max-w-3xl">
+                    <ResultsReport
+                      result={entry.result}
+                      impactData={entry.impact}
+                      responses={entry.responses}
+                      demographicGroups={entry.demographics}
+                      ragSelection={entry.ragSelection}
+                    />
                   </div>
                 )}
               </div>

@@ -33,7 +33,6 @@ export default function AppHome() {
         } else {
           setReady(true);
           fetchStats();
-          // Poll stats every 30 seconds
           const interval = setInterval(fetchStats, 30000);
           return () => clearInterval(interval);
         }
@@ -50,6 +49,36 @@ export default function AppHome() {
       </div>
     );
   }
+
+  const cards = [
+    {
+      href: "/app/simulate",
+      image: "/simulation.png",
+      label: "Simulate",
+      color: "brand-blue",
+      borderHover: "hover:border-brand-blue",
+      desc: "Generate a diverse panel of AI customers tailored to your business and ask them any question. Get honest reactions, sentiment analysis, and a go/no-go recommendation backed by behavioural science.",
+      cta: "Run a simulation",
+    },
+    {
+      href: "/app/customers",
+      image: "/customer_twin.png",
+      label: "Customer Twins",
+      color: "brand-orange",
+      borderHover: "hover:border-brand-orange",
+      desc: "Build a digital twin of each high-value customer from your real conversations. Upload WhatsApp, email, or meeting notes and ask the twin how they would react to pricing changes, new offerings, or difficult conversations.",
+      cta: "Manage customers",
+    },
+    {
+      href: "/app/vendors",
+      image: "/vendor_twin.png",
+      label: "Vendor Twins",
+      color: "brand-pink",
+      borderHover: "hover:border-brand-pink",
+      desc: "Create digital twins of your suppliers and partners from correspondence history. Predict their negotiation style, anticipate counter-offers, and prepare for every meeting with data-backed intelligence.",
+      cta: "Manage vendors",
+    },
+  ];
 
   return (
     <div className="overflow-y-auto p-8 lg:p-12">
@@ -79,67 +108,36 @@ export default function AppHome() {
           ))}
         </div>
 
-        {/* Feature cards -- full width grid */}
+        {/* Feature cards with images */}
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Simulate */}
-          <a
-            href="/app/simulate"
-            className="group rounded-2xl border border-[#E5E2DC] bg-white p-6 transition-all hover:-translate-y-1 hover:border-brand-blue hover:shadow-lg"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-blue/10">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#448CFD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 20V10" /><path d="M18 20V4" /><path d="M6 20v-4" />
-              </svg>
-            </div>
-            <h3 className="mb-1 text-lg font-bold text-black">Simulate</h3>
-            <p className="mb-4 text-sm leading-relaxed text-gray-500">
-              Ask any question about your business and see how your customers
-              would react. Get a verdict, breakdown, and recommendation.
-            </p>
-            <span className="flex items-center gap-1 text-sm font-medium text-brand-blue">
-              Run a simulation <ArrowRight className="h-4 w-4" />
-            </span>
-          </a>
+          {cards.map((card) => (
+            <a
+              key={card.label}
+              href={card.href}
+              className={`group flex flex-col overflow-hidden rounded-2xl border border-[#E5E2DC] bg-white transition-all hover:-translate-y-1 ${card.borderHover} hover:shadow-lg`}
+            >
+              {/* Image */}
+              <div className="relative h-56 w-full overflow-hidden bg-gray-100">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={card.image}
+                  alt={card.label}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+              </div>
 
-          {/* Customer Twins */}
-          <a
-            href="/app/customers"
-            className="group rounded-2xl border border-[#E5E2DC] bg-white p-6 transition-all hover:-translate-y-1 hover:border-brand-orange hover:shadow-lg"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-orange/10">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF8720" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" />
-              </svg>
-            </div>
-            <h3 className="mb-1 text-lg font-bold text-black">Customer Twins</h3>
-            <p className="mb-4 text-sm leading-relaxed text-gray-500">
-              Build digital twins of your real customers from correspondence.
-              Ask them anything about your relationship.
-            </p>
-            <span className="flex items-center gap-1 text-sm font-medium text-brand-orange">
-              Manage customers <ArrowRight className="h-4 w-4" />
-            </span>
-          </a>
-
-          {/* Vendor Twins */}
-          <a
-            href="/app/vendors"
-            className="group rounded-2xl border border-[#E5E2DC] bg-white p-6 transition-all hover:-translate-y-1 hover:border-brand-pink hover:shadow-lg"
-          >
-            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-pink/10">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF8DE4" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect width="20" height="14" x="2" y="5" rx="2" /><line x1="2" x2="22" y1="10" y2="10" />
-              </svg>
-            </div>
-            <h3 className="mb-1 text-lg font-bold text-black">Vendor Twins</h3>
-            <p className="mb-4 text-sm leading-relaxed text-gray-500">
-              Understand your suppliers and prepare for negotiations. Know
-              how they will respond before you ask.
-            </p>
-            <span className="flex items-center gap-1 text-sm font-medium text-brand-pink">
-              Manage vendors <ArrowRight className="h-4 w-4" />
-            </span>
-          </a>
+              {/* Content */}
+              <div className="flex flex-1 flex-col p-6">
+                <h3 className="mb-2 text-lg font-bold text-black">{card.label}</h3>
+                <p className="mb-4 flex-1 text-sm leading-relaxed text-gray-500">
+                  {card.desc}
+                </p>
+                <span className={`flex items-center gap-1 text-sm font-medium text-${card.color}`}>
+                  {card.cta} <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </a>
+          ))}
         </div>
 
         {/* Recent activity section */}

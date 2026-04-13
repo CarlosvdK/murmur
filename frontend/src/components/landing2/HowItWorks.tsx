@@ -5,30 +5,30 @@ import SectionReveal from "./SectionReveal";
 const STEPS = [
   {
     num: "01",
-    title: "Tell us about your business",
-    desc: "Answer a few plain-English questions about your business, your customers, and what you're deciding. No forms. No jargon. Just describe it like you'd explain it to a friend.",
+    title: "Describe your business",
+    desc: "Answer a few plain-English questions about your business, your customers, and what you sell. No forms. No jargon. Just describe it like you would explain it to a friend.",
   },
   {
     num: "02",
-    title: "We do our research",
-    desc: "Before building anything, Murmur gathers real-world context about your market, your area, and your customers. This is what makes the simulation specific to you -- not generic.",
+    title: "We gather intelligence",
+    desc: "Before generating anything, Murmur researches your market, your area, your competitors, and published behavioural science. The result is grounded in your actual situation -- not a generic model.",
   },
   {
     num: "03",
     title: "Your customers come to life",
-    desc: "We generate a diverse group of simulated customers -- each with their own personality, spending habits, loyalty level, and relationship with your business. Including the ones who'd never leave you a review.",
+    desc: "For simulations: a diverse panel of AI customers is generated -- each with their own personality, habits, and loyalty level. For twins: your real conversations are analysed to build a digital copy of each relationship.",
   },
   {
     num: "04",
-    title: "Honest, plain-English results",
-    desc: "Each customer answers your question in their own voice. You see the themes, the tension points, and a clear recommendation -- with honest caveats about what we don't know.",
+    title: "Ask anything, get honest answers",
+    desc: "Ask your simulated customers or digital twins any question. They respond in their own voice with honest reactions, not what they think you want to hear. You see themes, tension points, and a clear recommendation -- with caveats about what we don't know.",
   },
 ];
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="px-8 py-28 lg:px-16 xl:px-24">
-      <div className="mx-auto max-w-7xl">
+    <section id="how-it-works" className="bg-white px-6 py-28 lg:px-12 xl:px-20">
+      <div className="mx-auto max-w-[1400px]">
         {/* Centered header */}
         <SectionReveal className="mx-auto mb-16 max-w-3xl text-center">
           <p className="mb-4 text-sm font-medium uppercase tracking-[0.15em] text-gray-400">
@@ -40,7 +40,7 @@ export default function HowItWorks() {
             in under a minute
           </h2>
           <p className="text-xl text-gray-500">
-            No data science. No surveys. No waiting.
+            Four steps. Works the same whether you are simulating or building a twin.
           </p>
         </SectionReveal>
 

@@ -24,7 +24,7 @@ interface ImpactData {
   most_likely_summary: string;
 }
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8001/api";
 
 export default function ImpactPanel({ simulationId }: { simulationId: string }) {
   const [data, setData] = useState<ImpactData | null>(null);
