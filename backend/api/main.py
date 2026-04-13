@@ -27,6 +27,7 @@ if _prod_url:
 # Always allow the production domain
 _allowed_origins.append("https://murmurdynamics.com")
 _allowed_origins.append("https://www.murmurdynamics.com")
+_allowed_origins.append("https://murmur-production-fbb0.up.railway.app")
 
 app.add_middleware(
     CORSMiddleware,
