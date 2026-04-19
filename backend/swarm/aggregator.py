@@ -77,6 +77,79 @@ def _build_aggregation_prompt(
     return prompt
 
 
+def _apply_confidence_cap(
+    result: dict,
+    business: BusinessSnapshot,
+    persona_responses: List[dict],
+    context_narrative: str | None,
+    expected_persona_count: int | None = None,
+) -> dict:
+    """Downgrade the LLM-declared confidence when structural conditions fail.
+
+    The aggregator prompt asks Claude to follow a rubric, but LLMs drift
+    toward "high" when the narrative reads confident. This pass re-checks
+    the hard conditions and caps confidence if any fail. It NEVER upgrades
+    confidence -- it only caps.
+
+    Conditions that force a cap to at most "medium":
+    - Business profile is thin (description OR customer_description < 100
+      chars, or missing).
+    - Fewer than 60% of personas produced a reaction.
+    - Context narrative is empty or very short.
+
+    Conditions that force a cap to "low":
+    - Fewer than 40% of personas produced a reaction.
+    - Both business description and customer description are empty.
+    """
+    current = (result.get("confidence_score") or "medium").lower()
+    rank = {"low": 0, "medium": 1, "high": 2}
+    cap = rank.get(current, 1)
+    reasons: List[str] = []
+
+    desc = (business.description or "").strip()
+    cust = (getattr(business, "customer_description", "") or "").strip()
+    thin_profile = len(desc) < 100 or len(cust) < 100
+    missing_profile = not desc and not cust
+
+    expected = expected_persona_count or max(len(persona_responses), 1)
+    success_rate = len(persona_responses) / expected if expected else 0
+
+    ctx_chars = len(context_narrative or "")
+
+    if missing_profile or success_rate < 0.40:
+        cap = min(cap, 0)
+        if missing_profile:
+            reasons.append("business profile is missing")
+        if success_rate < 0.40:
+            reasons.append(f"only {int(success_rate*100)}% of personas produced a reaction")
+    else:
+        if thin_profile:
+            cap = min(cap, 1)
+            reasons.append("business/customer description is thin")
+        if success_rate < 0.60:
+            cap = min(cap, 1)
+            reasons.append(f"only {int(success_rate*100)}% of personas succeeded")
+        if ctx_chars < 400:
+            cap = min(cap, 1)
+            reasons.append("real-world context is sparse")
+
+    new_level = {0: "low", 1: "medium", 2: "high"}[cap]
+    if rank.get(current, 1) > cap:
+        logger.info(
+            "Confidence capped: %s -> %s. Reasons: %s",
+            current, new_level, "; ".join(reasons),
+        )
+        result["confidence_score"] = new_level
+        existing_reason = (result.get("confidence_reasoning") or "").strip()
+        cap_note = "Capped to " + new_level + " because " + "; ".join(reasons) + "."
+        result["confidence_reasoning"] = (
+            cap_note if not existing_reason else f"{existing_reason} {cap_note}"
+        )
+        result["confidence_capped"] = True
+        result["confidence_cap_reasons"] = reasons
+    return result
+
+
 async def aggregate_responses(
     business: BusinessSnapshot,
     question: str,
@@ -84,6 +157,7 @@ async def aggregate_responses(
     variant_a: str | None = None,
     variant_b: str | None = None,
     context_narrative: str | None = None,
+    expected_persona_count: int | None = None,
 ) -> dict:
     """Synthesise all persona responses into a structured result.
 
@@ -136,7 +210,7 @@ async def aggregate_responses(
         "Aggregation complete — confidence: %s", result.get("confidence", "unknown")
     )
 
-    return {
+    out = {
         "summary": result.get("headline", ""),
         "recommendation": result.get("recommendation", ""),
         "confidence_score": result.get("confidence", "medium"),
@@ -155,3 +229,11 @@ async def aggregate_responses(
         "stated_vs_actual_gap": result.get("stated_vs_actual_gap"),
         "raw_output": result,
     }
+
+    # Apply the structural confidence cap. The LLM may claim "high" when
+    # the profile is thin or many personas failed -- cap it here.
+    out = _apply_confidence_cap(
+        out, business, persona_responses, context_narrative,
+        expected_persona_count=expected_persona_count,
+    )
+    return out

@@ -567,24 +567,34 @@ def _score_prediction(case: dict, result: dict) -> dict:
             was_correct = our_prediction == expected
             reasoning = f"Explicit winner field: {our_prediction}, expected: {expected}"
         elif winner and winner.lower() == "tie":
-            # Tie -- check if recommendation leans toward the expected option
+            # A declared tie is a non-prediction. It only counts as correct if the
+            # recommendation text STRICTLY leans toward the expected option by a
+            # clear margin (>=2 signals). A tie with equal signals is wrong --
+            # "we couldn't tell" is not the same as the real-world answer.
             a_signals = sum(1 for w in ["option a", "first option", "variant a", "former"] if w in full_text)
             b_signals = sum(1 for w in ["option b", "second option", "variant b", "latter"] if w in full_text)
+            margin = 2
             if expected == "A":
-                was_correct = a_signals >= b_signals
+                was_correct = a_signals - b_signals >= margin
             else:
-                was_correct = b_signals >= a_signals
+                was_correct = b_signals - a_signals >= margin
             our_prediction = "A" if a_signals > b_signals else "B" if b_signals > a_signals else "tie"
-            reasoning = f"Tie declared, leaning: A={a_signals} B={b_signals}"
+            reasoning = f"Tie declared, leaning: A={a_signals} B={b_signals}, margin_required={margin}"
         else:
-            # No winner field -- infer from full text
+            # No winner field -- infer from full text, require a clear margin
             a_words = ["option a", "first option", "recommend a", "variant a", "go with a"]
             b_words = ["option b", "second option", "recommend b", "variant b", "go with b"]
             a_count = sum(1 for w in a_words if w in full_text)
             b_count = sum(1 for w in b_words if w in full_text)
-            our_prediction = "A" if a_count > b_count else "B" if b_count > a_count else "unknown"
+            margin = 2
+            if a_count - b_count >= margin:
+                our_prediction = "A"
+            elif b_count - a_count >= margin:
+                our_prediction = "B"
+            else:
+                our_prediction = "unknown"
             was_correct = our_prediction == expected
-            reasoning = f"Inferred: A={a_count} B={b_count}, predicted={our_prediction}"
+            reasoning = f"Inferred: A={a_count} B={b_count}, predicted={our_prediction}, margin_required={margin}"
 
     # --- Positive/negative outcome tests (no A/B) ---
     elif expected == "positive":
@@ -634,6 +644,29 @@ def _score_prediction(case: dict, result: dict) -> dict:
             f"Behavioral: {'positive' if beh_positive else 'neutral'}. "
             f"Say-do gap: {'supports' if gap_positive else 'neutral'}."
         )
+
+    # --- Tie cases (null/no-difference outcomes) ---
+    elif expected == "tie":
+        # For null cases, we're testing whether the system correctly predicts
+        # "no clear winner" / "tie" when variants perform equivalently.
+        # A correct prediction is either:
+        # 1. Explicit "tie" winner field
+        # 2. Very balanced text signals (a_count ≈ b_count)
+        if winner and winner.lower() == "tie":
+            was_correct = True
+            our_prediction = "tie"
+            reasoning = "Explicitly predicted tie (correct for null case)"
+        else:
+            a_words = ["option a", "first option", "recommend a", "variant a", "go with a"]
+            b_words = ["option b", "second option", "recommend b", "variant b", "go with b"]
+            a_count = sum(1 for w in a_words if w in full_text)
+            b_count = sum(1 for w in b_words if w in full_text)
+            # For null cases, predictions are correct when a_count and b_count
+            # are very close (diff <= 1) OR when neither is strongly favored
+            diff = abs(a_count - b_count)
+            was_correct = diff <= 1
+            our_prediction = "A" if a_count > b_count else "B" if b_count > a_count else "tie"
+            reasoning = f"Tie case: A={a_count}, B={b_count}, diff={diff}, correct=(diff<=1)"
 
     else:
         was_correct = False
@@ -745,12 +778,19 @@ async def run_single_backtest(case: dict, persona_count: int = 15) -> dict:
             business, case["question"], responses,
             case.get("variant_a"), case.get("variant_b"),
             context_narrative=context_narrative,
+            expected_persona_count=len(personas),
         )
 
         # -- Step 7.5: Research override --
+        # Strong + high-confidence overrides now mutate the aggregation:
+        # they flip `winner` and prefix `recommendation`. See
+        # backend.swarm.research_override.apply_override_to_result.
         research_override = None
         try:
-            from backend.swarm.research_override import apply_research_override
+            from backend.swarm.research_override import (
+                apply_research_override,
+                apply_override_to_result,
+            )
             research_override = await apply_research_override(
                 question=case["question"],
                 aggregation_result=result,
@@ -758,12 +798,34 @@ async def run_single_backtest(case: dict, persona_count: int = 15) -> dict:
                 business_type=business.type,
             )
             if research_override and research_override.get("override_applied"):
-                result["research_override"] = research_override
-                logger.info("Research override: tactic=%s, conflict=%s",
-                            research_override.get("tactic_detected"),
-                            research_override.get("conflict_level"))
+                result = apply_override_to_result(result, research_override)
+                logger.info(
+                    "Research override: tactic=%s, conflict=%s, flipped=%s",
+                    research_override.get("tactic_detected"),
+                    research_override.get("conflict_level"),
+                    result.get("winner_flipped", False),
+                )
         except Exception as e:
             logger.warning("Research override failed (non-fatal): %s", e)
+
+        # -- Step 7.6: Structural bias correction --
+        try:
+            from backend.swarm.bias_correction import (
+                apply_bias_correction,
+                average_sentiments_from_responses,
+            )
+            tactic = (research_override or {}).get("tactic_detected")
+            if tactic:
+                stated_avg, revealed_avg = average_sentiments_from_responses(responses)
+                result = apply_bias_correction(
+                    result,
+                    question=case["question"],
+                    tactic=tactic,
+                    average_stated_sentiment=stated_avg,
+                    average_revealed_sentiment=revealed_avg,
+                )
+        except Exception as e:
+            logger.warning("Bias correction failed (non-fatal): %s", e)
 
         # -- Step 8: Impact estimate --
         impact = estimate_impact(responses, case["question"], business_type=business.type)
@@ -776,6 +838,9 @@ async def run_single_backtest(case: dict, persona_count: int = 15) -> dict:
 
         # -- Step 10: Score prediction against reality --
         score = _score_prediction(case, result)
+
+        # -- Step 11: Compute diversity metrics (for methodology assessment) --
+        diversity = _compute_diversity_metrics(responses)
 
         elapsed = time.monotonic() - start
 
@@ -799,10 +864,15 @@ async def run_single_backtest(case: dict, persona_count: int = 15) -> dict:
             "behavioral_prediction": result.get("behavioral_prediction"),
             "stated_vs_actual_gap": result.get("stated_vs_actual_gap"),
             "baseline_summary": result.get("baseline_summary"),
+            "research_override": result.get("research_override"),
+            "winner_flipped": result.get("winner_flipped", False),
+            "winner_flipped_from": result.get("winner_flipped_from"),
+            "bias_correction": result.get("bias_correction"),
             "persona_count": len(personas),
             "response_count": len(responses),
             "caveat_count": len(caveats),
             "impact_decision": impact.decision,
+            "diversity_metrics": diversity,
             "elapsed_seconds": round(elapsed, 1),
             "features": features,
             "feature_names": extractor.feature_names,
@@ -827,26 +897,226 @@ async def run_single_backtest(case: dict, persona_count: int = 15) -> dict:
 async def run_all_backtests(
     persona_count: int = 15,
     only_ids: list[int] = None,
+    aa_repeats: int = 1,
 ) -> list[dict]:
-    """Run all backtest cases and produce a scored report."""
+    """Run all backtest cases and produce a scored report.
+
+    When ``aa_repeats > 1`` each case is executed that many times with the
+    SAME inputs. This is an A/A-style noise measurement: two runs that
+    disagree reveal the within-simulation variance. Each repeat is a
+    separate result row, tagged with ``aa_run_index`` (0-based) so we can
+    compute winner stability per case.
+    """
     results = []
 
     for case in BACKTEST_CASES:
         if only_ids and case["id"] not in only_ids:
             continue
 
-        result = await run_single_backtest(case, persona_count)
-        results.append(result)
+        for run_idx in range(aa_repeats):
+            result = await run_single_backtest(case, persona_count)
+            if aa_repeats > 1:
+                result["aa_run_index"] = run_idx
+                result["aa_total_runs"] = aa_repeats
+            results.append(result)
 
-        # Save incrementally
-        _save_results(results)
+            # Save incrementally
+            _save_results(results)
 
-        # Print live progress
-        status = "CORRECT" if result.get("was_correct") else "WRONG" if result.get("was_correct") is False else "ERROR"
-        holdout = " [HOLDOUT]" if result.get("holdout") else ""
-        print(f"  [{status}] {result['case_name']}{holdout} ({result.get('elapsed_seconds', 0)}s)")
+            # Print live progress
+            status = "CORRECT" if result.get("was_correct") else "WRONG" if result.get("was_correct") is False else "ERROR"
+            holdout = " [HOLDOUT]" if result.get("holdout") else ""
+            run_label = f" run={run_idx+1}/{aa_repeats}" if aa_repeats > 1 else ""
+            print(f"  [{status}] {result['case_name']}{holdout}{run_label} ({result.get('elapsed_seconds', 0)}s)")
+
+    if aa_repeats > 1:
+        _print_aa_noise_report(results)
+
+    # Print methodology assessment reports
+    _print_methodology_assessment(results)
 
     return results
+
+
+def _compute_diversity_metrics(responses: list[dict]) -> dict:
+    """Compute swarm diversity metrics from persona responses.
+
+    Returns:
+    - sentiment_std_dev: std deviation of sentiment scores across personas
+    - sentiment_range: (min, max) sentiment values
+    - agreement_level: "low" if std_dev > 0.25, "medium" if 0.15-0.25, "high" if < 0.15
+    """
+    import statistics
+
+    sentiments = []
+    for r in responses:
+        core = r.get("core") or {}
+        try:
+            s = float(core.get("sentiment", 0.0))
+            sentiments.append(s)
+        except (TypeError, ValueError):
+            pass
+
+    if len(sentiments) < 2:
+        return {
+            "sentiment_std_dev": None,
+            "sentiment_range": None,
+            "agreement_level": "insufficient_data",
+            "persona_count_with_sentiment": len(sentiments),
+        }
+
+    std_dev = statistics.stdev(sentiments)
+    agreement = "high" if std_dev < 0.15 else "medium" if std_dev < 0.25 else "low"
+
+    return {
+        "sentiment_std_dev": round(std_dev, 3),
+        "sentiment_range": (round(min(sentiments), 3), round(max(sentiments), 3)),
+        "agreement_level": agreement,
+        "persona_count_with_sentiment": len(sentiments),
+    }
+
+
+def _print_methodology_assessment(results: list[dict]) -> None:
+    """Print methodology assessment: calibration, diversity, and test categorization."""
+    from collections import defaultdict
+
+    # Categorize results
+    by_category = defaultdict(list)
+    for r in results:
+        if r.get("was_correct") is None:
+            continue
+        case_id = r["case_id"]
+        # Categorize by test type
+        if case_id <= 10:
+            category = "Original (1-10)"
+        elif case_id <= 35:
+            category = "Extra published (11-35)"
+        elif case_id <= 38:
+            category = "Reversed (36-38)"
+        elif case_id <= 42:
+            category = "Dark cases (39-42)"
+        elif case_id <= 44:
+            category = "Null cases (43-44)"
+        else:
+            category = "Other"
+        by_category[category].append(r)
+
+    # Calibration analysis
+    print()
+    print("=" * 70)
+    print("METHODOLOGY ASSESSMENT")
+    print("=" * 70)
+
+    # Accuracy by test category
+    print()
+    print("Accuracy by Test Category:")
+    print("-" * 70)
+    for category in ["Original (1-10)", "Extra published (11-35)", "Reversed (36-38)",
+                     "Dark cases (39-42)", "Null cases (43-44)", "Other"]:
+        if category not in by_category:
+            continue
+        rows = by_category[category]
+        correct = sum(1 for r in rows if r.get("was_correct"))
+        total = len(rows)
+        pct = (correct / total * 100) if total > 0 else 0
+        print(f"  {category:<30} {correct:>3}/{total:<3} ({pct:>5.1f}%)")
+
+    # Diversity analysis
+    print()
+    print("Swarm Diversity (sentiment agreement level):")
+    print("-" * 70)
+    diversity_counts = defaultdict(int)
+    for r in results:
+        if r.get("was_correct") is None:
+            continue
+        div = r.get("diversity_metrics", {})
+        agreement = div.get("agreement_level", "unknown")
+        diversity_counts[agreement] += 1
+
+    for level in ["low", "medium", "high"]:
+        count = diversity_counts.get(level, 0)
+        if count > 0 or level in diversity_counts:
+            print(f"  {level.capitalize():>8} agreement: {count:>3} cases (sentiment std_dev across personas)")
+
+    # Null case handling
+    print()
+    print("Null Case Predictions (tests where real outcome was 'tie'):")
+    print("-" * 70)
+    if "Null cases (43-44)" in by_category:
+        null_results = by_category["Null cases (43-44)"]
+        null_correct = sum(1 for r in null_results if r.get("was_correct"))
+        null_total = len(null_results)
+        null_pct = (null_correct / null_total * 100) if null_total > 0 else 0
+        print(f"  Correctly predicted 'no difference': {null_correct}/{null_total} ({null_pct:.0f}%)")
+        for r in null_results:
+            pred = r.get("our_prediction", "?")
+            outcome = r.get("expected_winner", "?")
+            status = "✓" if r.get("was_correct") else "✗"
+            print(f"    {status} Case {r['case_id']}: predicted '{pred}', expected '{outcome}'")
+
+    # Reversed case analysis (contamination test)
+    print()
+    print("Reversed Cases (contamination check):")
+    print("-" * 70)
+    if "Reversed (36-38)" in by_category:
+        reversed_results = by_category["Reversed (36-38)"]
+        original_results = by_category.get("Original (1-10)", [])
+
+        # Match reversed cases to originals
+        reversed_correct = sum(1 for r in reversed_results if r.get("was_correct"))
+        reversed_total = len(reversed_results)
+        reversed_pct = (reversed_correct / reversed_total * 100) if reversed_total > 0 else 0
+
+        original_pct = (sum(1 for r in original_results if r.get("was_correct")) / len(original_results) * 100) if original_results else 0
+
+        print(f"  Original cases accuracy:  {original_pct:.0f}%")
+        print(f"  Reversed cases accuracy:  {reversed_pct:.0f}%")
+        if reversed_pct < original_pct - 10:
+            print(f"  ⚠ WARNING: Accuracy dropped {original_pct - reversed_pct:.0f} points on reversed cases.")
+            print(f"    This suggests potential data contamination or label dependency.")
+        else:
+            print(f"    ✓ No significant contamination detected.")
+
+    print("=" * 70)
+
+
+def _print_aa_noise_report(results: list[dict]) -> None:
+    """Summarise A/A noise: for each case, how often did we get the same winner?"""
+    from collections import Counter, defaultdict
+
+    by_case: dict[int, list[dict]] = defaultdict(list)
+    for r in results:
+        if r.get("was_correct") is None:
+            continue
+        by_case[r["case_id"]].append(r)
+
+    print()
+    print("=" * 60)
+    print("A/A NOISE REPORT")
+    print("=" * 60)
+    print(f"{'Case':<42} {'Runs':>5} {'Stability':>10}")
+    print("-" * 60)
+    stabilities: list[float] = []
+    for case_id in sorted(by_case):
+        runs = by_case[case_id]
+        if len(runs) < 2:
+            continue
+        winners = [r.get("our_prediction") or r.get("winner") or "?" for r in runs]
+        counts = Counter(winners)
+        modal_count = counts.most_common(1)[0][1]
+        stability = modal_count / len(runs)
+        stabilities.append(stability)
+        name = runs[0]["case_name"][:40]
+        print(f"{name:<42} {len(runs):>5} {stability*100:>9.0f}%")
+    print("-" * 60)
+    if stabilities:
+        avg = sum(stabilities) / len(stabilities)
+        print(f"Mean winner stability across cases: {avg*100:.0f}%")
+        print(
+            "  -- lower stability = higher within-simulation noise. "
+            "Predictions below 100% are a coin-flip component."
+        )
+    print("=" * 60)
 
 
 def _save_results(results: list[dict]):

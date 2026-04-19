@@ -125,6 +125,18 @@ def _build_core_prompt(
     return prompt
 
 
+def _build_actual_prompt() -> str:
+    """Build Turn 2b (actual behaviour) prompt from interview_turn2b_actual.txt.
+
+    This is a deliberate isolation turn: the persona is asked to answer as
+    their real, lazy, habit-driven self WITHOUT trying to stay consistent
+    with Turn 2's stated answer. This is how we surface the Murphy et al.
+    2005 stated-vs-revealed gap at generation time rather than detecting
+    it after the fact.
+    """
+    return _load_prompt("interview_turn2b_actual.txt")
+
+
 def _build_depth_prompt() -> str:
     """Build Turn 3 (depth) prompt from interview_turn3_depth.txt."""
     return _load_prompt("interview_turn3_depth.txt")
@@ -289,6 +301,7 @@ async def _interview_persona_focus_group(
 
     warmup_prompt = _build_warmup_prompt(business)
     core_prompt = _build_core_prompt(question, variant_a, variant_b)
+    actual_prompt = _build_actual_prompt()
     depth_prompt = _build_depth_prompt()
 
     async with semaphore:
@@ -325,12 +338,46 @@ async def _interview_persona_focus_group(
         t2_text = t2.content[0].text
         core_data = _parse_json_response(t2_text, "turn 2 core")
 
+        # -- Turn 2b: Actual behaviour (isolation pass) ----------------------
+        # Asks the persona to predict their real-world behaviour WITHOUT the
+        # pressure to stay consistent with the Turn 2 stated answer. This
+        # surfaces the Murphy et al. 2005 gap at generation time.
+        logger.info("Interviewing persona: %s (turn 2b)", persona.name)
+        if on_turn_progress:
+            on_turn_progress(persona.name, "actual")
+
+        messages.append({"role": "assistant", "content": t2_text})
+        messages.append({"role": "user", "content": actual_prompt})
+
+        t2b = await client.messages.create(
+            model=model,
+            max_tokens=512,
+            system=system,
+            messages=messages,
+        )
+        t2b_text = t2b.content[0].text
+        actual_data = _parse_json_response(t2b_text, "turn 2b actual")
+
+        # Merge actual_data into core_data so downstream aggregation sees both.
+        # The stated fields remain on core_data; the revealed fields are
+        # prefixed with "actual_" so nothing is overwritten.
+        if isinstance(actual_data, dict):
+            for k, v in actual_data.items():
+                # keep both the stated and actual versions visible
+                if k in core_data and k not in (
+                    "predicted_actual_action", "actual_sentiment",
+                    "behaviour_gap", "gap_size",
+                    "actual_preference", "actual_preference_strength",
+                ):
+                    continue
+                core_data[k] = v
+
         # -- Turn 3: Depth ---------------------------------------------------
         logger.info("Interviewing persona: %s (turn 3)", persona.name)
         if on_turn_progress:
             on_turn_progress(persona.name, "depth")
 
-        messages.append({"role": "assistant", "content": t2_text})
+        messages.append({"role": "assistant", "content": t2b_text})
         messages.append({"role": "user", "content": depth_prompt})
 
         t3 = await client.messages.create(
@@ -371,18 +418,43 @@ async def _interview_persona_focus_group(
     except (TypeError, ValueError):
         sentiment = 0.0
 
+    # Revealed (actual) sentiment -- when turn 2b produced one, average the
+    # stated and actual sentiments for the backward-compat top-level value.
+    # This gently pulls the downstream impact estimator toward revealed
+    # behaviour without discarding the stated signal.
+    actual_sentiment_raw = core_data.get("actual_sentiment")
+    try:
+        if actual_sentiment_raw is not None:
+            actual_sent = float(actual_sentiment_raw)
+            sentiment = (sentiment + actual_sent) / 2
+    except (TypeError, ValueError):
+        pass
+
     result = {
         "persona_name": persona.name,
         # Per-turn data
         "warmup": warmup_data,
         "core": core_data,
+        "actual": {
+            "predicted_actual_action": core_data.get("predicted_actual_action"),
+            "actual_sentiment": core_data.get("actual_sentiment"),
+            "behaviour_gap": core_data.get("behaviour_gap"),
+            "gap_size": core_data.get("gap_size"),
+            "actual_preference": core_data.get("actual_preference"),
+            "actual_preference_strength": core_data.get("actual_preference_strength"),
+        },
         "depth": depth_data,
-        # Backward-compatible top-level fields (from core turn)
+        # Backward-compatible top-level fields
         "reaction": core_data.get("reaction", ""),
         "reasoning": core_data.get("reasoning", ""),
         "sentiment": sentiment,
-        "preference": core_data.get("preference"),
-        "preference_strength": core_data.get("preference_strength"),
+        # Preference: prefer the REVEALED one when available (closes the
+        # stated-vs-revealed gap at scoring time).
+        "preference": core_data.get("actual_preference") or core_data.get("preference"),
+        "preference_strength": (
+            core_data.get("actual_preference_strength")
+            or core_data.get("preference_strength")
+        ),
     }
 
     if ab_comparison_data is not None:

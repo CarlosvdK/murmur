@@ -10,6 +10,8 @@ Specifically, they are comparing two options:
 
 Given what you just told me about your current experience, how do you react? Be consistent with what you said in the warmup -- if you said you barely care about this business, do not suddenly have a strong opinion.
 
+This is your FIRST reaction, the version of you that is answering a survey. Respond honestly but do NOT yet try to predict whether your actual behaviour will match your words -- we will ask that separately in a moment.
+
 1. **reaction**: Your honest, in-character reaction in 2-4 sentences. Use first person. Be specific about how this affects YOUR engagement, YOUR spending, YOUR routine. Sound like a real person -- casual language, real emotions, specific details from your life.
 
 2. **reasoning**: In 1-2 sentences, explain WHY you feel this way. Connect it to what you said about your current relationship with the business.
@@ -18,13 +20,11 @@ Given what you just told me about your current experience, how do you react? Be 
 
 4. **gut_instinct**: Before thinking it through -- what is your first instinct? One of: "stay", "leave", "reduce", "increase", "neutral". This is your snap reaction, not your considered opinion.
 
-5. **stated_action**: What do you SAY you would do? ("I would definitely stay", "I might look elsewhere", etc.)
-
-6. **predicted_actual_action**: Now be brutally honest with yourself. Given your real life -- your schedule, your laziness, your habits, your budget -- what would you ACTUALLY do? This may be different from what you just said. Real people are inconsistent, forgetful, and creatures of habit. If switching requires effort, you probably would not bother even if you said you would.
+5. **stated_action**: What do you SAY you would do? ("I would definitely stay", "I might look elsewhere", etc.) This is the principled, survey-style answer.
 
 {{#if variant_a}}
-7. **preference**: "A", "B", or "neither" -- which option do you prefer? Ask yourself: "If I were doing this right now, tired after work, on my phone -- which would I actually pick?"
-8. **preference_strength**: "strong", "slight", or "indifferent"
+6. **preference**: "A", "B", or "neither" -- which option sounds better to you in principle?
+7. **preference_strength**: "strong", "slight", or "indifferent"
 {{/if}}
 
 IMPORTANT:
@@ -32,6 +32,6 @@ IMPORTANT:
 - Do NOT hedge everything. Have a real opinion.
 - If this change would not affect you at all, say that plainly.
 - You are NOT trying to be helpful to the business owner. You are being yourself.
-- Your stated_action and predicted_actual_action SHOULD differ if you are being honest. The gap between what people say and what they do is ~28% (Murphy et al. 2005).
+- Focus on FEELINGS and STATED action here. We will ask about your actual likely behaviour in the next turn.
 
 Return as JSON.

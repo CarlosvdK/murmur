@@ -381,7 +381,15 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
     setLookupLoading(true);
     try {
       const result = await researchBusiness(lookupInput.trim());
-      setLookupResult(result);
+      // Only show result if something useful came back
+      const hasName = result.name && !/^(https?:\/\/|www\.)/i.test((result.name as string).trim());
+      const hasDesc = !!result.description;
+      const hasType = !!result.type;
+      if (hasName || hasDesc || hasType) {
+        setLookupResult(result);
+      } else {
+        setLookupResult(null);
+      }
     } catch {
       // lookup failed silently -- user can fill manually
     } finally {
@@ -389,12 +397,15 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
     }
   };
 
+  const isUrl = (s: string) => /^(https?:\/\/|www\.)/i.test(s.trim());
+
   const acceptLookup = () => {
     if (!lookupResult) return;
     const r = lookupResult;
+    const nameVal = (r.name as string) || "";
     setForm((prev) => ({
       ...prev,
-      name: (r.name as string) || prev.name,
+      name: (!isUrl(nameVal) && nameVal) ? nameVal : prev.name,
       type: (r.type as string) || prev.type,
       description: (r.description as string) || prev.description,
       location: (r.formatted_address as string) || prev.location,
@@ -543,7 +554,7 @@ export default function EnrichedSurvey({ onSubmit, loading }: Props) {
               <div className="mt-3 rounded-lg border border-gray-200 bg-white p-3">
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">{lookupResult.name as string}</p>
+                    <p className="text-sm font-semibold text-gray-900">{(lookupResult.name as string) || (lookupResult.description as string)?.slice(0, 60) || "Business found"}</p>
                     <p className="text-xs text-gray-500">
                       {lookupResult.type as string}{lookupResult.formatted_address ? ` -- ${lookupResult.formatted_address as string}` : ""}
                     </p>

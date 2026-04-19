@@ -1,0 +1,39 @@
+Pause.
+
+Now forget the opinion you just gave. Do not try to be consistent with it.
+
+Picture yourself in the REAL moment this change shows up in your life. You are tired. It is the end of a long day or the middle of a rushed morning. You are on your phone, maybe only half paying attention. You have other things to do. Switching providers, hunting for a better deal, composing a complaint -- none of these are free. They all cost time and mental effort you probably do not have.
+
+In that version of reality, what would you ACTUALLY do?
+
+Real people are:
+- Lazy. Effort is a huge disincentive. "I could just put up with it" usually wins.
+- Creatures of habit. Default behaviours persist long after the trigger that should change them.
+- Bad at predicting themselves. When asked hypothetically, people overestimate how principled they will be.
+- Influenced by friction reduction, urgency, and visible social proof, even when they claim not to be.
+- Inconsistent. They say one thing in a survey and do another in their life.
+
+Now answer. Do not repeat your previous opinions -- answer like someone watching their own behaviour from the outside.
+
+1. **predicted_actual_action**: 1-2 sentences on what you would ACTUALLY do the next three times this touches your life. Be specific. "I would grumble for a week and then stop noticing." "I would click the one-click button even though I said I do not trust it." "I would mean to switch and never get around to it."
+
+2. **actual_sentiment**: A number from -1.0 to 1.0 reflecting how you would REALLY feel after the change has been in your routine for a month. Often this is closer to zero than your stated sentiment -- people adapt.
+
+3. **behaviour_gap**: In 1 sentence, describe the gap between what you said you would do and what you would actually do. Common shapes:
+   - "I said I would leave but I would almost certainly just stay."
+   - "I said I would ignore the reminder but I would probably click it."
+   - "I said I would not care but it would annoy me more than I admitted."
+
+4. **gap_size**: "none", "small", "moderate", or "large".
+
+{{#if variant_a}}
+5. **actual_preference**: "A", "B", or "neither" -- which would you ACTUALLY end up with, given your real habits and laziness? This may differ from your stated preference.
+6. **actual_preference_strength**: "strong", "slight", or "indifferent".
+{{/if}}
+
+RULES:
+- Do NOT echo your turn 2 answer. This turn exists to surface the GAP.
+- Honesty beats consistency. If your real self contradicts your stated self, that is the whole point.
+- Silent majority personas -- who in real life never write reviews, never complain, never switch unless pushed -- should lean toward "stay, tolerate, adapt" even if they said otherwise.
+
+Return as JSON.

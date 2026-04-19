@@ -43,6 +43,48 @@ _progress_verbs = [
     "Consulting", "Checking in with", "Getting insights from",
     "Having a chat with", "Understanding", "Learning from",
 ]
+
+# Per-turn verbs for focus group interviews. Each turn has a different
+# flavour so the UI shows what is actually happening, not a raw label.
+_TURN_VERBS: dict[str, list[str]] = {
+    "warmup": [
+        "Getting to know", "Saying hello to", "Warming up with",
+        "Meeting", "Chatting with",
+    ],
+    "core": [
+        "Talking with", "Interviewing", "Listening to",
+        "Hearing from", "Having a chat with",
+    ],
+    "actual": [
+        "Digging into what", "Asking", "Probing",
+        "Getting the real story from",
+    ],
+    "depth": [
+        "Going deeper with", "Exploring future behaviour with",
+        "Looking ahead with", "Asking what happens next with",
+    ],
+    "ab_compare": [
+        "Comparing options with", "A/B testing with",
+        "Weighing choices with",
+    ],
+}
+
+
+def _format_turn_progress(raw: str) -> str:
+    """Turn a raw ``"Name (turn)"`` progress token into friendly UI text.
+
+    Example: ``"Maria (warmup)"`` -> ``"Getting to know Maria..."``. If the
+    token does not look like a turn label, returns the raw name prefixed
+    with a generic verb.
+    """
+    if "(" in raw and raw.endswith(")"):
+        name, _, rest = raw.rpartition("(")
+        name = name.strip()
+        turn = rest.rstrip(")").strip().lower()
+        verbs = _TURN_VERBS.get(turn)
+        if verbs:
+            return f"{random.choice(verbs)} {name}..."
+    return raw
 _thinking_messages = [
     "Analysing your business profile...",
     "Reading through your survey responses...",
@@ -397,7 +439,8 @@ async def create_simulation(
 
     asyncio.create_task(
         _run_pipeline(sim_id, snapshot, data.question, data.variant_a,
-                      data.variant_b, data.persona_count, workspace_data)
+                      data.variant_b, data.persona_count, workspace_data,
+                      business_id=data.business_id)
     )
 
     return simulation
@@ -411,6 +454,7 @@ async def _run_pipeline(
     variant_b: Optional[str],
     persona_count: int,
     workspace_data: dict = None,
+    business_id: Optional[str] = None,
 ):
     """Full simulation pipeline: context -> generate -> interview -> aggregate -> caveats."""
     start = time.monotonic()
@@ -595,10 +639,35 @@ async def _run_pipeline(
             else:
                 logger.info("Reviewer intelligence returned no manifest -- using freeform generation")
 
-        # Step 1: Generate personas
+        # Step 1: Generate personas (or load from 1-month archetype cache)
         _update_sim(sim_id, status=SimulationStatus.GENERATING_PERSONAS.value)
         progress.status = SimulationStatus.GENERATING_PERSONAS
-        msg = random.choice([
+
+        # Determine if we're loading cached or generating fresh
+        personas_generated = True
+        db = get_supabase()
+        if business_id:
+            try:
+                from backend.swarm.persona_archetype import get_or_create_archetype
+                personas, personas_generated = await get_or_create_archetype(
+                    db, str(business_id), business, persona_count,
+                    context_narrative=context_narrative, manifest=manifest,
+                )
+            except Exception as e:
+                logger.warning("Archetype cache lookup failed, generating fresh: %s", e)
+                personas_generated = True
+                personas = await generate_personas(
+                    business, persona_count,
+                    context_narrative=context_narrative, manifest=manifest,
+                )
+        else:
+            # Backtest or offline mode: always generate fresh
+            personas = await generate_personas(
+                business, persona_count,
+                context_narrative=context_narrative, manifest=manifest,
+            )
+
+        msg = "Loading your customer panel..." if not personas_generated else random.choice([
             "Building your customer profiles...",
             "Creating realistic customer personas...",
             "Assembling a diverse customer panel...",
@@ -606,11 +675,6 @@ async def _run_pipeline(
         ])
         progress.step = msg
         emit_sse("personas", msg)
-
-        personas = await generate_personas(
-            business, persona_count, context_narrative=context_narrative,
-            manifest=manifest,
-        )
 
         persona_db_ids = _store_personas(personas, sim_id)
 
@@ -631,16 +695,25 @@ async def _run_pipeline(
         emit_sse("simulation", sim_msg)
 
         def on_progress(persona_name: str, count: int):
-            progress.current_persona = persona_name
+            # Update current_persona to the clean name (strip any turn suffix).
+            clean_name = (
+                persona_name.split("(", 1)[0].strip() if "(" in persona_name
+                else persona_name
+            )
+            progress.current_persona = clean_name
             progress.personas_interviewed = count
-            # If the simulator already sends a full message (contains turn info), use it directly
+
             if "(" in persona_name:
-                progress.step = persona_name
-                emit_sse("simulation", persona_name)
+                # Turn-tagged progress from the focus-group simulator --
+                # render with a turn-specific verb so the UI shows
+                # "Getting to know Maria...", "Interviewing Sam...",
+                # "Asking Jordan..." etc., not raw "Name (warmup)".
+                message = _format_turn_progress(persona_name)
             else:
                 verb = random.choice(_progress_verbs)
-                progress.step = f"{verb} {persona_name}..."
-                emit_sse("simulation", f"{verb} {persona_name}...")
+                message = f"{verb} {persona_name}..."
+            progress.step = message
+            emit_sse("simulation", message)
             progress.elapsed_seconds = time.monotonic() - start
 
         responses = await run_simulation(
@@ -667,12 +740,20 @@ async def _run_pipeline(
         result_data = await aggregate_responses(
             business, interpreted_question, responses, variant_a, variant_b,
             context_narrative=context_narrative,
+            expected_persona_count=len(personas),
         )
 
         # Step 3.5: Research override check
+        # When a strong, high-confidence override is returned, we promote it
+        # from advisory text into an actual mutation of the aggregation --
+        # flipping the winner and prefixing the recommendation. See
+        # apply_override_to_result for the promotion rule.
         research_override = None
         try:
-            from backend.swarm.research_override import apply_research_override
+            from backend.swarm.research_override import (
+                apply_research_override,
+                apply_override_to_result,
+            )
             research_override = await apply_research_override(
                 question=interpreted_question,
                 aggregation_result=result_data,
@@ -680,15 +761,38 @@ async def _run_pipeline(
                 business_type=business.type,
             )
             if research_override and research_override.get("override_applied"):
-                result_data["research_override"] = research_override
+                result_data = apply_override_to_result(result_data, research_override)
                 logger.info(
-                    "Research override applied: tactic=%s, conflict=%s",
+                    "Research override applied: tactic=%s, conflict=%s, flipped=%s",
                     research_override.get("tactic_detected"),
                     research_override.get("conflict_level"),
+                    result_data.get("winner_flipped", False),
                 )
                 emit_sse("research", "Checking published research against customer feedback...")
         except Exception as e:
             logger.warning("Research override failed (non-fatal): %s", e)
+
+        # Step 3.6: Structural bias correction (per-tactic priors)
+        # Applies a research-backed numerical shift to sentiment based on
+        # the detected tactic class, scaled down by any stated-vs-revealed
+        # gap already observed in the two-shot elicitation.
+        try:
+            from backend.swarm.bias_correction import (
+                apply_bias_correction,
+                average_sentiments_from_responses,
+            )
+            tactic = (research_override or {}).get("tactic_detected")
+            if tactic:
+                stated_avg, revealed_avg = average_sentiments_from_responses(responses)
+                result_data = apply_bias_correction(
+                    result_data,
+                    question=interpreted_question,
+                    tactic=tactic,
+                    average_stated_sentiment=stated_avg,
+                    average_revealed_sentiment=revealed_avg,
+                )
+        except Exception as e:
+            logger.warning("Bias correction failed (non-fatal): %s", e)
 
         # Step 4.5: Impact estimation
         impact = estimate_impact(responses, interpreted_question, business_type=business.type)

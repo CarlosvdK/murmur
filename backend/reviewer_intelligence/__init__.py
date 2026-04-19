@@ -29,6 +29,9 @@ from backend.reviewer_intelligence.persona_calibrator import (
     calibrate_personas,
     PersonaGenerationManifest,
 )
+from backend.reviewer_intelligence.demographic_fallback import (
+    build_fallback_signals,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -55,10 +58,22 @@ async def build_reviewer_intelligence(
         )
 
         if signals is None:
-            logger.info("No review signals available -- falling back to freeform generation")
+            # Demographic fallback: rather than dropping the manifest entirely
+            # (which loses all structured anchoring), synthesise low-confidence
+            # signals from business-type + location priors. The resulting
+            # manifest is marked confidence="low" and carries an explicit
+            # bias warning downstream.
+            logger.info(
+                "No review signals available -- using demographic fallback for %s",
+                business.name,
+            )
             if on_progress:
-                on_progress("No review data found -- using business profile only")
-            return None
+                on_progress("No review data found -- using industry priors for this business type")
+            signals = build_fallback_signals(
+                business_name=business.name,
+                business_type=business.type,
+                location=business.location,
+            )
 
         # Step 2: Apply bias corrections
         if on_progress:

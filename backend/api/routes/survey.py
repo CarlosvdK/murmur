@@ -302,8 +302,11 @@ async def research_business(data: BusinessResearchRequest):
             or places_result.get("website")
             or (_normalize_url(input_text) if _is_url(input_text) else None)
         )
-    if not pre_fill.get("name"):
-        pre_fill["name"] = places_result.get("name") or website_data.get("name") or input_text
+    if not pre_fill.get("name") or _is_url(pre_fill.get("name", "")):
+        pre_fill["name"] = places_result.get("name") or website_data.get("name") or ""
+        # Don't fall back to the raw URL as the business name
+        if _is_url(pre_fill.get("name", "")):
+            pre_fill["name"] = ""
     if not pre_fill.get("formatted_address"):
         pre_fill["formatted_address"] = places_result.get("formatted_address") or website_data.get("formatted_address") or ""
 

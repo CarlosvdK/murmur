@@ -51,9 +51,27 @@ YOUR TASK -- produce a structured report:
    - "Despite saying they would not care, several acknowledged the change would bother them more than they initially let on"
    - "The stated loyalty was strong, but the switching ease scores suggest it would not survive a better alternative"
 
-6. **standout_voices**: Pick 2-3 specific personas whose responses show the most interesting CONTRAST between their stated and actual behavior. Quote from both their reaction AND their self-correction.
+6. **standout_voices**: Select EXACTLY 3 voices using this SYSTEMATIC rule (not "most interesting"):
+   - One with the highest (most positive) sentiment -- the strongest advocate.
+   - One with the lowest (most negative) sentiment -- the strongest objector.
+   - One whose sentiment is closest to the MEDIAN of all personas -- the "average" voice.
+   Do NOT hand-pick dramatic quotes. This fixed sampling rule prevents cherry-picking
+   and ensures the business owner sees the full distribution, not just outliers
+   you found interesting. If two personas tie, prefer the one whose reasoning
+   explicitly mentions a stated-vs-actual gap.
 
-7. **confidence**: Rate confidence: "high", "medium", or "low" with a 1-sentence explanation.
+7. **confidence**: Rate confidence: "high", "medium", or "low" with a 1-sentence
+   explanation. Use this RUBRIC -- do not freestyle:
+   - "high" ONLY IF all three conditions hold: (a) agreement across personas is
+     clear (no 50/50 split), (b) the business profile is rich (description plus
+     customer description are both specific, not one-liners), (c) the question
+     does not involve a known stated-vs-revealed preference tactic (urgency,
+     friction reduction, forced path, streaks, long-form copy, social proof).
+   - "medium" if agreement is clear but either the profile is thin OR the
+     question involves a stated-vs-revealed tactic.
+   - "low" if personas disagree substantially, OR fewer than 60% produced a
+     clean reaction, OR the business profile is a single sentence.
+   Default to "medium" when unsure. "High" must be earned.
 
 8. **recommendation**: What would you suggest to the business owner? 2-3 sentences. Always include a caveat. Never be absolute. Frame as "based on these conversations" not "our AI suggests."
 
