@@ -997,6 +997,16 @@ def _print_methodology_assessment(results: list[dict]) -> None:
             category = "Dark cases (39-42)"
         elif case_id <= 44:
             category = "Null cases (43-44)"
+        elif case_id <= 54:
+            category = "Dark cases (45-54)"
+        elif case_id <= 59:
+            category = "Null cases (55-59)"
+        elif case_id <= 64:
+            category = "Sensitivity variants (60-64)"
+        elif case_id <= 69:
+            category = "Boundary/failure cases (65-69)"
+        elif case_id <= 74:
+            category = "Regional variants (70-74)"
         else:
             category = "Other"
         by_category[category].append(r)
@@ -1012,7 +1022,9 @@ def _print_methodology_assessment(results: list[dict]) -> None:
     print("Accuracy by Test Category:")
     print("-" * 70)
     for category in ["Original (1-10)", "Extra published (11-35)", "Reversed (36-38)",
-                     "Dark cases (39-42)", "Null cases (43-44)", "Other"]:
+                     "Dark cases (39-42)", "Null cases (43-44)", "Dark cases (45-54)",
+                     "Null cases (55-59)", "Sensitivity variants (60-64)",
+                     "Boundary/failure cases (65-69)", "Regional variants (70-74)", "Other"]:
         if category not in by_category:
             continue
         rows = by_category[category]
@@ -1042,13 +1054,17 @@ def _print_methodology_assessment(results: list[dict]) -> None:
     print()
     print("Null Case Predictions (tests where real outcome was 'tie'):")
     print("-" * 70)
-    if "Null cases (43-44)" in by_category:
-        null_results = by_category["Null cases (43-44)"]
+    null_results = []
+    for cat in ["Null cases (43-44)", "Null cases (55-59)"]:
+        if cat in by_category:
+            null_results.extend(by_category[cat])
+
+    if null_results:
         null_correct = sum(1 for r in null_results if r.get("was_correct"))
         null_total = len(null_results)
         null_pct = (null_correct / null_total * 100) if null_total > 0 else 0
         print(f"  Correctly predicted 'no difference': {null_correct}/{null_total} ({null_pct:.0f}%)")
-        for r in null_results:
+        for r in sorted(null_results, key=lambda x: x['case_id']):
             pred = r.get("our_prediction", "?")
             outcome = r.get("expected_winner", "?")
             status = "✓" if r.get("was_correct") else "✗"
