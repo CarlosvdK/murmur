@@ -23,6 +23,8 @@ from backend.models.persona import PersonaProfile
 from backend.swarm import generate_personas, run_simulation, aggregate_responses
 from backend.swarm.caveats import generate_caveats
 from backend.context.engine import gather_context
+from backend.context.location_profiler import LocationProfiler
+from backend.context.realtime_intelligence import RealtimeIntelligence
 from backend.reviewer_intelligence import build_reviewer_intelligence
 from backend.reviewer_intelligence.review_signal_extractor import extract_review_signals
 from backend.impact import estimate_impact
@@ -582,7 +584,65 @@ async def _run_pipeline(
         except Exception as e:
             logger.warning("Profile builder failed (non-fatal): %s", e)
 
-        # Combine all context sources: survey + profile + research + live agents
+        # Step 0.3: Gather location profile + real-time context (non-blocking parallel)
+        location_profile = None
+        realtime_context = None
+        try:
+            # Extract customer location from workspace data or business location
+            customer_location = (workspace_data or {}).get("customer_location") or business.location
+
+            # Initialize profilers
+            db = get_supabase()
+            profiler = LocationProfiler(db=db, cache=None)
+            intelligence = RealtimeIntelligence(cache=None)
+
+            # Gather in parallel, non-blocking (3s timeout)
+            async def gather_location_and_realtime():
+                try:
+                    tasks = [
+                        profiler.get_or_create(customer_location),
+                        intelligence.gather_all(
+                            location=customer_location,
+                            simulation_date=datetime.now(timezone.utc),
+                        ),
+                    ]
+                    results = await asyncio.gather(*tasks, return_exceptions=True)
+                    loc_prof = results[0] if not isinstance(results[0], Exception) else None
+                    realtime = results[1] if len(results) > 1 and not isinstance(results[1], Exception) else None
+                    return loc_prof, realtime
+                except Exception as e:
+                    logger.debug(f"Parallel context gathering error: {e}")
+                    return None, None
+
+            location_profile, realtime_context = await asyncio.wait_for(
+                gather_location_and_realtime(),
+                timeout=3.0
+            )
+
+            if location_profile:
+                logger.info(
+                    "Location profile: %s, inflation=%.1f%%, trust=%s",
+                    location_profile.country_code,
+                    location_profile.inflation_rate,
+                    location_profile.trust_in_institutions,
+                )
+                _update_sim(sim_id, location_profile=location_profile.model_dump())
+
+            if realtime_context:
+                logger.info(
+                    "Real-time context: temp=%.0f°C, sentiment=%.2f, payday_week=%s",
+                    realtime_context.weather_temp,
+                    realtime_context.social_sentiment_score,
+                    realtime_context.is_payday_week,
+                )
+                _update_sim(sim_id, realtime_context=realtime_context.model_dump())
+
+        except asyncio.TimeoutError:
+            logger.warning("Location/realtime context timeout (non-fatal)")
+        except Exception as e:
+            logger.warning("Location/realtime context gathering failed (non-fatal): %s", e)
+
+        # Combine all context sources: survey + profile + research + live agents + location + realtime
         enriched_parts = []
         if survey_context:
             enriched_parts.append(survey_context)
@@ -592,6 +652,53 @@ async def _run_pipeline(
             enriched_parts.append(research_context[:6000])
         if context_narrative:
             enriched_parts.append(context_narrative)
+
+        # Add location intelligence (Hofstede + macro economics)
+        if location_profile:
+            location_intel = f"""LOCATION INTELLIGENCE (Customer Base):
+Country: {location_profile.country_code}
+Timezone: {location_profile.timezone}
+
+Cultural Profile (Hofstede Dimensions):
+  Power Distance: {location_profile.hofstede.get('pdist', '?')}/100 (higher = respect hierarchy)
+  Individualism: {location_profile.hofstede.get('idv', '?')}/100 (higher = individual > group)
+  Uncertainty Avoidance: {location_profile.hofstede.get('uai', '?')}/100 (higher = risk averse)
+  Long-term Orientation: {location_profile.hofstede.get('ltowvs', '?')}/100 (higher = future focused)
+Communication Style: {'High-context (indirect, relationships matter)' if location_profile.context_culture == 'high' else 'Low-context (direct, explicit)'}
+
+Macroeconomic Context:
+  Inflation Rate: {location_profile.inflation_rate:.1f}% annually
+  Unemployment: {location_profile.unemployment_rate:.1f}%
+  Interest Rates: {location_profile.interest_rate:.1f}%
+  GDP Growth: {location_profile.gdp_growth_rate:.1f}%
+
+Business Environment:
+  Primary Payment Method: {location_profile.primary_payment}
+  Digital Adoption Level: {location_profile.digital_adoption}
+  Trust in Institutions: {location_profile.trust_in_institutions}"""
+            enriched_parts.append(location_intel)
+
+        # Add real-time context (weather, temporal, sentiment, news)
+        if realtime_context:
+            realtime_intel = f"""REAL-TIME CONTEXT (Today/This Week):
+Weather: {realtime_context.weather_temp:.0f}°C, {realtime_context.weather_condition}
+Forecast: {realtime_context.weather_forecast_7d}
+
+Temporal Signals:
+  Day of Week: {realtime_context.day_of_week}
+  Time of Day: {realtime_context.time_of_day}
+  Holiday: {'Yes' if realtime_context.is_holiday else 'No'}
+  Payday Week: {'Yes (spending higher)' if realtime_context.is_payday_week else 'No'}
+
+Economic News: {'; '.join(realtime_context.economic_news[:2]) if realtime_context.economic_news else 'No major news'}
+
+Social Sentiment: {realtime_context.social_sentiment_score:.2f} (-1=very negative, 0=neutral, 1=positive)
+
+Trending Topics: {', '.join(realtime_context.trending_topics[:3]) if realtime_context.trending_topics else 'None'}
+
+Upcoming Events: {', '.join(realtime_context.upcoming_events) if realtime_context.upcoming_events else 'None'}"""
+            enriched_parts.append(realtime_intel)
+
         # Inject question interpretation context so personas understand the framing
         if interpretation and interpretation.key_context_for_personas:
             enriched_parts.append(
