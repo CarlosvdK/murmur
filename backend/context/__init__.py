@@ -1,3 +1,11 @@
-from backend.context.engine import gather_context
+"""Context intelligence engine: Location profiler + Real-time intelligence."""
 
-__all__ = ["gather_context"]
+from .location_profiler import LocationProfiler, LocationProfile
+from .realtime_intelligence import RealtimeIntelligence, RealtimeContext
+
+__all__ = [
+    "LocationProfiler",
+    "LocationProfile",
+    "RealtimeIntelligence",
+    "RealtimeContext",
+]
