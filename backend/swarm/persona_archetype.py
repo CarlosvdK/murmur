@@ -1,20 +1,24 @@
 """
-Persona archetype cache layer with 1-month TTL.
+Persona archetype cache layer (indefinite, not TTL-based).
 
-Personas are expensive to generate (one API call per persona, ~15s per swarm).
-For a given business, we reuse the same "archetype" (demographics, personality,
-OCEAN traits) across multiple questions, as long as the archetype is fresh
-(<30 days old). The responses (Turn 2, 2b, 3) are always generated fresh.
+KEY INSIGHT: Personas represent CUSTOMER DEMOGRAPHICS (static), not responses.
+They should be cached INDEFINITELY for the same business, but regenerated
+if the business profile changes significantly.
 
-This keeps the swarm feeling consistent ("Maria from last week is still here")
-while avoiding stale personas that have drifted from current customer behavior.
+CONTEXT and RESPONSES are always generated fresh per question/date.
+
+Caching strategy:
+- Personas: Cached indefinitely until business profile changes
+- Context: Always refreshed from APIs based on current date/question
+- Responses: Always generated fresh per question
 """
 
 from __future__ import annotations
 
 import json
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
+from difflib import SequenceMatcher
 from typing import Optional
 
 from backend.models.persona import PersonaProfile
@@ -34,6 +38,8 @@ async def get_or_create_archetype(
 ) -> tuple[list[PersonaProfile], bool]:
     """Get cached persona archetype or generate fresh.
 
+    Personas are cached INDEFINITELY. Context and responses are always fresh.
+
     Returns (personas, was_generated).
     was_generated=False means we reused a cached archetype.
     was_generated=True means we generated fresh and cached it.
@@ -48,38 +54,28 @@ async def get_or_create_archetype(
         return personas, True
 
     try:
-        # Try to load from cache
+        # Try to load from cache (no expiration check)
         archetype = db.table("persona_archetypes").select("*").eq(
             "business_id", business_id
         ).execute()
 
         if archetype.data and len(archetype.data) > 0:
             row = archetype.data[0]
-            expires_at = datetime.fromisoformat(row["expires_at"])
-            now = datetime.now(timezone.utc)
-
-            if expires_at > now:
-                # Cache is valid
-                profiles_data = row["profiles"]
-                personas = [
-                    PersonaProfile(**p) if isinstance(p, dict) else p
-                    for p in profiles_data
-                ]
-                logger.info(
-                    "Persona archetype cache HIT for business %s, %d personas, "
-                    "expires in %.0f hours",
-                    business_id, len(personas),
-                    (expires_at - now).total_seconds() / 3600,
-                )
-                return personas, False
-            else:
-                # Cache is expired
-                logger.info("Persona archetype cache EXPIRED for business %s", business_id)
+            profiles_data = row["profiles"]
+            personas = [
+                PersonaProfile(**p) if isinstance(p, dict) else p
+                for p in profiles_data
+            ]
+            logger.info(
+                "Persona archetype cache HIT for business %s, %d personas reused",
+                business_id, len(personas),
+            )
+            return personas, False
 
     except Exception as e:
         logger.warning("Archetype cache lookup failed (non-fatal): %s", e)
 
-    # Cache miss or error -- generate fresh
+    # Cache miss -- generate fresh
     personas = await generate_personas(
         business, persona_count,
         context_narrative=context_narrative,
@@ -94,20 +90,20 @@ async def get_or_create_archetype(
             else p
             for p in personas
         ]
-        expires_at = (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
 
         db.table("persona_archetypes").upsert(
             {
                 "business_id": business_id,
                 "profiles": profiles_json,
                 "persona_count": len(personas),
-                "expires_at": expires_at,
+                "business_snapshot_hash": _hash_business_snapshot(business),
+                "created_at": datetime.now(timezone.utc).isoformat(),
             }
         ).execute()
 
         logger.info(
-            "Stored persona archetype for business %s, %d personas, expires %s",
-            business_id, len(personas), expires_at,
+            "Stored persona archetype for business %s, %d personas",
+            business_id, len(personas),
         )
     except Exception as e:
         logger.warning("Failed to store archetype (non-fatal): %s", e)
@@ -115,20 +111,62 @@ async def get_or_create_archetype(
     return personas, True
 
 
-async def delete_expired_archetypes(db) -> int:
-    """Clean up expired archetypes. Call this as a daily cron job.
+async def delete_archetype_on_profile_change(db, business_id: str) -> bool:
+    """Delete cached personas if business profile changed significantly.
 
-    Returns number of rows deleted.
+    Returns True if deleted, False otherwise.
     """
     if db is None:
-        return 0
+        return False
 
     try:
-        now = datetime.now(timezone.utc).isoformat()
-        result = db.table("persona_archetypes").delete().lt("expires_at", now).execute()
-        deleted = len(result.data) if result.data else 0
-        logger.info("Deleted %d expired persona archetypes", deleted)
+        result = db.table("persona_archetypes").delete().eq(
+            "business_id", business_id
+        ).execute()
+        deleted = len(result.data) > 0 if result.data else False
+        if deleted:
+            logger.info("Deleted persona archetype for business %s due to profile change", business_id)
         return deleted
     except Exception as e:
-        logger.warning("Failed to delete expired archetypes: %s", e)
-        return 0
+        logger.warning("Failed to delete archetype: %s", e)
+        return False
+
+
+def is_profile_changed(
+    old_profile: BusinessSnapshot,
+    new_profile: BusinessSnapshot,
+    threshold: float = 0.3,
+) -> bool:
+    """Detect significant changes in business profile.
+
+    Compares: name, industry, description.
+    Returns True if similarity < threshold.
+
+    Args:
+        old_profile: Previous business snapshot
+        new_profile: New business snapshot
+        threshold: Similarity threshold (0-1). Default 0.3 means >30% change triggers regen.
+
+    Returns:
+        True if profile changed significantly, False otherwise.
+    """
+    old_text = f"{old_profile.name} {old_profile.industry} {old_profile.description}".lower()
+    new_text = f"{new_profile.name} {new_profile.industry} {new_profile.description}".lower()
+
+    similarity = SequenceMatcher(None, old_text, new_text).ratio()
+    changed = similarity < (1 - threshold)
+
+    if changed:
+        logger.info(
+            "Profile change detected: similarity %.2f < threshold %.2f",
+            similarity, 1 - threshold,
+        )
+
+    return changed
+
+
+def _hash_business_snapshot(business: BusinessSnapshot) -> str:
+    """Create a hash of the business profile for change detection."""
+    text = f"{business.name}|{business.industry}|{business.description}"
+    import hashlib
+    return hashlib.md5(text.encode()).hexdigest()
