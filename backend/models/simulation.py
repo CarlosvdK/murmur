@@ -61,6 +61,13 @@ class StandoutVoice(BaseModel):
     quote: str
 
 
+class Citation(BaseModel):
+    """A research section that informed the simulation result."""
+    domain: str
+    title: str
+    similarity: float = Field(ge=0.0, le=1.0)
+
+
 class SimulationResult(BaseModel):
     id: UUID
     simulation_id: UUID
@@ -77,5 +84,6 @@ class SimulationResult(BaseModel):
     behavioral_prediction: Optional[dict] = None  # Turn 3 predicted behavior
     stated_vs_actual_gap: Optional[str] = None  # Aggregate say-do gap analysis
     demographic_breakdown: Optional[List[dict]] = None  # Responses grouped by segment
+    citations: Optional[List[Citation]] = None  # Research sections that informed this result
     raw_output: dict = {}
     created_at: datetime

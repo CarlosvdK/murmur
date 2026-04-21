@@ -150,6 +150,28 @@ def _apply_confidence_cap(
     return result
 
 
+def _normalize_citations(sections: List[dict] | None) -> List[dict]:
+    """Convert research sections -> citation dicts that match the Citation model.
+
+    Incoming sections may carry extra fields (content, source_id) that we
+    deliberately drop before serialisation.
+    """
+    if not sections:
+        return []
+    out: List[dict] = []
+    for s in sections:
+        try:
+            similarity = float(s.get("similarity", 0.0))
+        except (TypeError, ValueError):
+            similarity = 0.0
+        out.append({
+            "domain": str(s.get("domain", "")),
+            "title": str(s.get("title") or s.get("section_title") or ""),
+            "similarity": max(0.0, min(1.0, similarity)),
+        })
+    return out
+
+
 async def aggregate_responses(
     business: BusinessSnapshot,
     question: str,
@@ -158,6 +180,7 @@ async def aggregate_responses(
     variant_b: str | None = None,
     context_narrative: str | None = None,
     expected_persona_count: int | None = None,
+    research_sections: List[dict] | None = None,
 ) -> dict:
     """Synthesise all persona responses into a structured result.
 
@@ -227,6 +250,8 @@ async def aggregate_responses(
         "baseline_summary": result.get("baseline_summary"),
         "behavioral_prediction": result.get("behavioral_prediction"),
         "stated_vs_actual_gap": result.get("stated_vs_actual_gap"),
+        # Research citations: which sections of the corpus informed this result
+        "citations": _normalize_citations(research_sections),
         "raw_output": result,
     }
 

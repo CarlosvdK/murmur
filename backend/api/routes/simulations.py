@@ -3,7 +3,7 @@ import json
 import logging
 import random
 import time
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from uuid import UUID, uuid4
 from datetime import datetime, timezone
@@ -204,6 +204,9 @@ def _response_to_row(resp: dict, sim_id: UUID, persona_db_id: str) -> dict:
 
 
 def _result_to_row(result: SimulationResult) -> dict:
+    citations = [c.model_dump() if hasattr(c, "model_dump") else c for c in (result.citations or [])]
+    raw = dict(result.raw_output or {})
+    raw["citations"] = citations  # Survives DB round-trip via JSONB column
     return {
         "id": str(result.id),
         "simulation_id": str(result.simulation_id),
@@ -215,7 +218,7 @@ def _result_to_row(result: SimulationResult) -> dict:
         "winner_reasoning": result.winner_reasoning,
         "themes": [t.model_dump() if hasattr(t, "model_dump") else t for t in (result.themes or [])],
         "standout_voices": [v.model_dump() if hasattr(v, "model_dump") else v for v in (result.standout_voices or [])],
-        "raw_output": result.raw_output,
+        "raw_output": raw,
         "created_at": result.created_at.isoformat(),
     }
 
@@ -236,6 +239,7 @@ def _row_to_result(row: dict) -> SimulationResult:
         baseline_summary=raw.get("baseline_summary"),
         behavioral_prediction=raw.get("behavioral_prediction"),
         stated_vs_actual_gap=raw.get("stated_vs_actual_gap"),
+        citations=raw.get("citations"),
         raw_output=raw,
         created_at=row["created_at"],
     )
@@ -249,6 +253,46 @@ def _update_sim(sim_id: UUID, **fields):
     """Update arbitrary fields on a simulation row."""
     db = get_supabase()
     db.table("simulations").update(fields).eq("id", str(sim_id)).execute()
+
+
+def _mark_simulation_failed(sim_id: str, message: str) -> None:
+    """Mark a simulation FAILED with a user-visible error message.
+
+    Used both by the main pipeline exception handler and the bounded-task
+    wrapper. Swallows DB errors so the wrapper never itself raises.
+    """
+    try:
+        db = get_supabase()
+        db.table("simulations").update({
+            "status": SimulationStatus.FAILED.value,
+            "error_message": message[:500],
+        }).eq("id", str(sim_id)).execute()
+    except Exception as exc:
+        logger.warning("_mark_simulation_failed DB update failed: %s", exc)
+
+
+async def run_pipeline_with_timeout(coro, *, sim_id, timeout: float):
+    """Run a pipeline coroutine with a hard deadline.
+
+    On timeout or unhandled exception, mark the simulation FAILED and
+    return None instead of propagating. This keeps the fire-and-forget
+    background task from lingering.
+    """
+    try:
+        return await asyncio.wait_for(coro, timeout=timeout)
+    except asyncio.TimeoutError:
+        logger.warning("Pipeline timed out for sim %s after %ds", sim_id, timeout)
+        _mark_simulation_failed(
+            str(sim_id),
+            f"Simulation timed out after {int(timeout)}s. "
+            "This usually means an upstream API (Claude, Supabase, or a "
+            "context tool) didn't respond. Please try again.",
+        )
+        return None
+    except Exception as exc:
+        logger.exception("Pipeline raised for sim %s", sim_id)
+        _mark_simulation_failed(str(sim_id), f"{type(exc).__name__}: {exc}")
+        return None
 
 
 def _store_personas(personas: list[PersonaProfile], sim_id: UUID) -> list[str]:
@@ -363,12 +407,22 @@ async def generate_clarifying_questions(
         ]}
 
 
+import os as _os
+from backend.observability.rate_limit import limiter
+
+
 @router.post("/", response_model=Simulation)
+@limiter.limit(_os.getenv("RATE_LIMIT_SIMULATIONS_CREATE", "20/minute"))
 async def create_simulation(
+    request: Request,
     data: SimulationCreate,
     user_id: UUID = Depends(get_current_user_id),
 ):
-    """Create a simulation and start running it in the background."""
+    """Create a simulation and start running it in the background.
+
+    Rate limited per-IP because simulations trigger Claude API spend.
+    Override with RATE_LIMIT_SIMULATIONS_CREATE env var.
+    """
     db = get_supabase()
 
     # Verify business exists and belongs to this user
@@ -439,10 +493,15 @@ async def create_simulation(
     )
     _simulation_queues[sim_id] = asyncio.Queue()
 
+    pipeline_timeout = float(_os.getenv("SIMULATION_PIPELINE_TIMEOUT", "480"))
     asyncio.create_task(
-        _run_pipeline(sim_id, snapshot, data.question, data.variant_a,
-                      data.variant_b, data.persona_count, workspace_data,
-                      business_id=data.business_id)
+        run_pipeline_with_timeout(
+            _run_pipeline(sim_id, snapshot, data.question, data.variant_a,
+                          data.variant_b, data.persona_count, workspace_data,
+                          business_id=data.business_id),
+            sim_id=sim_id,
+            timeout=pipeline_timeout,
+        )
     )
 
     return simulation
@@ -520,6 +579,7 @@ async def _run_pipeline(
         except Exception as e:
             logger.warning("Question interpretation failed (non-fatal): %s", e)
 
+        research_sections: list[dict] = []
         try:
             country = (workspace_data or {}).get("location_country", "")
             # Use INTERPRETED question for better semantic search
@@ -531,11 +591,12 @@ async def _run_pipeline(
                 max_chars=6000,
             )
             research_context = rag_result.get("context", "")
+            research_sections = rag_result.get("sections_used", []) or []
             logger.info("Research context (%s): %d chars for type=%s",
                         rag_result.get("method", "unknown"), len(research_context), business.type)
             # Store RAG metadata for frontend
             _update_sim(sim_id, rag_selection={
-                "sections": rag_result.get("sections_used", []),
+                "sections": research_sections,
                 "method": rag_result.get("method", "unknown"),
             })
         except Exception as e:
@@ -848,6 +909,7 @@ Upcoming Events: {', '.join(realtime_context.upcoming_events) if realtime_contex
             business, interpreted_question, responses, variant_a, variant_b,
             context_narrative=context_narrative,
             expected_persona_count=len(personas),
+            research_sections=research_sections,
         )
 
         # Step 3.5: Research override check
@@ -1001,6 +1063,7 @@ Upcoming Events: {', '.join(realtime_context.upcoming_events) if realtime_contex
             baseline_summary=result_data.get("baseline_summary"),
             behavioral_prediction=result_data.get("behavioral_prediction"),
             stated_vs_actual_gap=result_data.get("stated_vs_actual_gap"),
+            citations=result_data.get("citations") or None,
             raw_output=result_data.get("raw_output", {}),
             created_at=datetime.now(timezone.utc),
         )
@@ -1068,6 +1131,34 @@ async def stream_simulation_progress(sim_id: UUID):
 
 
 # --- Read endpoints ---
+
+@router.get("/accuracy-stats")
+async def get_accuracy_stats(user_id: UUID = Depends(get_current_user_id)):
+    """Return accuracy stats from real_outcomes table."""
+    db = get_supabase()
+    # Get user's business IDs
+    biz_result = db.table("businesses").select("id").eq("user_id", str(user_id)).execute()
+    biz_ids = [b["id"] for b in biz_result.data]
+    if not biz_ids:
+        return {"total_outcomes": 0, "matched": 0, "accuracy_pct": None}
+
+    # Get simulation IDs for those businesses
+    sim_result = db.table("simulations").select("id").in_("business_id", biz_ids).execute()
+    sim_ids = [s["id"] for s in sim_result.data]
+    if not sim_ids:
+        return {"total_outcomes": 0, "matched": 0, "accuracy_pct": None}
+
+    # Get real outcomes
+    outcomes = db.table("real_outcomes").select("*").in_("simulation_id", sim_ids).execute()
+    total = len(outcomes.data)
+    matched = len([o for o in outcomes.data if o.get("outcome_matched")])
+
+    return {
+        "total_outcomes": total,
+        "matched": matched,
+        "accuracy_pct": round((matched / total) * 100) if total > 0 else None,
+    }
+
 
 @router.get("/{sim_id}", response_model=Simulation)
 async def get_simulation(sim_id: UUID):
@@ -1288,36 +1379,7 @@ async def list_simulations(user_id: UUID = Depends(get_current_user_id)):
     return [_row_to_sim(row) for row in result.data]
 
 
-@router.get("/accuracy-stats")
-async def get_accuracy_stats(user_id: UUID = Depends(get_current_user_id)):
-    """Return accuracy stats from real_outcomes table."""
-    db = get_supabase()
-    # Get user's business IDs
-    biz_result = db.table("businesses").select("id").eq("user_id", str(user_id)).execute()
-    biz_ids = [b["id"] for b in biz_result.data]
-    if not biz_ids:
-        return {"total_outcomes": 0, "matched": 0, "accuracy_pct": None}
-
-    # Get simulation IDs for those businesses
-    sim_result = db.table("simulations").select("id").in_("business_id", biz_ids).execute()
-    sim_ids = [s["id"] for s in sim_result.data]
-    if not sim_ids:
-        return {"total_outcomes": 0, "matched": 0, "accuracy_pct": None}
-
-    # Get real outcomes
-    outcomes = db.table("real_outcomes").select("*").in_("simulation_id", sim_ids).execute()
-    total = len(outcomes.data)
-    matched = len([o for o in outcomes.data if o.get("outcome_matched")])
-
-    return {
-        "total_outcomes": total,
-        "matched": matched,
-        "accuracy_pct": round((matched / total) * 100) if total > 0 else None,
-    }
-
-
 class RealOutcomeCreate(BaseModel):
-    simulation_id: str
     what_actually_happened: str
     outcome_matched: Optional[bool] = None
     match_details: Optional[str] = None
@@ -1330,7 +1392,12 @@ async def submit_real_outcome(
     data: RealOutcomeCreate,
     user_id: UUID = Depends(get_current_user_id),
 ):
-    """Submit what actually happened after a simulation prediction."""
+    """Submit what actually happened after a simulation prediction.
+
+    Side effects:
+      - inserts into real_outcomes (free-text narrative)
+      - inserts into simulation_accuracy (structured calibration record)
+    """
     db = get_supabase()
 
     # Verify simulation belongs to user's business
@@ -1342,12 +1409,41 @@ async def submit_real_outcome(
     if not biz.data:
         raise HTTPException(status_code=404, detail="Business not found")
 
-    outcome = {
+    outcome_row = {
         "simulation_id": str(sim_id),
         "what_actually_happened": data.what_actually_happened,
         "outcome_matched": data.outcome_matched,
         "match_details": data.match_details,
         "notes": data.notes,
     }
-    result = db.table("real_outcomes").insert(outcome).execute()
-    return result.data[0] if result.data else {"status": "saved"}
+    inserted = db.table("real_outcomes").insert(outcome_row).execute()
+    saved = inserted.data[0] if inserted.data else outcome_row
+
+    # Structured accuracy record -- best effort, never block the user-facing write.
+    try:
+        latest = (
+            db.table("simulation_results")
+              .select("id, confidence_score, winner, summary")
+              .eq("simulation_id", str(sim_id))
+              .order("created_at", desc=True)
+              .limit(1)
+              .maybe_single()
+              .execute()
+        )
+        result_row = (latest.data if latest else None) or {}
+        from backend.ml.accuracy import compute_simulation_accuracy
+        record = compute_simulation_accuracy(
+            result=result_row,
+            outcome={
+                "outcome_matched": data.outcome_matched,
+                "match_details": data.match_details,
+            },
+        )
+        record["simulation_id"] = str(sim_id)
+        if isinstance(saved, dict) and saved.get("id"):
+            record["real_outcome_id"] = saved["id"]
+        db.table("simulation_accuracy").insert(record).execute()
+    except Exception as exc:  # pragma: no cover -- logged for visibility
+        logger.warning("simulation_accuracy insert failed (non-fatal): %s", exc)
+
+    return saved if isinstance(saved, dict) else {"status": "saved"}
