@@ -31,12 +31,24 @@ export default function Home() {
           }}
         />
         <div className="relative z-10 mx-auto max-w-[1400px]">
-          {/* Dark-tinted glass panel -- iOS-style. Strong backdrop blur +
-              saturation boost so the Murmuration dots show through as
-              softened, vivid blobs. Gradient gives depth. */}
+          {/* Dark-tinted glass panel. backdrop-filter does not reliably
+              sample WebGL canvas content across stacking contexts, so we
+              rely on a semi-transparent overlay + subtle gradient + inner
+              highlight to read as glass. Dots pass straight through the
+              alpha, slightly muted by the dark tint. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-gradient-to-br from-black/35 to-black/25 shadow-2xl shadow-black/10 ring-1 ring-white/10 backdrop-blur-2xl backdrop-saturate-150 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
+            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-gradient-to-br from-black/40 via-black/30 to-black/20 shadow-2xl shadow-black/20 ring-1 ring-white/15 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
+          />
+          {/* Inner highlight -- a bright hairline at the top edge gives the
+              classic "glass" specular feel. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgba(255,255,255,0.12), transparent 15%, transparent 85%, rgba(0,0,0,0.1))",
+            }}
           />
           <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
