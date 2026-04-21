@@ -25,7 +25,9 @@ import {
   Users,
 } from "lucide-react";
 import CIChart from "./CIChart";
+import DecisionCard from "./DecisionCard";
 import EvidenceTab from "./EvidenceTab";
+import ProfileQualityNote from "./ProfileQualityNote";
 
 interface Props {
   result: SimulationResult;
@@ -69,6 +71,8 @@ interface Props {
     personas: string[];
     members: { persona_name: string; age?: number; sentiment: number }[];
   }[];
+  profileCompleteness?: number | null;
+  profileNextImprovement?: string | null;
 }
 
 function ConfidenceBadge({ level }: { level: string }) {
@@ -133,6 +137,8 @@ export default function ResultsReport({
   impactData,
   responses,
   demographicGroups,
+  profileCompleteness,
+  profileNextImprovement,
 }: Props) {
   const [activeTab, setActiveTab] = useState<"decision" | "evidence">("decision");
 
@@ -192,6 +198,12 @@ export default function ResultsReport({
       {/* ====== DECISION TAB ====== */}
       {activeTab === "decision" && (
         <div className="space-y-5">
+          {/* Profile-quality caveat (silent when profile is rich) */}
+          <ProfileQualityNote
+            completeness={profileCompleteness}
+            nextImprovement={profileNextImprovement}
+          />
+
           {/* CI Chart */}
           {impactData && (
             <CIChart
@@ -209,25 +221,21 @@ export default function ResultsReport({
             />
           )}
 
-          {/* Decision framework explanation */}
+          {/* Decision card -- prominent go/no-go for the glance-test */}
           {impactData && (
+            <DecisionCard
+              decision={impactData.decision}
+              reasoning={impactData.decision_reasoning}
+              confidence={result.confidence_score as "high" | "medium" | "low" | undefined}
+            />
+          )}
+
+          {/* Decision framework explanation (the underlying logic) */}
+          {impactData && impactData.decision_framework && (
             <div className="rounded-xl border border-[#E5E2DC] bg-white p-5">
               <p className="text-sm leading-relaxed text-gray-600">
                 {impactData.decision_framework}
               </p>
-              <div className={`mt-4 rounded-xl px-4 py-3 ${
-                impactData.decision === "proceed" ? "bg-green-50" :
-                impactData.decision === "avoid" ? "bg-red-50" :
-                impactData.decision === "caution" ? "bg-amber-50" : "bg-blue-50"
-              }`}>
-                <p className={`text-sm font-medium ${
-                  impactData.decision === "proceed" ? "text-green-700" :
-                  impactData.decision === "avoid" ? "text-red-700" :
-                  impactData.decision === "caution" ? "text-amber-700" : "text-blue-700"
-                }`}>
-                  {impactData.decision_reasoning}
-                </p>
-              </div>
             </div>
           )}
 
@@ -359,55 +367,60 @@ export default function ResultsReport({
             </div>
           )}
 
-          {/* Research sources */}
-          {ragSelection && (
-            <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-              <div className="mb-3 flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-gray-400" />
-                <h4 className="text-xs font-medium uppercase tracking-wider text-gray-400">
-                  Research Sources
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {(ragSelection as any)?.method === "vector_search" && (
-                    <span className="ml-2 text-[9px] text-gray-300">semantic match</span>
-                  )}
-                </h4>
+          {/* Research sources: prefer result.citations (new), fall back to ragSelection (legacy) */}
+          {(() => {
+            const citations = result.citations || [];
+            /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+            const ragSections = (ragSelection as any)?.sections as
+              | { domain: string; title: string; similarity: number }[]
+              | undefined;
+            const sections = citations.length > 0 ? citations : ragSections;
+            const domains = ragSelection?.domains;
+            const hasAnything = (sections && sections.length > 0) || (domains && domains.length > 0);
+            if (!hasAnything) return null;
+            return (
+              <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+                <div className="mb-3 flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-gray-400" />
+                  <h4 className="text-xs font-medium uppercase tracking-wider text-gray-400">
+                    Research Sources
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                    {(ragSelection as any)?.method === "vector_search" && (
+                      <span className="ml-2 text-[9px] text-gray-300">semantic match</span>
+                    )}
+                  </h4>
+                </div>
+                {sections && sections.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {sections.map((section, i) => (
+                      <span
+                        key={i}
+                        className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
+                      >
+                        {section.title}
+                        {section.similarity > 0 && (
+                          <span className="ml-1 text-gray-300">
+                            {Math.round(section.similarity * 100)}%
+                          </span>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-1.5">
+                    {domains!.map((domain) => (
+                      <span
+                        key={domain}
+                        className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
+                      >
+                        {DOMAIN_LABELS[domain] || domain}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-              {/* Vector search: show section-level matches with similarity */}
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {(ragSelection as any)?.sections && (
-                <div className="flex flex-wrap gap-1.5">
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                  {((ragSelection as any).sections as { domain: string; title: string; similarity: number }[]).map((section: { domain: string; title: string; similarity: number }, i: number) => (
-                    <span
-                      key={i}
-                      className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
-                    >
-                      {section.title}
-                      {section.similarity > 0 && (
-                        <span className="ml-1 text-gray-300">
-                          {Math.round(section.similarity * 100)}%
-                        </span>
-                      )}
-                    </span>
-                  ))}
-                </div>
-              )}
-              {/* Fallback: show domain names (keyword selector) */}
-              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-              {ragSelection.domains && !(ragSelection as any)?.sections && (
-                <div className="flex flex-wrap gap-1.5">
-                  {ragSelection.domains.map((domain) => (
-                    <span
-                      key={domain}
-                      className="rounded-full border border-gray-200 bg-gray-50 px-2.5 py-0.5 text-[10px] text-gray-500"
-                    >
-                      {DOMAIN_LABELS[domain] || domain}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
+            );
+          })()}
         </div>
       )}
 

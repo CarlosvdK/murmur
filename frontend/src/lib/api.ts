@@ -338,6 +338,7 @@ export interface SimulationResult {
   };
   stated_vs_actual_gap?: string;
   demographic_breakdown?: { group: string; personas: string[]; avg_sentiment: number }[];
+  citations?: { domain: string; title: string; similarity: number }[];
   raw_output?: Record<string, unknown>;
   created_at: string;
 }

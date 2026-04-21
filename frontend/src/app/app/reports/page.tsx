@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { listSimulations, listContacts, getAccuracyStats, Simulation } from "@/lib/api";
+import OutcomeForm from "@/components/results/OutcomeForm";
 
 export default function ReportsPage() {
   const [simulations, setSimulations] = useState<Simulation[]>([]);
@@ -52,15 +53,19 @@ export default function ReportsPage() {
                     <th className="px-4 py-3">Date</th>
                     <th className="px-4 py-3">Personas</th>
                     <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3">Real outcome</th>
                   </tr>
                 </thead>
                 <tbody>
                   {completed.map((s) => (
-                    <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50">
+                    <tr key={s.id} className="border-b border-gray-50 hover:bg-gray-50 align-top">
                       <td className="px-6 py-3 text-sm text-black">{s.question.slice(0, 60)}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">{new Date(s.created_at).toLocaleDateString()}</td>
                       <td className="px-4 py-3 text-sm text-gray-500">{s.persona_count}</td>
                       <td className="px-4 py-3"><span className="rounded-full bg-green-50 px-2 py-0.5 text-xs text-green-600">Complete</span></td>
+                      <td className="px-4 py-3">
+                        <OutcomeForm simulationId={s.id} />
+                      </td>
                     </tr>
                   ))}
                 </tbody>

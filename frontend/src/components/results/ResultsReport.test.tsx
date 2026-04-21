@@ -89,6 +89,37 @@ describe('ResultsReport', () => {
     });
   });
 
+  describe('Research Citations', () => {
+    it('renders citation titles when result.citations is provided', () => {
+      const withCitations: SimulationResult = {
+        ...mockResult,
+        citations: [
+          { domain: 'pricing', title: 'Kahneman 1979 prospect theory', similarity: 0.81 },
+          { domain: 'loyalty', title: 'Dick & Basu 1994 attitudinal loyalty', similarity: 0.72 },
+        ],
+      };
+      render(<ResultsReport result={withCitations} />);
+      expect(screen.getByText(/Kahneman 1979 prospect theory/)).toBeInTheDocument();
+      expect(screen.getByText(/Dick & Basu 1994 attitudinal loyalty/)).toBeInTheDocument();
+    });
+
+    it('shows similarity as a percentage', () => {
+      const withCitations: SimulationResult = {
+        ...mockResult,
+        citations: [
+          { domain: 'pricing', title: 'Paper A', similarity: 0.81 },
+        ],
+      };
+      render(<ResultsReport result={withCitations} />);
+      expect(screen.getByText(/81%/)).toBeInTheDocument();
+    });
+
+    it('omits the citations panel when the list is empty', () => {
+      render(<ResultsReport result={{ ...mockResult, citations: [] }} />);
+      expect(screen.queryByText(/Research sources/i)).not.toBeInTheDocument();
+    });
+  });
+
   describe('Themes Section', () => {
     it('should display theme cards', () => {
       render(<ResultsReport result={mockResult} />);
