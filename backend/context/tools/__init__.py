@@ -18,6 +18,8 @@ def _get_all_tool_classes() -> list[type]:
     from backend.context.tools.review_analyzer import ReviewAnalyzerTool
     from backend.context.tools.social_sentiment import SocialSentimentTool
     from backend.context.tools.google_trends import GoogleTrendsTool
+    from backend.context.tools.economic_data_tool import EconomicDataContextTool
+    from backend.context.tools.market_data_tool import MarketDataContextTool
 
     return [
         WebSearchTool,
@@ -29,6 +31,8 @@ def _get_all_tool_classes() -> list[type]:
         ReviewAnalyzerTool,
         SocialSentimentTool,
         GoogleTrendsTool,
+        EconomicDataContextTool,
+        MarketDataContextTool,
     ]
 
 

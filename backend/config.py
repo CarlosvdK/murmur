@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     brave_search_api_key: str = ""
     reddit_client_id: str = ""
     reddit_client_secret: str = ""
+    fred_api_key: str = ""
+    alpha_vantage_api_key: str = ""
 
     # Context engine tuning
     context_enabled: bool = True
