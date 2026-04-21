@@ -112,8 +112,6 @@ export default function Murmuration() {
       for (let ix = 0; ix < AMOUNTX; ix++) {
         for (let iy = 0; iy < AMOUNTY; iy++) {
           const arrIdx = i * 3;
-          const baseX = ix * SEPARATION - (AMOUNTX * SEPARATION) / 2;
-          const baseZ = iy * SEPARATION - (AMOUNTY * SEPARATION) / 2;
 
           // Wave sweeping front to back
           const yVal =
@@ -137,8 +135,8 @@ export default function Murmuration() {
       renderer.setSize(w(), h());
     };
 
-    el.addEventListener("touchmove", onTouchMove, { passive: true });
-    el.addEventListener("touchend", onTouchEnd);
+    // No mouse / touch / pointer listeners: the field is decorative and
+    // must not react to the user at all.
     window.addEventListener("resize", handleResize);
 
     animate();
@@ -167,7 +165,7 @@ export default function Murmuration() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
       style={{ zIndex: 1 }}
     />
   );
