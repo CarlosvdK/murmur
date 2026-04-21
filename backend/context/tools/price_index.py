@@ -17,6 +17,7 @@ from typing import Optional
 import httpx
 
 from backend.context.tools.base import ContextTool
+from backend.context.tools.retry import retry_get_json
 
 logger = logging.getLogger(__name__)
 
@@ -121,11 +122,7 @@ class PriceIndexTool(ContextTool):
             "FP.CPI.TOTL.ZG"  # Consumer price inflation
         )
         params = {"format": "json", "per_page": 5, "mrv": 5}
-
-        async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.get(url, params=params)
-            resp.raise_for_status()
-            data = resp.json()
+        data = await retry_get_json(url, params=params, timeout=15)
 
         points = {}
         if len(data) > 1 and data[1]:
