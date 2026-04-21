@@ -1,0 +1,25 @@
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.21.2
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: detect-private-key
+      - id: check-added-large-files
+        args: [--maxkb=1024]
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: secret-hygiene-tests
+        name: secret-hygiene tests
+        entry: python -m pytest backend/tests/test_secret_hygiene.py -q
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
