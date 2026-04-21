@@ -30,7 +30,15 @@ export default function Home() {
             background: "radial-gradient(ellipse, rgba(68,140,253,0.08) 0%, rgba(255,141,228,0.04) 40%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[1400px] grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="relative z-10 mx-auto max-w-[1400px]">
+          {/* Dark-tinted glass panel -- calms the dot field behind the
+              content without hiding it. Extends beyond the grid so it reads
+              as a distinct surface, not a box hugging the text. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-black/10 backdrop-blur-md ring-1 ring-black/5 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
+          />
+          <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <SectionReveal>
               <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-orange px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white">
@@ -74,6 +82,7 @@ export default function Home() {
           <SectionReveal delay={0.3}>
             <HeroDemoCard />
           </SectionReveal>
+          </div>
         </div>
       </section>
 
