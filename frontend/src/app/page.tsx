@@ -31,12 +31,12 @@ export default function Home() {
           }}
         />
         <div className="relative z-10 mx-auto max-w-[1400px]">
-          {/* Dark-tinted glass panel -- calms the dot field behind the
-              content without hiding it. Extends beyond the grid so it reads
-              as a distinct surface, not a box hugging the text. */}
+          {/* Dark-tinted glass panel -- iOS-style. Strong backdrop blur +
+              saturation boost so the Murmuration dots show through as
+              softened, vivid blobs. Gradient gives depth. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-black/10 backdrop-blur-md ring-1 ring-black/5 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
+            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-gradient-to-br from-black/35 to-black/25 shadow-2xl shadow-black/10 ring-1 ring-white/10 backdrop-blur-2xl backdrop-saturate-150 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
           />
           <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
