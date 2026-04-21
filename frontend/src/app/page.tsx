@@ -38,7 +38,7 @@ export default function Home() {
               alpha, slightly muted by the dark tint. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-gradient-to-br from-black/40 via-black/30 to-black/20 shadow-2xl shadow-black/20 ring-1 ring-white/15 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
+            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-gradient-to-br from-black/60 via-black/55 to-black/45 shadow-2xl shadow-black/20 ring-1 ring-white/15 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
           />
           {/* Inner highlight -- a bright hairline at the top edge gives the
               classic "glass" specular feel. */}
