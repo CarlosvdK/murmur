@@ -12,7 +12,6 @@ import AccuracySection from "@/components/landing2/AccuracySection";
 import Testimonials from "@/components/landing2/Testimonials";
 import FinalCTA from "@/components/landing2/FinalCTA";
 import SectionReveal from "@/components/landing2/SectionReveal";
-import Murmuration from "@/components/landing2/Murmuration";
 
 export default function Home() {
   return (
@@ -21,7 +20,6 @@ export default function Home() {
 
       {/* HERO -- eggshell */}
       <section className="relative min-h-[90vh] overflow-hidden px-6 pb-20 pt-32 lg:px-8 xl:px-12 2xl:px-16">
-        <Murmuration />
         <div
           className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
           style={{
