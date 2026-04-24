@@ -104,7 +104,7 @@ function computeTextMask(
 export function Entropy({
   className = "",
   size,
-  cycleSeconds = 12,
+  cycleSeconds = 18,
   text = ["MAKE SENSE", "OF THE NOISE"],
 }: EntropyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -200,9 +200,22 @@ export function Entropy({
         // noise restart is visually striking.
         p.x = Math.random() * width;
         p.y = Math.random() * height;
-        p.vx = (Math.random() - 0.5) * 4;
-        p.vy = (Math.random() - 0.5) * 4;
+        p.vx = (Math.random() - 0.5) * 2.2;
+        p.vy = (Math.random() - 0.5) * 2.2;
       }
+    };
+
+    // Radius around a target within which a text actor counts as "resolved".
+    // Connections and jitter fade out based on this so the letter edges go
+    // crisp exactly as the particle arrives.
+    const SETTLE_RADIUS = 80;
+
+    const particleSettled = (p: Particle): number => {
+      if (p.targetX === undefined || p.targetY === undefined) return 0;
+      const dx = p.targetX - p.x;
+      const dy = p.targetY - p.y;
+      const d = Math.sqrt(dx * dx + dy * dy);
+      return Math.max(0, 1 - d / SETTLE_RADIUS);
     };
 
     const animate = (now: number) => {
@@ -215,28 +228,29 @@ export function Entropy({
         lastCycle = cycleIndex;
       }
 
-      // Settle envelope for text actors:
-      //   t in [0.00, 0.08]  jittering, no pull
-      //   t in [0.08, 0.70]  easing toward their glyph position
-      //   t in [0.70, 0.88]  held in place
-      //   t in [0.88, 1.00]  released back into chaos so the next cycle's
+      // Time-based envelope for the force applied to text actors.
+      //   t in [0.00, 0.06]  noise pass -- particles drift randomly
+      //   t in [0.06, 0.75]  slow migration toward each glyph position
+      //   t in [0.75, 0.92]  held in place
+      //   t in [0.92, 1.00]  released back into chaos so the next cycle's
       //                      scatter does not feel abrupt
-      let settleAmount: number;
-      if (t < 0.08) settleAmount = 0;
-      else if (t < 0.7) settleAmount = smoothstep((t - 0.08) / 0.62);
-      else if (t < 0.88) settleAmount = 1;
-      else settleAmount = 1 - smoothstep((t - 0.88) / 0.12);
+      let phase: number;
+      if (t < 0.06) phase = 0;
+      else if (t < 0.75) phase = smoothstep((t - 0.06) / 0.69);
+      else if (t < 0.92) phase = 1;
+      else phase = 1 - smoothstep((t - 0.92) / 0.08);
 
-      const textJitter = (1 - settleAmount) * 0.35;
-      const textReturnForce = 0.005 + settleAmount * 0.06;
-      const textDamping = 0.9 + settleAmount * 0.07;
+      const textJitter = (1 - phase) * 0.28;
+      // Max return force 0.035 (was 0.065) so particles glide in rather than
+      // snap. The longer cycle compensates so they still arrive in time.
+      const textReturnForce = 0.0025 + phase * 0.032;
+      const textDamping = 0.93 + phase * 0.04;
 
       ctx.clearRect(0, 0, width, height);
 
       // Update
       for (const p of particles) {
         if (p.targetX !== undefined && p.targetY !== undefined) {
-          // Text actor
           p.vx += (p.targetX - p.x) * textReturnForce;
           p.vy += (p.targetY - p.y) * textReturnForce;
           p.vx += (Math.random() - 0.5) * textJitter;
@@ -245,11 +259,10 @@ export function Entropy({
           p.vy *= textDamping;
         } else {
           // Edge / chaos actor -- always drifting.
-          p.vx += (Math.random() - 0.5) * 0.45;
-          p.vy += (Math.random() - 0.5) * 0.45;
+          p.vx += (Math.random() - 0.5) * 0.4;
+          p.vy += (Math.random() - 0.5) * 0.4;
           p.vx *= 0.94;
           p.vy *= 0.94;
-          // Gentle bounce off canvas walls.
           if (p.x < 0 || p.x > width) p.vx *= -1;
           if (p.y < 0 || p.y > height) p.vy *= -1;
         }
@@ -259,37 +272,50 @@ export function Entropy({
         p.y = Math.max(0, Math.min(height, p.y));
       }
 
-      // Connections between nearby particles -- the web.
-      const CONNECT = 44;
+      // Precompute per-particle settle factor for the draw passes below.
+      const settleFactor = new Float32Array(particles.length);
+      for (let i = 0; i < particles.length; i++) {
+        settleFactor[i] = particleSettled(particles[i]);
+      }
+
+      // Connections between nearby particles -- the web. A line fades out as
+      // either endpoint approaches its glyph target, so the letterforms
+      // resolve crisply instead of staying tangled with cross-hatching.
+      const CONNECT = 40;
       for (let i = 0; i < particles.length; i++) {
         const a = particles[i];
+        const sA = settleFactor[i];
         for (let j = i + 1; j < particles.length; j++) {
           const b = particles[j];
           const dx = a.x - b.x;
           const dy = a.y - b.y;
           const dSq = dx * dx + dy * dy;
-          if (dSq < CONNECT * CONNECT) {
-            const d = Math.sqrt(dSq);
-            const alpha = 0.18 * (1 - d / CONNECT);
-            const r = (a.color[0] + b.color[0]) / 2;
-            const g = (a.color[1] + b.color[1]) / 2;
-            const bl = (a.color[2] + b.color[2]) / 2;
-            ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${alpha})`;
-            ctx.lineWidth = 0.75;
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-          }
+          if (dSq >= CONNECT * CONNECT) continue;
+          const sB = settleFactor[j];
+          const resolveFade = 1 - Math.max(sA, sB);
+          if (resolveFade < 0.05) continue; // both particles home -- no line
+          const d = Math.sqrt(dSq);
+          const alpha = 0.2 * (1 - d / CONNECT) * resolveFade;
+          const r = (a.color[0] + b.color[0]) / 2;
+          const g = (a.color[1] + b.color[1]) / 2;
+          const bl = (a.color[2] + b.color[2]) / 2;
+          ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${alpha})`;
+          ctx.lineWidth = 0.75;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.lineTo(b.x, b.y);
+          ctx.stroke();
         }
       }
 
-      // Draw particles on top. Text actors are a touch brighter/bigger as
-      // they approach their target so the word punches out.
-      for (const p of particles) {
+      // Draw particles on top. Text actors brighten + enlarge slightly as
+      // they reach their glyph so the word has visual weight when it lands.
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
         const isText = p.targetX !== undefined;
-        const alpha = isText ? 0.75 + 0.2 * settleAmount : 0.75;
-        const radius = isText ? 1.9 + 0.6 * settleAmount : 1.9;
+        const s = isText ? settleFactor[i] : 0;
+        const alpha = isText ? 0.72 + 0.25 * s : 0.75;
+        const radius = isText ? 1.9 + 0.5 * s : 1.9;
         const [r, g, b] = p.color;
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         ctx.beginPath();
