@@ -35,9 +35,9 @@ export default function RotatingWord() {
       <AnimatePresence mode="wait">
         <motion.span
           key={word.text}
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -30 }}
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 40 }}
           transition={{ duration: 0.4, ease: "easeInOut" }}
           className={`inline-block ${word.color}`}
         >
