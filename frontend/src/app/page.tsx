@@ -30,27 +30,7 @@ export default function Home() {
             background: "radial-gradient(ellipse, rgba(68,140,253,0.08) 0%, rgba(255,141,228,0.04) 40%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[1400px]">
-          {/* Dark-tinted glass panel. backdrop-filter does not reliably
-              sample WebGL canvas content across stacking contexts, so we
-              rely on a semi-transparent overlay + subtle gradient + inner
-              highlight to read as glass. Dots pass straight through the
-              alpha, slightly muted by the dark tint. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] bg-gradient-to-br from-black/60 via-black/55 to-black/45 shadow-2xl shadow-black/20 ring-1 ring-white/15 sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
-          />
-          {/* Inner highlight -- a bright hairline at the top edge gives the
-              classic "glass" specular feel. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -inset-x-6 -inset-y-10 rounded-[2.5rem] sm:-inset-x-8 sm:-inset-y-12 lg:-inset-x-10"
-            style={{
-              background:
-                "linear-gradient(to bottom, rgba(255,255,255,0.12), transparent 15%, transparent 85%, rgba(0,0,0,0.1))",
-            }}
-          />
-          <div className="relative grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="relative z-10 mx-auto max-w-[1400px] grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <SectionReveal>
               <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-orange px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white">
@@ -94,7 +74,6 @@ export default function Home() {
           <SectionReveal delay={0.3}>
             <HeroDemoCard />
           </SectionReveal>
-          </div>
         </div>
       </section>
 
