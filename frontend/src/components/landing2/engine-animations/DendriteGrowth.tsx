@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import {
-  CANVAS_SIZE,
   brandColor,
   brandRgba,
   clamp01,
@@ -11,21 +10,18 @@ import {
 } from "./shared";
 
 /**
- * Dendrite growth -- a small network that grows organically outward from
- * a seed node, branches thickening where they persist and pulses firing
- * along existing edges. Supports Tab 3 "Twins grow smarter over time".
+ * Dendrite growth -- a small network grows outward from a seed node,
+ * branches thickening where they persist and pulses firing along existing
+ * edges. Supports Tab 3 "Twins grow smarter over time".
  */
 export default function DendriteGrowth() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = setupCanvas(canvas);
-    if (!ctx) return;
-
-    const CX = CANVAS_SIZE / 2;
-    const CY = CANVAS_SIZE / 2;
+    if (!container || !canvas) return;
 
     type Node = {
       x: number;
@@ -35,20 +31,40 @@ export default function DendriteGrowth() {
       colorT: number;
     };
 
-    const nodes: Node[] = [
-      { x: CX, y: CY, parent: null, bornMs: 0, colorT: 0.5 },
-    ];
-
-    const MAX_NODES = 24;
-    const SPAWN_INTERVAL = 650; // ms
-    let nextSpawnAt = SPAWN_INTERVAL;
-
-    type Pulse = { fromIdx: number; toIdx: number; startMs: number };
-    const pulses: Pulse[] = [];
+    let width = 0;
+    let height = 0;
+    let ctx: CanvasRenderingContext2D | null = null;
+    let nodes: Node[] = [];
+    let nextSpawnAt = 0;
+    const pulses: { fromIdx: number; toIdx: number; startMs: number }[] = [];
     let nextPulseAt = 1800;
 
+    const MAX_NODES = 28;
+    const SPAWN_INTERVAL = 650;
+
     const start = performance.now();
-    let animationId = 0;
+
+    const rebuild = () => {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      if (!width || !height) return;
+      ctx = setupCanvas(canvas, width, height);
+      // Seed node at centre of the current canvas size.
+      nodes = [
+        {
+          x: width / 2,
+          y: height / 2,
+          parent: null,
+          bornMs: 0,
+          colorT: 0.5,
+        },
+      ];
+      nextSpawnAt = SPAWN_INTERVAL;
+    };
+
+    rebuild();
+    const ro = new ResizeObserver(rebuild);
+    ro.observe(container);
 
     const distance = (a: { x: number; y: number }, b: { x: number; y: number }) =>
       Math.hypot(a.x - b.x, a.y - b.y);
@@ -65,7 +81,6 @@ export default function DendriteGrowth() {
 
     const spawnNode = (elapsed: number) => {
       if (nodes.length >= MAX_NODES) return;
-      // Pick an existing node weighted toward leaves (fewer existing children).
       const childCount = new Array(nodes.length).fill(0);
       for (const n of nodes) if (n.parent !== null) childCount[n.parent]++;
       const weights = nodes.map((_, i) => 1 / (1 + childCount[i] * 2));
@@ -82,24 +97,24 @@ export default function DendriteGrowth() {
       const parent = nodes[parentIdx];
       const depth = nodeDepth(parent) + 1;
 
-      // Angle away from the parent's own parent (so branches reach outward).
       let awayAngle = Math.random() * Math.PI * 2;
       if (parent.parent !== null) {
         const gp = nodes[parent.parent];
         awayAngle = Math.atan2(parent.y - gp.y, parent.x - gp.x);
       }
       const angle = awayAngle + (Math.random() - 0.5) * 1.4;
-      const dist = 48 + Math.random() * 26;
+      // Scale branch length with canvas size.
+      const baseLen = Math.min(width, height) * 0.11;
+      const dist = baseLen + Math.random() * baseLen * 0.55;
       let x = parent.x + Math.cos(angle) * dist;
       let y = parent.y + Math.sin(angle) * dist;
 
-      // Keep inside canvas with a margin.
-      x = Math.max(20, Math.min(CANVAS_SIZE - 20, x));
-      y = Math.max(20, Math.min(CANVAS_SIZE - 20, y));
+      const margin = 22;
+      x = Math.max(margin, Math.min(width - margin, x));
+      y = Math.max(margin, Math.min(height - margin, y));
 
-      // Avoid collisions with other nodes.
       for (const existing of nodes) {
-        if (distance(existing, { x, y }) < 28) return; // skip this tick
+        if (distance(existing, { x, y }) < 30) return;
       }
 
       nodes.push({
@@ -107,24 +122,26 @@ export default function DendriteGrowth() {
         y,
         parent: parentIdx,
         bornMs: elapsed,
-        // Colour shifts with depth along the brand palette.
         colorT: clamp01(depth / 5),
       });
     };
 
+    let animationId = 0;
+
     const animate = (now: number) => {
+      if (!ctx) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
       const elapsed = now - start;
-      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.clearRect(0, 0, width, height);
 
       if (elapsed >= nextSpawnAt) {
         spawnNode(elapsed);
-        nextSpawnAt =
-          elapsed + SPAWN_INTERVAL * (0.85 + Math.random() * 0.4);
+        nextSpawnAt = elapsed + SPAWN_INTERVAL * (0.85 + Math.random() * 0.4);
       }
 
-      // Schedule edge pulses once we have a handful of edges.
       if (elapsed >= nextPulseAt && nodes.length > 4) {
-        // Pick a random edge.
         const childCandidates = nodes
           .map((n, i) => (n.parent !== null ? i : -1))
           .filter((i) => i >= 0);
@@ -140,7 +157,6 @@ export default function DendriteGrowth() {
         }
       }
 
-      // --- Draw edges
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         if (n.parent === null) continue;
@@ -148,20 +164,15 @@ export default function DendriteGrowth() {
         const age = clamp01((elapsed - n.bornMs) / 900);
         const alpha = 0.55 * age;
         ctx.strokeStyle = brandRgba(n.colorT, alpha);
-        ctx.lineWidth = 1 + age * 0.6;
+        ctx.lineWidth = 1.1 + age * 0.8;
         ctx.lineCap = "round";
+        const drawT = smoothstep(age);
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
-        // Partial line during growth for a "draw-on" feel.
-        const drawT = smoothstep(age);
-        ctx.lineTo(
-          p.x + (n.x - p.x) * drawT,
-          p.y + (n.y - p.y) * drawT
-        );
+        ctx.lineTo(p.x + (n.x - p.x) * drawT, p.y + (n.y - p.y) * drawT);
         ctx.stroke();
       }
 
-      // --- Draw pulses travelling along edges
       for (let i = pulses.length - 1; i >= 0; i--) {
         const pulse = pulses[i];
         const age = (elapsed - pulse.startMs) / 700;
@@ -179,14 +190,13 @@ export default function DendriteGrowth() {
         const [r, g, b] = brandColor(to.colorT);
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(x, y, 3.2, 0, Math.PI * 2);
+        ctx.arc(x, y, 3.4, 0, Math.PI * 2);
         ctx.fill();
       }
 
-      // --- Draw nodes
       for (const n of nodes) {
         const age = clamp01((elapsed - n.bornMs) / 700);
-        const radius = 3 + 1.5 * smoothstep(age);
+        const radius = 3.2 + 1.8 * smoothstep(age);
         const [r, g, b] = brandColor(n.colorT);
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.95 * age})`;
         ctx.beginPath();
@@ -199,8 +209,15 @@ export default function DendriteGrowth() {
 
     animationId = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      cancelAnimationFrame(animationId);
+      ro.disconnect();
+    };
   }, []);
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div ref={containerRef} className="h-full w-full">
+      <canvas ref={canvasRef} />
+    </div>
+  );
 }

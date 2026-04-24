@@ -40,11 +40,12 @@ export default function EngineSection() {
 
   return (
     <section className="bg-[#F5F3EF] px-6 py-28 lg:px-12 xl:px-20">
-      {/* REVERSED: diagram LEFT, text RIGHT */}
-      <div className="mx-auto grid max-w-[1400px] gap-16 lg:grid-cols-2">
+      {/* Animation LEFT, text + accordion RIGHT. items-stretch so the left
+          cell matches the full height of the copy on the right. */}
+      <div className="mx-auto grid max-w-[1400px] gap-16 lg:grid-cols-2 lg:items-stretch">
         {/* Left: animation that changes per open accordion tab. */}
-        <SectionReveal className="flex items-center justify-center">
-          <div className="relative h-[400px] w-[400px]">
+        <SectionReveal className="flex h-full items-stretch justify-center">
+          <div className="relative h-full w-full min-h-[520px]">
             <AnimatePresence mode="wait">
               {(() => {
                 const idx = openIdx ?? 0;
@@ -56,7 +57,7 @@ export default function EngineSection() {
                     animate={{ opacity: 1 }}
                     exit={reduced ? {} : { opacity: 0 }}
                     transition={{ duration: 0.25 }}
-                    className="absolute inset-0 flex items-center justify-center"
+                    className="absolute inset-0"
                   >
                     <ActiveAnimation />
                   </motion.div>

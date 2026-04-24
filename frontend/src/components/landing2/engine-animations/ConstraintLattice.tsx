@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import {
-  CANVAS_SIZE,
   brandColor,
   brandRgba,
   setupCanvas,
@@ -12,29 +11,20 @@ import {
 /**
  * Constraint lattice -- chaotic dots pulled into a structured grid, then
  * breathing softly in place. Supports Tab 2 "Structured personas".
- *
- * Phases: chaos (0-2s) -> settle (2-4.5s) -> hold with breath (4.5s+).
- * Not looped. Component remounts each time the tab re-opens.
  */
 export default function ConstraintLattice() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = setupCanvas(canvas);
-    if (!ctx) return;
+    if (!container || !canvas) return;
 
-    const CX = CANVAS_SIZE / 2;
-    const CY = CANVAS_SIZE / 2;
     const COLS = 5;
     const ROWS = 4;
-    const GRID_W = 260;
-    const GRID_H = 200;
 
     type Dot = {
-      chaosX: number;
-      chaosY: number;
       slotX: number;
       slotY: number;
       x: number;
@@ -46,64 +36,84 @@ export default function ConstraintLattice() {
       colorT: number;
     };
 
-    const dots: Dot[] = [];
-    let idx = 0;
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
-        const slotX =
-          CX -
-          GRID_W / 2 +
-          (GRID_W / (COLS - 1)) * c +
-          (Math.random() - 0.5) * 8;
-        const slotY =
-          CY -
-          GRID_H / 2 +
-          (GRID_H / (ROWS - 1)) * r +
-          (Math.random() - 0.5) * 8;
-        const chaosX = CANVAS_SIZE * 0.1 + Math.random() * CANVAS_SIZE * 0.8;
-        const chaosY = CANVAS_SIZE * 0.1 + Math.random() * CANVAS_SIZE * 0.8;
-        dots.push({
-          chaosX,
-          chaosY,
-          slotX,
-          slotY,
-          x: chaosX,
-          y: chaosY,
-          vx: (Math.random() - 0.5) * 2,
-          vy: (Math.random() - 0.5) * 2,
-          phase: Math.random() * Math.PI * 2,
-          phaseSpeed: 0.018 + Math.random() * 0.015,
-          colorT: idx / (ROWS * COLS - 1),
-        });
-        idx++;
-      }
-    }
-
-    type Pulse = { dotIdx: number; startMs: number };
-    const pulses: Pulse[] = [];
+    let width = 0;
+    let height = 0;
+    let ctx: CanvasRenderingContext2D | null = null;
+    let dots: Dot[] = [];
+    const pulses: { dotIdx: number; startMs: number }[] = [];
     let nextPulseAt = 5500;
+    let gridLeft = 0;
+    let gridTop = 0;
+    let gridW = 0;
+    let gridH = 0;
 
+    const start = performance.now();
     const CHAOS_END = 2000;
     const SETTLE_END = 4500;
 
-    const start = performance.now();
+    const rebuild = () => {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      if (!width || !height) return;
+      ctx = setupCanvas(canvas, width, height);
+
+      gridW = width * 0.62;
+      gridH = height * 0.52;
+      gridLeft = (width - gridW) / 2;
+      gridTop = (height - gridH) / 2;
+
+      dots = [];
+      let idx = 0;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const slotX =
+            gridLeft +
+            (gridW / (COLS - 1)) * c +
+            (Math.random() - 0.5) * 8;
+          const slotY =
+            gridTop +
+            (gridH / (ROWS - 1)) * r +
+            (Math.random() - 0.5) * 8;
+          const chaosX = width * 0.08 + Math.random() * width * 0.84;
+          const chaosY = height * 0.08 + Math.random() * height * 0.84;
+          dots.push({
+            slotX,
+            slotY,
+            x: chaosX,
+            y: chaosY,
+            vx: (Math.random() - 0.5) * 2,
+            vy: (Math.random() - 0.5) * 2,
+            phase: Math.random() * Math.PI * 2,
+            phaseSpeed: 0.018 + Math.random() * 0.015,
+            colorT: idx / (ROWS * COLS - 1),
+          });
+          idx++;
+        }
+      }
+    };
+
+    rebuild();
+    const ro = new ResizeObserver(rebuild);
+    ro.observe(container);
+
     let animationId = 0;
 
     const animate = (now: number) => {
+      if (!ctx) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
       const elapsed = now - start;
-      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.clearRect(0, 0, width, height);
 
-      // Compute settle factor (0 during chaos, 1 once fully locked in).
       let settle = 0;
       if (elapsed < CHAOS_END) settle = 0;
       else if (elapsed < SETTLE_END)
         settle = smoothstep((elapsed - CHAOS_END) / (SETTLE_END - CHAOS_END));
       else settle = 1;
 
-      // --- Update dots
       for (const d of dots) {
         if (settle < 1) {
-          // Chaos drift + easing toward slot, weighted by settle.
           d.vx += (Math.random() - 0.5) * 0.35;
           d.vy += (Math.random() - 0.5) * 0.35;
           d.vx *= 0.94;
@@ -113,7 +123,6 @@ export default function ConstraintLattice() {
           d.x = chaosX * (1 - settle) + d.slotX * settle;
           d.y = chaosY * (1 - settle) + d.slotY * settle;
         } else {
-          // Held in place with gentle breath.
           d.phase += d.phaseSpeed;
           const breath = Math.sin(d.phase) * 1.3;
           d.x = d.slotX + Math.cos(d.phase * 0.7) * 0.6;
@@ -121,7 +130,6 @@ export default function ConstraintLattice() {
         }
       }
 
-      // --- Trigger pulses during hold
       if (elapsed > SETTLE_END && elapsed > nextPulseAt) {
         pulses.push({
           dotIdx: Math.floor(Math.random() * dots.length),
@@ -130,28 +138,27 @@ export default function ConstraintLattice() {
         nextPulseAt = elapsed + 600 + Math.random() * 900;
       }
 
-      // --- Draw faint grid scaffolding (implied lattice). Fades in with settle.
+      // Scaffold grid (fades in with settle).
       if (settle > 0.4) {
         const gridAlpha = smoothstep((settle - 0.4) / 0.6) * 0.06;
         ctx.strokeStyle = `rgba(0, 0, 0, ${gridAlpha})`;
         ctx.lineWidth = 0.5;
         for (let r = 0; r < ROWS; r++) {
+          const y = gridTop + (gridH / (ROWS - 1)) * r;
           ctx.beginPath();
-          const y = CY - GRID_H / 2 + (GRID_H / (ROWS - 1)) * r;
-          ctx.moveTo(CX - GRID_W / 2 - 10, y);
-          ctx.lineTo(CX + GRID_W / 2 + 10, y);
+          ctx.moveTo(gridLeft - 14, y);
+          ctx.lineTo(gridLeft + gridW + 14, y);
           ctx.stroke();
         }
         for (let c = 0; c < COLS; c++) {
+          const x = gridLeft + (gridW / (COLS - 1)) * c;
           ctx.beginPath();
-          const x = CX - GRID_W / 2 + (GRID_W / (COLS - 1)) * c;
-          ctx.moveTo(x, CY - GRID_H / 2 - 10);
-          ctx.lineTo(x, CY + GRID_H / 2 + 10);
+          ctx.moveTo(x, gridTop - 14);
+          ctx.lineTo(x, gridTop + gridH + 14);
           ctx.stroke();
         }
       }
 
-      // --- Draw active pulses first (behind dots).
       for (let i = pulses.length - 1; i >= 0; i--) {
         const p = pulses[i];
         const age = (elapsed - p.startMs) / 1200;
@@ -160,7 +167,7 @@ export default function ConstraintLattice() {
           continue;
         }
         const d = dots[p.dotIdx];
-        const radius = 4 + age * 28;
+        const radius = 4 + age * 34;
         const alpha = (1 - age) * 0.45;
         ctx.strokeStyle = brandRgba(d.colorT, alpha);
         ctx.lineWidth = 1.2;
@@ -169,14 +176,12 @@ export default function ConstraintLattice() {
         ctx.stroke();
       }
 
-      // --- Draw dots
       for (const d of dots) {
         const [r, g, b] = brandColor(d.colorT);
-        // Dots brighten once settled.
         const alpha = 0.55 + 0.35 * settle;
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, 4.2, 0, Math.PI * 2);
+        ctx.arc(d.x, d.y, 5, 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -185,8 +190,15 @@ export default function ConstraintLattice() {
 
     animationId = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      cancelAnimationFrame(animationId);
+      ro.disconnect();
+    };
   }, []);
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div ref={containerRef} className="h-full w-full">
+      <canvas ref={canvasRef} />
+    </div>
+  );
 }

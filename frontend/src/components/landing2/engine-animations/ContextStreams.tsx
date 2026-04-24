@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from "react";
 import {
-  CANVAS_SIZE,
   brandColor,
   brandRgba,
   clamp01,
@@ -12,121 +11,136 @@ import {
 
 /**
  * Convergent streams -- eight curved traces drawing themselves inward
- * toward a central focal point. Supports Tab 1 "Context-first": gather
- * from many sources, then speak.
+ * toward a central focal point. Supports Tab 1 "Context-first".
  */
 export default function ContextStreams() {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    const container = containerRef.current;
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = setupCanvas(canvas);
-    if (!ctx) return;
+    if (!container || !canvas) return;
 
-    const cx = CANVAS_SIZE / 2;
-    const cy = CANVAS_SIZE / 2;
-    const START_RADIUS = 170;
+    type Stream = {
+      sx: number;
+      sy: number;
+      mx: number;
+      my: number;
+      colorT: number;
+      arrivalStart: number;
+      arrivalDuration: number;
+    };
 
-    // Stream definitions. Each has an angle of approach and a color tint.
-    const STREAMS = Array.from({ length: 8 }, (_, i) => {
-      const angle = (i / 8) * Math.PI * 2 - Math.PI / 2; // start from top
-      const sx = cx + Math.cos(angle) * START_RADIUS;
-      const sy = cy + Math.sin(angle) * START_RADIUS;
-      // Control point: pulled laterally so the curve bends nicely.
-      const perpAngle = angle + Math.PI / 2;
-      const bend = 28 * ((i % 2) * 2 - 1); // alternate sides
-      const midX = (sx + cx) / 2 + Math.cos(perpAngle) * bend;
-      const midY = (sy + cy) / 2 + Math.sin(perpAngle) * bend;
-      return {
-        sx,
-        sy,
-        mx: midX,
-        my: midY,
-        colorT: i / 7,
-        arrivalStart: 400 + i * 520, // ms; staggered entrance
-        arrivalDuration: 1800,
-      };
-    });
+    let width = 0;
+    let height = 0;
+    let cx = 0;
+    let cy = 0;
+    let ctx: CanvasRenderingContext2D | null = null;
+    let streams: Stream[] = [];
+    const triggered = new Set<number>();
+    let pulses: { startMs: number; colorT: number }[] = [];
 
     const CYCLE_MS = 11000;
 
-    // Arrivals ring-pulses triggered when a stream reaches the centre.
-    type Pulse = { startMs: number; colorT: number };
-    let pulses: Pulse[] = [];
-    const triggered = new Set<number>();
+    const rebuild = () => {
+      width = container.clientWidth;
+      height = container.clientHeight;
+      if (!width || !height) return;
+      cx = width / 2;
+      cy = height / 2;
+      ctx = setupCanvas(canvas, width, height);
 
-    const start = performance.now();
-    let animationId = 0;
+      const startRadius = Math.min(cx, cy) * 0.88;
+      streams = Array.from({ length: 8 }, (_, i) => {
+        const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+        const sx = cx + Math.cos(angle) * startRadius;
+        const sy = cy + Math.sin(angle) * startRadius;
+        const perpAngle = angle + Math.PI / 2;
+        const bend = Math.min(cx, cy) * 0.16 * ((i % 2) * 2 - 1);
+        const midX = (sx + cx) / 2 + Math.cos(perpAngle) * bend;
+        const midY = (sy + cy) / 2 + Math.sin(perpAngle) * bend;
+        return {
+          sx,
+          sy,
+          mx: midX,
+          my: midY,
+          colorT: i / 7,
+          arrivalStart: 400 + i * 520,
+          arrivalDuration: 1800,
+        };
+      });
 
-    const drawBezierHead = (
-      s: { sx: number; sy: number; mx: number; my: number; colorT: number },
-      progress: number,
-      alpha: number
-    ) => {
-      // Draw a bezier up to `progress` with a soft fade along its length.
+      triggered.clear();
+      pulses = [];
+    };
+
+    rebuild();
+    const ro = new ResizeObserver(rebuild);
+    ro.observe(container);
+
+    const bezierPoint = (s: Stream, t: number) => {
+      const mt = 1 - t;
+      return {
+        x: mt * mt * s.sx + 2 * mt * t * s.mx + t * t * cx,
+        y: mt * mt * s.sy + 2 * mt * t * s.my + t * t * cy,
+      };
+    };
+
+    const drawBezierHead = (s: Stream, progress: number, alpha: number) => {
+      if (!ctx) return;
       const steps = 40;
       const endStep = Math.max(1, Math.floor(steps * progress));
       for (let k = 0; k < endStep; k++) {
-        const t0 = k / steps;
-        const t1 = (k + 1) / steps;
-        const p0 = bezierPoint(s, t0);
-        const p1 = bezierPoint(s, t1);
-        // Fade toward the tail (older segments dimmer).
+        const p0 = bezierPoint(s, k / steps);
+        const p1 = bezierPoint(s, (k + 1) / steps);
         const tailBrightness = clamp01((k - endStep + 14) / 14);
         ctx.strokeStyle = brandRgba(s.colorT, 0.7 * tailBrightness * alpha);
-        ctx.lineWidth = 1.4;
+        ctx.lineWidth = 1.6;
         ctx.lineCap = "round";
         ctx.beginPath();
         ctx.moveTo(p0.x, p0.y);
         ctx.lineTo(p1.x, p1.y);
         ctx.stroke();
       }
-
-      // Head dot (leads the trace).
       const head = bezierPoint(s, progress);
       const [r, g, b] = brandColor(s.colorT);
       ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${0.95 * alpha})`;
       ctx.beginPath();
-      ctx.arc(head.x, head.y, 2.6, 0, Math.PI * 2);
+      ctx.arc(head.x, head.y, 3, 0, Math.PI * 2);
       ctx.fill();
     };
 
-    function bezierPoint(
-      s: { sx: number; sy: number; mx: number; my: number },
-      t: number
-    ) {
-      const mt = 1 - t;
-      return {
-        x: mt * mt * s.sx + 2 * mt * t * s.mx + t * t * cx,
-        y: mt * mt * s.sy + 2 * mt * t * s.my + t * t * cy,
-      };
-    }
+    const start = performance.now();
+    let animationId = 0;
 
     const animate = (now: number) => {
+      if (!ctx) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
       const elapsed = (now - start) % CYCLE_MS;
 
-      // At cycle boundary, reset arrival tracking.
       if (elapsed < 120) {
         triggered.clear();
         pulses = [];
       }
 
-      // Overall alpha: fade in 0-0.3s, fade out last 1s of cycle.
-      const overallAlpha = smoothstep(elapsed / 300) * (1 - smoothstep((elapsed - (CYCLE_MS - 1000)) / 1000));
+      const overallAlpha =
+        smoothstep(elapsed / 300) *
+        (1 - smoothstep((elapsed - (CYCLE_MS - 1000)) / 1000));
 
-      ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.clearRect(0, 0, width, height);
 
-      // Soft outer halo behind the focal point to anchor the composition.
-      const gradRadius = 90;
+      // Soft halo anchoring the focal point.
+      const gradRadius = Math.min(cx, cy) * 0.45;
       const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, gradRadius);
       grad.addColorStop(0, `rgba(255, 135, 32, ${0.08 * overallAlpha})`);
       grad.addColorStop(1, "rgba(255, 135, 32, 0)");
       ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+      ctx.fillRect(0, 0, width, height);
 
-      // Draw streams
-      STREAMS.forEach((s, i) => {
+      streams.forEach((s, i) => {
         if (elapsed < s.arrivalStart) return;
         const p = clamp01((elapsed - s.arrivalStart) / s.arrivalDuration);
         drawBezierHead(s, p, overallAlpha);
@@ -136,7 +150,6 @@ export default function ContextStreams() {
         }
       });
 
-      // Draw arrival pulses (ripples emanating from centre).
       pulses = pulses.filter((pulse) => elapsed - pulse.startMs < 1200);
       for (const pulse of pulses) {
         const age = (elapsed - pulse.startMs) / 1200;
@@ -149,26 +162,24 @@ export default function ContextStreams() {
         ctx.stroke();
       }
 
-      // Focal point -- grows brighter as more streams arrive.
-      const focalBrightness = triggered.size / STREAMS.length;
+      const focalBrightness = triggered.size / streams.length;
       const focalAlpha = (0.2 + focalBrightness * 0.6) * overallAlpha;
       ctx.fillStyle = `rgba(255, 135, 32, ${focalAlpha})`;
       ctx.beginPath();
-      ctx.arc(cx, cy, 5.5, 0, Math.PI * 2);
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
       ctx.fill();
 
-      // Outgoing stroke downward once all streams have arrived.
       const OUTGOING_START = 7800;
       if (elapsed > OUTGOING_START) {
         const t = clamp01((elapsed - OUTGOING_START) / 1800);
         const env = smoothstep(t) * (1 - smoothstep((t - 0.6) / 0.4));
-        const length = 60 * smoothstep(t);
+        const length = Math.min(cx, cy) * 0.18 * smoothstep(t);
         ctx.strokeStyle = `rgba(255, 135, 32, ${env * 0.9 * overallAlpha})`;
-        ctx.lineWidth = 1.6;
+        ctx.lineWidth = 1.8;
         ctx.lineCap = "round";
         ctx.beginPath();
-        ctx.moveTo(cx, cy + 8);
-        ctx.lineTo(cx, cy + 8 + length);
+        ctx.moveTo(cx, cy + 9);
+        ctx.lineTo(cx, cy + 9 + length);
         ctx.stroke();
       }
 
@@ -177,8 +188,15 @@ export default function ContextStreams() {
 
     animationId = requestAnimationFrame(animate);
 
-    return () => cancelAnimationFrame(animationId);
+    return () => {
+      cancelAnimationFrame(animationId);
+      ro.disconnect();
+    };
   }, []);
 
-  return <canvas ref={canvasRef} />;
+  return (
+    <div ref={containerRef} className="h-full w-full">
+      <canvas ref={canvasRef} />
+    </div>
+  );
 }

@@ -39,16 +39,18 @@ export function brandRgba(t: number, alpha: number): string {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
-export const CANVAS_SIZE = 400;
-
-export function setupCanvas(canvas: HTMLCanvasElement): CanvasRenderingContext2D | null {
+export function setupCanvas(
+  canvas: HTMLCanvasElement,
+  width: number,
+  height: number
+): CanvasRenderingContext2D | null {
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = CANVAS_SIZE * dpr;
-  canvas.height = CANVAS_SIZE * dpr;
-  canvas.style.width = `${CANVAS_SIZE}px`;
-  canvas.style.height = `${CANVAS_SIZE}px`;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(dpr, dpr);
   return ctx;
