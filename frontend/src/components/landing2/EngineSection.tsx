@@ -1,8 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import SectionReveal from "./SectionReveal";
+import ContextStreams from "./engine-animations/ContextStreams";
+import ConstraintLattice from "./engine-animations/ConstraintLattice";
+import DendriteGrowth from "./engine-animations/DendriteGrowth";
+import ConfidenceField from "./engine-animations/ConfidenceField";
+
+const ANIMATIONS = [
+  ContextStreams,
+  ConstraintLattice,
+  DendriteGrowth,
+  ConfidenceField,
+];
 
 const POINTS = [
   {
@@ -31,45 +42,27 @@ export default function EngineSection() {
     <section className="bg-[#F5F3EF] px-6 py-28 lg:px-12 xl:px-20">
       {/* REVERSED: diagram LEFT, text RIGHT */}
       <div className="mx-auto grid max-w-[1400px] gap-16 lg:grid-cols-2">
-        {/* Left: diagram */}
+        {/* Left: animation that changes per open accordion tab. */}
         <SectionReveal className="flex items-center justify-center">
-          <div className="w-full max-w-sm">
-            <div className="mb-6 flex flex-wrap justify-center gap-3">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="h-3.5 w-3.5 rounded-full"
-                  style={{ backgroundColor: ["#448CFD", "#FF8DE4", "#FF8720"][i % 3] }}
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }}
-                  transition={{ duration: 2.5, delay: i * 0.3, repeat: Infinity, repeatDelay: 2 }}
-                />
-              ))}
-            </div>
-            <div className="flex justify-center"><div className="h-10 w-px bg-gray-200" /></div>
-            <div className="flex justify-center py-3">
-              <motion.div
-                className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-brand-orange bg-brand-orange/5"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-              >
-                <span className="text-xl font-black text-brand-orange">M</span>
-              </motion.div>
-            </div>
-            <div className="flex justify-center"><div className="h-10 w-px bg-gray-200" /></div>
-            <div className="flex flex-wrap justify-center gap-2.5">
-              {Array.from({ length: 15 }).map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="h-4.5 w-4.5 rounded-full"
-                  style={{
-                    width: 18, height: 18,
-                    backgroundColor: ["#448CFD", "#FF8DE4", "#FF8720", "#6EB0FF"][i % 4],
-                  }}
-                  animate={{ opacity: [0.35, 0.75, 0.35] }}
-                  transition={{ duration: 3, delay: i * 0.2, repeat: Infinity }}
-                />
-              ))}
-            </div>
+          <div className="relative h-[400px] w-[400px]">
+            <AnimatePresence mode="wait">
+              {(() => {
+                const idx = openIdx ?? 0;
+                const ActiveAnimation = ANIMATIONS[idx];
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={reduced ? {} : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={reduced ? {} : { opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <ActiveAnimation />
+                  </motion.div>
+                );
+              })()}
+            </AnimatePresence>
           </div>
         </SectionReveal>
 
