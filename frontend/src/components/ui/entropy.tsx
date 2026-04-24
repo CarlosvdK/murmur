@@ -19,18 +19,20 @@ const BRAND_PALETTE: [number, number, number][] = [
   [255, 135, 32], // orange #FF8720
 ];
 
-// Motion feel. Everything moves at the same slow constant speed. Directions
-// drift smoothly via small angular noise -- no velocity accumulation, no
-// damping oscillation. This removes the "fast/slow/fast" pulsing.
-const BASE_SPEED = 0.55; // pixels per frame
-const ANGULAR_JITTER = 0.06; // radians per frame (edge actors + scatter phase)
+// Motion feel. Everything that moves moves at the same slow constant speed.
+// Directions drift via small angular noise -- no velocity accumulation, no
+// damping oscillation. Many dots don't move at all (anchors) so the web has
+// stable structure.
+const BASE_SPEED = 0.28; // pixels per frame for moving particles
+const ANGULAR_JITTER = 0.025; // radians per frame -- lazy direction drift
 const TEXT_ARRIVAL_RADIUS = 8; // px; speed decays to zero within this of target
+const ANCHOR_FRACTION = 0.55; // share of edge dots that never move
 
 // Web topology. Instead of "connect any two within R" we use K-nearest
 // neighbours. Each particle always has K edges -> no stranded clusters.
 const K_NEAREST = 3;
-const KNN_RECOMPUTE_FRAMES = 4; // only rebuild the KNN graph every N frames
-const MAX_EDGE_DRAW_DIST = 120; // px; don't streak ultra-long outliers
+const KNN_RECOMPUTE_FRAMES = 5; // rebuild the KNN graph every N frames
+const MAX_EDGE_DRAW_DIST = 140; // px; don't streak ultra-long outliers
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -60,11 +62,19 @@ type Particle = {
   y: number;
   angle: number; // current heading in radians
   color: [number, number, number];
+  /** True for edge dots that never move. Creates the "anchor" feel of a web. */
+  anchor: boolean;
   /** Glyph target (undefined for edge/chaos actors). */
   targetX?: number;
   targetY?: number;
 };
 
+/**
+ * Sample points along the OUTLINE of each glyph (not the filled interior).
+ * This gives the "spider writes letters with web threads" feel from
+ * Charlotte's Web -- dots trace the strokes of the letters, and when KNN
+ * connects them the web literally draws the words.
+ */
 function computeTextMask(
   lines: string[],
   canvasWidth: number,
@@ -80,15 +90,20 @@ function computeTextMask(
   const octx = off.getContext("2d");
   if (!octx) return [];
 
-  octx.fillStyle = "white";
-  octx.font = `900 ${fontSize}px Inter, system-ui, sans-serif`;
+  // Stroke the glyphs instead of filling them. lineWidth is thin so the
+  // sampled "ink" is a one-to-two-dot-thick outline, not a slab.
+  octx.strokeStyle = "white";
+  octx.lineWidth = Math.max(2.5, fontSize * 0.05);
+  octx.lineJoin = "round";
+  octx.lineCap = "round";
+  octx.font = `800 ${fontSize}px Inter, system-ui, sans-serif`;
   octx.textAlign = "center";
   octx.textBaseline = "middle";
 
   const totalHeight = lines.length * fontSize + (lines.length - 1) * lineGap;
   const startY = canvasHeight / 2 - totalHeight / 2 + fontSize / 2;
   lines.forEach((line, i) => {
-    octx.fillText(line, canvasWidth / 2, startY + i * (fontSize + lineGap));
+    octx.strokeText(line, canvasWidth / 2, startY + i * (fontSize + lineGap));
   });
 
   const img = octx.getImageData(0, 0, canvasWidth, canvasHeight);
@@ -128,7 +143,9 @@ export function Entropy({
     const rebuild = () => {
       const fontSize = Math.max(44, Math.floor(width / 10));
       const lineGap = Math.floor(fontSize * 0.12);
-      const stride = Math.max(5, Math.round(width / 140));
+      // Sparser stride: we are sampling a thin stroke now, not a fill, and
+      // we want the letters to feel written-with-thread, not pixellated.
+      const stride = Math.max(9, Math.round(width / 75));
       const textPoints = computeTextMask(
         text,
         width,
@@ -140,21 +157,24 @@ export function Entropy({
 
       particles = [];
 
-      // Text actors -- one per sampled text pixel. Start at random positions
-      // + random angles. They will pick up a bias toward their target during
-      // the settle phase.
+      // Text actors -- one per sampled contour pixel. Always mobile; they
+      // need to reach their glyph position. Once they arrive the settle
+      // logic clamps speed to 0, so they effectively become anchors on the
+      // letter itself.
       for (const pt of textPoints) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
           angle: Math.random() * Math.PI * 2,
           color: brandColor(pt.x / width),
+          anchor: false,
           targetX: pt.x,
           targetY: pt.y,
         });
       }
 
-      // Edge / chaos actors -- always drifting.
+      // Edge / chaos actors. Each one gets a coin flip for anchor-ness; the
+      // anchor fraction controls how "living" vs "structural" the web feels.
       const EDGE_COUNT = Math.round((width * height) / 1700);
       for (let i = 0; i < EDGE_COUNT; i++) {
         const x = Math.random() * width;
@@ -164,6 +184,7 @@ export function Entropy({
           y,
           angle: Math.random() * Math.PI * 2,
           color: brandColor(x / width),
+          anchor: Math.random() < ANCHOR_FRACTION,
         });
       }
 
@@ -276,9 +297,12 @@ export function Entropy({
       ctx.clearRect(0, 0, width, height);
 
       // --- Update particles -----------------------------------------------
-      // All particles move at the same constant BASE_SPEED. Only direction
-      // changes frame-to-frame. This is what gives the "slow, uniform" feel.
+      // Anchors do not move at all. Mobile particles glide at a single slow
+      // constant speed; only direction drifts. That gives the "living web"
+      // feel -- some threads taut, some breathing.
       for (const p of particles) {
+        if (p.anchor) continue;
+
         const hasTarget = p.targetX !== undefined && p.targetY !== undefined;
 
         if (hasTarget && phase > 0) {
@@ -288,14 +312,13 @@ export function Entropy({
           const dist = Math.hypot(dx, dy);
           const angleToTarget = dist > 0.0001 ? Math.atan2(dy, dx) : p.angle;
 
-          // Direction blend via unit-vector average (no angle-wrap artifacts).
           const cx = Math.cos(p.angle) * (1 - phase) + Math.cos(angleToTarget) * phase;
           const cy = Math.sin(p.angle) * (1 - phase) + Math.sin(angleToTarget) * phase;
           const norm = Math.hypot(cx, cy) || 1;
           p.angle = Math.atan2(cy / norm, cx / norm);
 
           // A little residual wander, stronger during noise, near-zero at hold.
-          p.angle += (Math.random() - 0.5) * ANGULAR_JITTER * (1 - 0.8 * phase);
+          p.angle += (Math.random() - 0.5) * ANGULAR_JITTER * (1 - 0.85 * phase);
 
           // Ease speed to zero once within TEXT_ARRIVAL_RADIUS of target.
           const arrivalFactor = Math.min(1, dist / TEXT_ARRIVAL_RADIUS);
@@ -303,12 +326,11 @@ export function Entropy({
           p.x += Math.cos(p.angle) * speed;
           p.y += Math.sin(p.angle) * speed;
         } else {
-          // Edge actor, or text actor during pure-noise phase.
+          // Mobile edge actor, or text actor during pure-noise phase.
           p.angle += (Math.random() - 0.5) * ANGULAR_JITTER;
           p.x += Math.cos(p.angle) * BASE_SPEED;
           p.y += Math.sin(p.angle) * BASE_SPEED;
 
-          // Reflect cleanly off the canvas walls so particles never leave.
           if (p.x < 0) {
             p.x = 0;
             p.angle = Math.PI - p.angle;
