@@ -70,7 +70,7 @@ export default function Home() {
             </SectionReveal>
           </div>
           <SectionReveal delay={0.3}>
-            <Entropy size={520} />
+            <Entropy />
           </SectionReveal>
         </div>
       </section>
