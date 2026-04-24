@@ -245,7 +245,7 @@ export function Entropy({
       else if (t < 0.92) phase = 1;
       else phase = 1 - smoothstep((t - 0.92) / 0.08);
 
-      const textJitter = (1 - phase) * 0.28;
+      const textJitter = (1 - phase) * 0.4;
       // Max return force 0.035 (was 0.065) so particles glide in rather than
       // snap. The longer cycle compensates so they still arrive in time.
       const textReturnForce = 0.0025 + phase * 0.032;
@@ -263,11 +263,11 @@ export function Entropy({
           p.vx *= textDamping;
           p.vy *= textDamping;
         } else {
-          // Edge / chaos actor -- always drifting.
-          p.vx += (Math.random() - 0.5) * 0.4;
-          p.vy += (Math.random() - 0.5) * 0.4;
-          p.vx *= 0.94;
-          p.vy *= 0.94;
+          // Edge / chaos actor -- always drifting, and lively.
+          p.vx += (Math.random() - 0.5) * 0.65;
+          p.vy += (Math.random() - 0.5) * 0.65;
+          p.vx *= 0.93;
+          p.vy *= 0.93;
           if (p.x < 0 || p.x > width) p.vx *= -1;
           if (p.y < 0 || p.y > height) p.vy *= -1;
         }
@@ -286,7 +286,7 @@ export function Entropy({
       // Connections between nearby particles -- the web. A line fades out as
       // either endpoint approaches its glyph target, so the letterforms
       // resolve crisply instead of staying tangled with cross-hatching.
-      const CONNECT = 40;
+      const CONNECT = 54;
       for (let i = 0; i < particles.length; i++) {
         const a = particles[i];
         const sA = settleFactor[i];
@@ -300,12 +300,12 @@ export function Entropy({
           const resolveFade = 1 - Math.max(sA, sB);
           if (resolveFade < 0.05) continue; // both particles home -- no line
           const d = Math.sqrt(dSq);
-          const alpha = 0.2 * (1 - d / CONNECT) * resolveFade;
+          const alpha = 0.3 * (1 - d / CONNECT) * resolveFade;
           const r = (a.color[0] + b.color[0]) / 2;
           const g = (a.color[1] + b.color[1]) / 2;
           const bl = (a.color[2] + b.color[2]) / 2;
           ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${alpha})`;
-          ctx.lineWidth = 0.75;
+          ctx.lineWidth = 0.9;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
