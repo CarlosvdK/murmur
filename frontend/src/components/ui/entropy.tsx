@@ -4,11 +4,11 @@ import { useEffect, useRef } from "react";
 
 interface EntropyProps {
   className?: string;
-  /** Optional fixed side. When omitted, fills container width and is square. */
+  /** Optional fixed side. When omitted, fills container width + height. */
   size?: number;
   /** Seconds for one full chaos -> text -> chaos loop. */
   cycleSeconds?: number;
-  /** Line(s) of text the central particles form. Multiple entries = multiple lines. */
+  /** Line(s) of text the central particles form. */
   text?: string[];
 }
 
@@ -18,6 +18,19 @@ const BRAND_PALETTE: [number, number, number][] = [
   [255, 141, 228], // pink  #FF8DE4
   [255, 135, 32], // orange #FF8720
 ];
+
+// Motion feel. Everything moves at the same slow constant speed. Directions
+// drift smoothly via small angular noise -- no velocity accumulation, no
+// damping oscillation. This removes the "fast/slow/fast" pulsing.
+const BASE_SPEED = 0.55; // pixels per frame
+const ANGULAR_JITTER = 0.06; // radians per frame (edge actors + scatter phase)
+const TEXT_ARRIVAL_RADIUS = 8; // px; speed decays to zero within this of target
+
+// Web topology. Instead of "connect any two within R" we use K-nearest
+// neighbours. Each particle always has K edges -> no stranded clusters.
+const K_NEAREST = 3;
+const KNN_RECOMPUTE_FRAMES = 4; // only rebuild the KNN graph every N frames
+const MAX_EDGE_DRAW_DIST = 120; // px; don't streak ultra-long outliers
 
 function lerp(a: number, b: number, t: number) {
   return a + (b - a) * t;
@@ -45,18 +58,13 @@ function brandColor(t: number): [number, number, number] {
 type Particle = {
   x: number;
   y: number;
-  vx: number;
-  vy: number;
+  angle: number; // current heading in radians
   color: [number, number, number];
-  /** If set, this particle is a "text actor" and will ease toward this point. */
+  /** Glyph target (undefined for edge/chaos actors). */
   targetX?: number;
   targetY?: number;
 };
 
-/**
- * Compute the set of (x, y) pixel positions occupied by one or more lines of
- * bold text, rendered centred in the given box. Used to pin particles to text.
- */
 function computeTextMask(
   lines: string[],
   canvasWidth: number,
@@ -88,19 +96,12 @@ function computeTextMask(
   for (let y = 0; y < canvasHeight; y += stride) {
     for (let x = 0; x < canvasWidth; x += stride) {
       const idx = (y * canvasWidth + x) * 4;
-      if (img.data[idx + 3] > 128) {
-        points.push({ x, y });
-      }
+      if (img.data[idx + 3] > 128) points.push({ x, y });
     }
   }
   return points;
 }
 
-/**
- * Entropy -- a field that loops from pure noise into a readable word and back.
- * Edge particles keep drifting chaotically throughout; central "text actors"
- * migrate toward glyph positions during the settle phase of each cycle.
- */
 export function Entropy({
   className = "",
   size,
@@ -122,15 +123,12 @@ export function Entropy({
     let height = 0;
 
     let particles: Particle[] = [];
+    let edges: [number, number][] = [];
 
     const rebuild = () => {
-      // Font size scales with the canvas. Tuned so the default two-liner
-      // reads clearly at ~500-900px wide.
       const fontSize = Math.max(44, Math.floor(width / 10));
       const lineGap = Math.floor(fontSize * 0.12);
-      // Stride controls how dense the text is. Smaller = more particles.
       const stride = Math.max(5, Math.round(width / 140));
-
       const textPoints = computeTextMask(
         text,
         width,
@@ -142,21 +140,21 @@ export function Entropy({
 
       particles = [];
 
-      // Text actors -- one per sampled text pixel.
+      // Text actors -- one per sampled text pixel. Start at random positions
+      // + random angles. They will pick up a bias toward their target during
+      // the settle phase.
       for (const pt of textPoints) {
         particles.push({
           x: Math.random() * width,
           y: Math.random() * height,
-          vx: (Math.random() - 0.5) * 3,
-          vy: (Math.random() - 0.5) * 3,
+          angle: Math.random() * Math.PI * 2,
           color: brandColor(pt.x / width),
           targetX: pt.x,
           targetY: pt.y,
         });
       }
 
-      // Edge / chaos actors -- persistent random walkers scattered across the
-      // canvas. Count scales with canvas area.
+      // Edge / chaos actors -- always drifting.
       const EDGE_COUNT = Math.round((width * height) / 1700);
       for (let i = 0; i < EDGE_COUNT; i++) {
         const x = Math.random() * width;
@@ -164,11 +162,12 @@ export function Entropy({
         particles.push({
           x,
           y,
-          vx: (Math.random() - 0.5) * 3,
-          vy: (Math.random() - 0.5) * 3,
+          angle: Math.random() * Math.PI * 2,
           color: brandColor(x / width),
         });
       }
+
+      edges = [];
     };
 
     const resize = () => {
@@ -176,7 +175,6 @@ export function Entropy({
         width = size;
         height = size;
       } else {
-        // Fill the parent: width AND height, not a forced square.
         width = container.clientWidth;
         height = Math.max(container.clientHeight, 560);
       }
@@ -197,130 +195,176 @@ export function Entropy({
     const start = performance.now();
     let animationId = 0;
     let lastCycle = -1;
+    let frame = 0;
 
     const scatterTextActors = () => {
       for (const p of particles) {
         if (p.targetX === undefined) continue;
-        // Throw them across the full canvas with fresh random velocity so the
-        // noise restart is visually striking.
         p.x = Math.random() * width;
         p.y = Math.random() * height;
-        p.vx = (Math.random() - 0.5) * 2.2;
-        p.vy = (Math.random() - 0.5) * 2.2;
+        p.angle = Math.random() * Math.PI * 2;
       }
     };
 
-    // Radius around a target within which a text actor counts as "resolved".
-    // Connections and jitter fade out based on this so the letter edges go
-    // crisp exactly as the particle arrives.
-    const SETTLE_RADIUS = 80;
+    /** Recompute K-nearest-neighbour edges. Dedupes so we do not draw the
+     *  same line twice. O(N * K * N) with an incremental top-K rather than
+     *  a full sort, but plain enough for N in the low thousands. */
+    const computeKNN = () => {
+      const N = particles.length;
+      const topD = new Float32Array(K_NEAREST);
+      const topJ = new Int32Array(K_NEAREST);
+      const seen = new Set<number>();
+      const fresh: [number, number][] = [];
 
-    const particleSettled = (p: Particle): number => {
-      if (p.targetX === undefined || p.targetY === undefined) return 0;
-      const dx = p.targetX - p.x;
-      const dy = p.targetY - p.y;
-      const d = Math.sqrt(dx * dx + dy * dy);
-      return Math.max(0, 1 - d / SETTLE_RADIUS);
+      for (let i = 0; i < N; i++) {
+        for (let k = 0; k < K_NEAREST; k++) {
+          topD[k] = Infinity;
+          topJ[k] = -1;
+        }
+        const pi = particles[i];
+        for (let j = 0; j < N; j++) {
+          if (j === i) continue;
+          const dx = pi.x - particles[j].x;
+          const dy = pi.y - particles[j].y;
+          const d = dx * dx + dy * dy;
+          // Insertion into the top-K buffer (keeps it sorted ascending).
+          if (d < topD[K_NEAREST - 1]) {
+            let k = K_NEAREST - 1;
+            while (k > 0 && topD[k - 1] > d) {
+              topD[k] = topD[k - 1];
+              topJ[k] = topJ[k - 1];
+              k--;
+            }
+            topD[k] = d;
+            topJ[k] = j;
+          }
+        }
+        for (let k = 0; k < K_NEAREST; k++) {
+          const j = topJ[k];
+          if (j < 0) continue;
+          const key = i < j ? i * N + j : j * N + i;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          fresh.push(i < j ? [i, j] : [j, i]);
+        }
+      }
+
+      edges = fresh;
     };
 
     const animate = (now: number) => {
       const elapsed = now - start;
       const cycleIndex = Math.floor(elapsed / CYCLE_MS);
-      const t = (elapsed % CYCLE_MS) / CYCLE_MS; // 0..1
+      const t = (elapsed % CYCLE_MS) / CYCLE_MS;
 
       if (cycleIndex !== lastCycle) {
         scatterTextActors();
         lastCycle = cycleIndex;
       }
 
-      // Time-based envelope for the force applied to text actors.
-      //   t in [0.00, 0.06]  noise pass -- particles drift randomly
-      //   t in [0.06, 0.75]  slow migration toward each glyph position
-      //   t in [0.75, 0.92]  held in place
-      //   t in [0.92, 1.00]  released back into chaos so the next cycle's
-      //                      scatter does not feel abrupt
+      // Time-based phase:
+      //   [0.00, 0.06] noise
+      //   [0.06, 0.75] formation -- particles glide toward glyphs
+      //   [0.75, 0.92] held word
+      //   [0.92, 1.00] release back to noise
       let phase: number;
       if (t < 0.06) phase = 0;
       else if (t < 0.75) phase = smoothstep((t - 0.06) / 0.69);
       else if (t < 0.92) phase = 1;
       else phase = 1 - smoothstep((t - 0.92) / 0.08);
 
-      const textJitter = (1 - phase) * 0.4;
-      // Max return force 0.035 (was 0.065) so particles glide in rather than
-      // snap. The longer cycle compensates so they still arrive in time.
-      const textReturnForce = 0.0025 + phase * 0.032;
-      const textDamping = 0.93 + phase * 0.04;
-
       ctx.clearRect(0, 0, width, height);
 
-      // Update
+      // --- Update particles -----------------------------------------------
+      // All particles move at the same constant BASE_SPEED. Only direction
+      // changes frame-to-frame. This is what gives the "slow, uniform" feel.
       for (const p of particles) {
-        if (p.targetX !== undefined && p.targetY !== undefined) {
-          p.vx += (p.targetX - p.x) * textReturnForce;
-          p.vy += (p.targetY - p.y) * textReturnForce;
-          p.vx += (Math.random() - 0.5) * textJitter;
-          p.vy += (Math.random() - 0.5) * textJitter;
-          p.vx *= textDamping;
-          p.vy *= textDamping;
+        const hasTarget = p.targetX !== undefined && p.targetY !== undefined;
+
+        if (hasTarget && phase > 0) {
+          // Blend current heading toward the target heading weighted by phase.
+          const dx = p.targetX! - p.x;
+          const dy = p.targetY! - p.y;
+          const dist = Math.hypot(dx, dy);
+          const angleToTarget = dist > 0.0001 ? Math.atan2(dy, dx) : p.angle;
+
+          // Direction blend via unit-vector average (no angle-wrap artifacts).
+          const cx = Math.cos(p.angle) * (1 - phase) + Math.cos(angleToTarget) * phase;
+          const cy = Math.sin(p.angle) * (1 - phase) + Math.sin(angleToTarget) * phase;
+          const norm = Math.hypot(cx, cy) || 1;
+          p.angle = Math.atan2(cy / norm, cx / norm);
+
+          // A little residual wander, stronger during noise, near-zero at hold.
+          p.angle += (Math.random() - 0.5) * ANGULAR_JITTER * (1 - 0.8 * phase);
+
+          // Ease speed to zero once within TEXT_ARRIVAL_RADIUS of target.
+          const arrivalFactor = Math.min(1, dist / TEXT_ARRIVAL_RADIUS);
+          const speed = BASE_SPEED * (arrivalFactor * phase + (1 - phase));
+          p.x += Math.cos(p.angle) * speed;
+          p.y += Math.sin(p.angle) * speed;
         } else {
-          // Edge / chaos actor -- always drifting, and lively.
-          p.vx += (Math.random() - 0.5) * 0.65;
-          p.vy += (Math.random() - 0.5) * 0.65;
-          p.vx *= 0.93;
-          p.vy *= 0.93;
-          if (p.x < 0 || p.x > width) p.vx *= -1;
-          if (p.y < 0 || p.y > height) p.vy *= -1;
+          // Edge actor, or text actor during pure-noise phase.
+          p.angle += (Math.random() - 0.5) * ANGULAR_JITTER;
+          p.x += Math.cos(p.angle) * BASE_SPEED;
+          p.y += Math.sin(p.angle) * BASE_SPEED;
+
+          // Reflect cleanly off the canvas walls so particles never leave.
+          if (p.x < 0) {
+            p.x = 0;
+            p.angle = Math.PI - p.angle;
+          } else if (p.x > width) {
+            p.x = width;
+            p.angle = Math.PI - p.angle;
+          }
+          if (p.y < 0) {
+            p.y = 0;
+            p.angle = -p.angle;
+          } else if (p.y > height) {
+            p.y = height;
+            p.angle = -p.angle;
+          }
         }
-        p.x += p.vx;
-        p.y += p.vy;
-        p.x = Math.max(0, Math.min(width, p.x));
-        p.y = Math.max(0, Math.min(height, p.y));
       }
 
-      // Precompute per-particle settle factor for the draw passes below.
-      const settleFactor = new Float32Array(particles.length);
-      for (let i = 0; i < particles.length; i++) {
-        settleFactor[i] = particleSettled(particles[i]);
+      // --- KNN graph ------------------------------------------------------
+      if (frame % KNN_RECOMPUTE_FRAMES === 0 || edges.length === 0) {
+        computeKNN();
       }
 
-      // Connections between nearby particles -- the web. A line fades out as
-      // either endpoint approaches its glyph target, so the letterforms
-      // resolve crisply instead of staying tangled with cross-hatching.
-      const CONNECT = 54;
-      for (let i = 0; i < particles.length; i++) {
+      // --- Draw edges -----------------------------------------------------
+      for (const [i, j] of edges) {
         const a = particles[i];
-        const sA = settleFactor[i];
-        for (let j = i + 1; j < particles.length; j++) {
-          const b = particles[j];
-          const dx = a.x - b.x;
-          const dy = a.y - b.y;
-          const dSq = dx * dx + dy * dy;
-          if (dSq >= CONNECT * CONNECT) continue;
-          const sB = settleFactor[j];
-          const resolveFade = 1 - Math.max(sA, sB);
-          if (resolveFade < 0.05) continue; // both particles home -- no line
-          const d = Math.sqrt(dSq);
-          const alpha = 0.3 * (1 - d / CONNECT) * resolveFade;
-          const r = (a.color[0] + b.color[0]) / 2;
-          const g = (a.color[1] + b.color[1]) / 2;
-          const bl = (a.color[2] + b.color[2]) / 2;
-          ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${alpha})`;
-          ctx.lineWidth = 0.9;
-          ctx.beginPath();
-          ctx.moveTo(a.x, a.y);
-          ctx.lineTo(b.x, b.y);
-          ctx.stroke();
-        }
+        const b = particles[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const d = Math.sqrt(dx * dx + dy * dy);
+        if (d > MAX_EDGE_DRAW_DIST) continue;
+        const alpha = 0.38 * (1 - d / MAX_EDGE_DRAW_DIST);
+        const r = (a.color[0] + b.color[0]) / 2;
+        const g = (a.color[1] + b.color[1]) / 2;
+        const bl = (a.color[2] + b.color[2]) / 2;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${bl}, ${alpha})`;
+        ctx.lineWidth = 0.85;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
       }
 
-      // Draw particles on top. Text actors brighten + enlarge slightly as
-      // they reach their glyph so the word has visual weight when it lands.
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        const isText = p.targetX !== undefined;
-        const s = isText ? settleFactor[i] : 0;
-        const alpha = isText ? 0.72 + 0.25 * s : 0.75;
-        const radius = isText ? 1.9 + 0.5 * s : 1.9;
+      // --- Draw particles -------------------------------------------------
+      // Text actors lean slightly brighter + larger as they approach their
+      // target so the word has visual weight but never disconnects from the
+      // web.
+      for (const p of particles) {
+        let settled = 0;
+        if (p.targetX !== undefined && p.targetY !== undefined) {
+          const dx = p.targetX - p.x;
+          const dy = p.targetY - p.y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          settled = Math.max(0, 1 - d / 60);
+        }
+        const alpha = 0.78 + 0.18 * settled;
+        const radius = 1.95 + 0.45 * settled;
         const [r, g, b] = p.color;
         ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         ctx.beginPath();
@@ -328,6 +372,7 @@ export function Entropy({
         ctx.fill();
       }
 
+      frame++;
       animationId = requestAnimationFrame(animate);
     };
 
