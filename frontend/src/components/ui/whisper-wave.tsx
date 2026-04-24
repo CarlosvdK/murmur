@@ -6,12 +6,11 @@ interface WhisperWaveProps {
   className?: string;
   /** Optional fixed side. When omitted, fills container width + height. */
   size?: number;
-  /** How many horizontal lines. */
-  lineCount?: number;
+  /** How many vertical bars. */
+  barCount?: number;
 }
 
-// Brand palette: blue -> pink -> orange. Each line picks its tint from here
-// based on its vertical position, giving a soft top-to-bottom gradient.
+// Brand palette: blue -> pink -> orange. Bars tint horizontally across this.
 const PALETTE: [number, number, number][] = [
   [68, 140, 253], // #448CFD
   [255, 141, 228], // #FF8DE4
@@ -36,39 +35,32 @@ function brandColor(t: number): [number, number, number] {
   ];
 }
 
-/**
- * Sum-of-sines 1D field. Aperiodic-looking, smooth, no deps.
- * Returns a value roughly in [-1, 1].
- */
-function smoothWave(x: number, phase: number): number {
-  return (
-    Math.sin(x * 0.018 + phase * 1.0) * 0.5 +
-    Math.sin(x * 0.061 + phase * 0.7) * 0.3 +
-    Math.sin(x * 0.117 + phase * 0.45) * 0.2
-  );
-}
-
-type Line = {
-  baselineY: number;
+type Bar = {
+  x: number;
+  color: [number, number, number];
+  /** 0-1 per-bar height scaler. Mixed so some bars are naturally taller. */
+  baseAmpFactor: number;
   phase: number;
   phaseSpeed: number;
-  noiseScale: number;
-  baseAmp: number;
-  color: [number, number, number];
+  /** Scheduled start time for the current swell (or null). */
   swellStart: number | null;
   swellDuration: number;
-  loudness: number; // 1.0 at rest, up to ~2.2 while swelling
+  /** How strong this particular bar's swell is -- depends on distance from the swell centre. */
+  swellStrength: number;
+  /** Dynamic loudness multiplier; 1.0 at rest, up to ~2.5 during swell. */
+  loudness: number;
 };
 
 /**
- * WhisperWave — ambient backdrop of a dozen thin wavy lines, each
- * representing a voice. Subtle all the time; occasionally one voice
- * swells briefly, then settles back into the murmur.
+ * WhisperWave — vertical bars arranged in a row like a voicenote waveform.
+ * Each bar pulses slowly on its own phase. Every few seconds a swell
+ * propagates across a cluster of neighbouring bars, rising and decaying
+ * in a short wave, like a voice momentarily speaking up.
  */
 export function WhisperWave({
   className = "",
   size,
-  lineCount = 14,
+  barCount = 72,
 }: WhisperWaveProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -83,30 +75,29 @@ export function WhisperWave({
     const dpr = window.devicePixelRatio || 1;
     let width = 0;
     let height = 0;
-    let lines: Line[] = [];
+    let bars: Bar[] = [];
     let nextSwellTime = 0;
 
+    const BAR_WIDTH = 3;
+    const MAX_AMP_FRACTION = 0.85; // tallest possible bar = 85% of canvas height
+    const MIN_HALF_AMP = 4; // minimum half-height (px) so every bar is always visible
+
     const rebuild = () => {
-      lines = [];
-      // Distribute lines vertically with a touch of jitter so the stack
-      // does not read as an equalizer grid.
-      const jitter = height / (lineCount * 2);
-      for (let i = 0; i < lineCount; i++) {
-        const t = lineCount > 1 ? i / (lineCount - 1) : 0.5;
-        const baselineY =
-          lerp(height * 0.08, height * 0.92, t) +
-          (Math.random() - 0.5) * jitter;
-        lines.push({
-          baselineY,
-          phase: Math.random() * 1000,
-          // Very slow drift: full cycle is ~minutes, not seconds.
-          phaseSpeed: 0.002 + Math.random() * 0.004,
-          noiseScale: 0.55 + Math.random() * 0.8,
-          // Mixed amplitudes: some lines are almost flat, others more alive.
-          baseAmp: 6 + Math.random() * 16,
-          color: brandColor(t),
+      bars = [];
+      // Evenly space bars horizontally with a half-step padding on each end.
+      const spacing = width / barCount;
+      for (let i = 0; i < barCount; i++) {
+        const centerX = spacing * (i + 0.5);
+        bars.push({
+          x: centerX - BAR_WIDTH / 2,
+          color: brandColor(barCount > 1 ? i / (barCount - 1) : 0.5),
+          baseAmpFactor: 0.35 + Math.random() * 0.65,
+          phase: Math.random() * Math.PI * 2,
+          // Slow individual drift.
+          phaseSpeed: 0.006 + Math.random() * 0.012,
           swellStart: null,
           swellDuration: 0,
+          swellStrength: 0,
           loudness: 1,
         });
       }
@@ -118,7 +109,7 @@ export function WhisperWave({
         height = size;
       } else {
         width = container.clientWidth;
-        height = Math.max(container.clientHeight, 560);
+        height = Math.max(container.clientHeight, 420);
       }
       canvas.width = width * dpr;
       canvas.height = height * dpr;
@@ -134,61 +125,81 @@ export function WhisperWave({
     ro.observe(container);
 
     const start = performance.now();
-    nextSwellTime = start + 1000;
+    nextSwellTime = start + 900;
     let animationId = 0;
 
     const triggerSwell = (now: number) => {
-      if (!lines.length) return;
-      const idx = Math.floor(Math.random() * lines.length);
-      lines[idx].swellStart = now;
-      lines[idx].swellDuration = 1500 + Math.random() * 1200; // 1.5-2.7s
-      nextSwellTime = now + 1400 + Math.random() * 2200; // next 1.4-3.6s
+      if (!bars.length) return;
+      const centerIdx = Math.floor(Math.random() * bars.length);
+      const radius = 4 + Math.floor(Math.random() * 5); // 4-8 bars each side
+      const propagationMs = 65; // delay per neighbour, makes it ripple
+
+      for (let offset = -radius; offset <= radius; offset++) {
+        const idx = centerIdx + offset;
+        if (idx < 0 || idx >= bars.length) continue;
+        const dist = Math.abs(offset);
+        const falloff = 1 - dist / (radius + 1); // 1 at centre, 0 at edges
+        const b = bars[idx];
+        b.swellStart = now + dist * propagationMs;
+        b.swellDuration = 850 + Math.random() * 400;
+        b.swellStrength = falloff * 1.6;
+      }
+      nextSwellTime = now + 1200 + Math.random() * 2200;
     };
 
     const animate = (now: number) => {
       if (now >= nextSwellTime) triggerSwell(now);
 
-      // Update per-line state.
-      for (const line of lines) {
-        line.phase += line.phaseSpeed;
+      ctx.clearRect(0, 0, width, height);
 
-        if (line.swellStart !== null) {
-          const t = (now - line.swellStart) / line.swellDuration;
+      const centerY = height / 2;
+      const maxHalfAmp = (height * MAX_AMP_FRACTION) / 2;
+
+      for (const bar of bars) {
+        bar.phase += bar.phaseSpeed;
+
+        // Swell envelope: attack 0.2, hold 0.3, decay 0.5.
+        if (bar.swellStart !== null && now >= bar.swellStart) {
+          const t = (now - bar.swellStart) / bar.swellDuration;
           if (t >= 1) {
-            line.loudness = 1;
-            line.swellStart = null;
+            bar.loudness = 1;
+            bar.swellStart = null;
           } else {
-            // Envelope: attack (0-0.2), hold (0.2-0.5), decay (0.5-1).
             let env: number;
             if (t < 0.2) env = t / 0.2;
             else if (t < 0.5) env = 1;
             else env = 1 - (t - 0.5) / 0.5;
-            line.loudness = 1 + env * 1.2; // peak 2.2x
+            bar.loudness = 1 + env * bar.swellStrength;
           }
         }
-      }
 
-      ctx.clearRect(0, 0, width, height);
+        // Base amplitude from sum-of-sines on this bar's phase, normalised 0..1.
+        const w =
+          Math.sin(bar.phase) * 0.5 +
+          Math.sin(bar.phase * 2.3 + 1.2) * 0.3 +
+          Math.sin(bar.phase * 4.1 + 3.7) * 0.2;
+        const normalised = (w + 1) / 2;
 
-      const step = 4; // sample every 4px along x; cheap + smooth
-      for (const line of lines) {
-        const amp = line.baseAmp * line.loudness;
-        // Alpha + stroke width scale with loudness so a swelling line
-        // visually rises out of the murmur.
-        const alpha = 0.34 + (line.loudness - 1) * 0.5;
-        const lw = 1.1 + (line.loudness - 1) * 1.2;
-        const [r, g, b] = line.color;
-        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        ctx.lineWidth = lw;
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
+        const halfAmp =
+          MIN_HALF_AMP +
+          (maxHalfAmp - MIN_HALF_AMP) *
+            normalised *
+            bar.baseAmpFactor *
+            bar.loudness;
+        const clampedHalf = Math.min(halfAmp, maxHalfAmp);
+        const top = centerY - clampedHalf;
+        const barH = clampedHalf * 2;
+
+        const alpha = 0.55 + (bar.loudness - 1) * 0.3;
+        const [r, g, b] = bar.color;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(alpha, 1)})`;
         ctx.beginPath();
-        for (let x = 0; x <= width; x += step) {
-          const y = line.baselineY + amp * smoothWave(x * line.noiseScale, line.phase);
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
+        if (typeof ctx.roundRect === "function") {
+          ctx.roundRect(bar.x, top, BAR_WIDTH, barH, BAR_WIDTH / 2);
+        } else {
+          ctx.rect(bar.x, top, BAR_WIDTH, barH);
         }
-        ctx.stroke();
+        ctx.fill();
       }
 
       animationId = requestAnimationFrame(animate);
@@ -200,7 +211,7 @@ export function WhisperWave({
       cancelAnimationFrame(animationId);
       ro.disconnect();
     };
-  }, [size, lineCount]);
+  }, [size, barCount]);
 
   return (
     <div
@@ -209,7 +220,7 @@ export function WhisperWave({
       style={
         size
           ? { width: size, height: size }
-          : { width: "100%", height: "100%", minHeight: 620 }
+          : { width: "100%", height: "100%", minHeight: 420 }
       }
     >
       <canvas ref={canvasRef} className="absolute inset-0" />

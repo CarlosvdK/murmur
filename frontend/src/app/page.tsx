@@ -70,7 +70,7 @@ export default function Home() {
             </SectionReveal>
           </div>
           <SectionReveal delay={0.3} className="h-full">
-            <WhisperWave lineCount={30} />
+            <WhisperWave />
           </SectionReveal>
         </div>
       </section>
