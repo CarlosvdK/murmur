@@ -1,6 +1,6 @@
 import Navigation from "@/components/landing2/Navigation";
 import RotatingWord from "@/components/landing2/RotatingWord";
-import HeroDemoCard from "@/components/landing2/HeroDemoCard";
+import { Entropy } from "@/components/ui/entropy";
 import TrustBar from "@/components/landing2/TrustBar";
 import ProblemSection from "@/components/landing2/ProblemSection";
 import ProductPillars from "@/components/landing2/ProductPillars";
@@ -70,7 +70,7 @@ export default function Home() {
             </SectionReveal>
           </div>
           <SectionReveal delay={0.3}>
-            <HeroDemoCard />
+            <Entropy size={520} />
           </SectionReveal>
         </div>
       </section>
