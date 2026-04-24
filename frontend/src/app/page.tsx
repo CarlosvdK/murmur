@@ -28,8 +28,8 @@ export default function Home() {
             background: "radial-gradient(ellipse, rgba(68,140,253,0.08) 0%, rgba(255,141,228,0.04) 40%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto grid max-w-[1800px] gap-16 lg:grid-cols-[1.05fr_1fr] lg:items-center xl:gap-24">
-          <div>
+        <div className="relative z-10 mx-auto grid max-w-[1800px] gap-16 lg:min-h-[calc(90vh-13rem)] lg:grid-cols-[1.05fr_1fr] lg:items-stretch xl:gap-24">
+          <div className="flex flex-col justify-center">
             <SectionReveal>
               <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-orange px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white">
                 The new age of customer intelligence
@@ -69,7 +69,7 @@ export default function Home() {
               </p>
             </SectionReveal>
           </div>
-          <SectionReveal delay={0.3}>
+          <SectionReveal delay={0.3} className="h-full">
             <Entropy />
           </SectionReveal>
         </div>

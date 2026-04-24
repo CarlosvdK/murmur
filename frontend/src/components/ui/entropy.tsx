@@ -104,7 +104,7 @@ function computeTextMask(
 export function Entropy({
   className = "",
   size,
-  cycleSeconds = 18,
+  cycleSeconds = 28,
   text = ["MAKE SENSE", "OF THE NOISE"],
 }: EntropyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -157,7 +157,7 @@ export function Entropy({
 
       // Edge / chaos actors -- persistent random walkers scattered across the
       // canvas. Count scales with canvas area.
-      const EDGE_COUNT = Math.round((width * height) / 2600);
+      const EDGE_COUNT = Math.round((width * height) / 1700);
       for (let i = 0; i < EDGE_COUNT; i++) {
         const x = Math.random() * width;
         const y = Math.random() * height;
@@ -172,9 +172,14 @@ export function Entropy({
     };
 
     const resize = () => {
-      const side = size ?? Math.min(container.clientWidth, 900);
-      width = side;
-      height = side;
+      if (size) {
+        width = size;
+        height = size;
+      } else {
+        // Fill the parent: width AND height, not a forced square.
+        width = container.clientWidth;
+        height = Math.max(container.clientHeight, 560);
+      }
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
@@ -341,7 +346,7 @@ export function Entropy({
       style={
         size
           ? { width: size, height: size }
-          : { width: "100%", aspectRatio: "1 / 1" }
+          : { width: "100%", height: "100%", minHeight: 620 }
       }
     >
       <canvas ref={canvasRef} className="absolute inset-0" />
