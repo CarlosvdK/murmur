@@ -40,15 +40,22 @@ type Bar = {
   color: [number, number, number];
   /** 0-1 per-bar height scaler. Mixed so some bars are naturally taller. */
   baseAmpFactor: number;
-  phase: number;
-  phaseSpeed: number;
-  /** Scheduled start time for the current swell (or null). */
-  swellStart: number | null;
-  swellDuration: number;
-  /** How strong this particular bar's swell is -- depends on distance from the swell centre. */
-  swellStrength: number;
-  /** Dynamic loudness multiplier; 1.0 at rest, up to ~2.5 during swell. */
-  loudness: number;
+  /** Small per-bar phase offset so neighbours aren't perfectly locked. */
+  personalOffset: number;
+};
+
+/**
+ * A travelling "voice phrase" -- a zone of elevated loudness whose centre
+ * crosses the bar row from left to right over its lifetime.
+ */
+type Swell = {
+  startTime: number;
+  /** How long the centre takes to cross from bar 0 to bar (N-1). */
+  lifetimeMs: number;
+  /** Spatial width of the zone, in bars. */
+  width: number;
+  /** Peak loudness boost at the zone's centre. */
+  strength: number;
 };
 
 /**
@@ -76,15 +83,22 @@ export function WhisperWave({
     let width = 0;
     let height = 0;
     let bars: Bar[] = [];
+    let swells: Swell[] = [];
     let nextSwellTime = 0;
+    let globalPhase = 0;
 
     const BAR_WIDTH = 3;
-    const MAX_AMP_FRACTION = 0.85; // tallest possible bar = 85% of canvas height
-    const MIN_HALF_AMP = 4; // minimum half-height (px) so every bar is always visible
+    const MAX_AMP_FRACTION = 0.85;
+    const MIN_HALF_AMP = 4;
+    // Base drift speed. Low = slow, meditative bars.
+    const PHASE_SPEED = 0.006;
+    // How much each bar's phase shifts from its left neighbour. Higher ->
+    // the wave pattern visibly travels left-to-right at a quicker pace.
+    const SPATIAL_STEP = 0.22;
 
     const rebuild = () => {
       bars = [];
-      // Evenly space bars horizontally with a half-step padding on each end.
+      swells = [];
       const spacing = width / barCount;
       for (let i = 0; i < barCount; i++) {
         const centerX = spacing * (i + 0.5);
@@ -92,13 +106,9 @@ export function WhisperWave({
           x: centerX - BAR_WIDTH / 2,
           color: brandColor(barCount > 1 ? i / (barCount - 1) : 0.5),
           baseAmpFactor: 0.35 + Math.random() * 0.65,
-          phase: Math.random() * Math.PI * 2,
-          // Slow individual drift.
-          phaseSpeed: 0.006 + Math.random() * 0.012,
-          swellStart: null,
-          swellDuration: 0,
-          swellStrength: 0,
-          loudness: 1,
+          // Keep the personal offset small so the L->R traveling pattern
+          // stays visually coherent instead of looking like random noise.
+          personalOffset: (Math.random() - 0.5) * 1.2,
         });
       }
     };
@@ -129,55 +139,61 @@ export function WhisperWave({
     let animationId = 0;
 
     const triggerSwell = (now: number) => {
-      if (!bars.length) return;
-      const centerIdx = Math.floor(Math.random() * bars.length);
-      const radius = 4 + Math.floor(Math.random() * 5); // 4-8 bars each side
-      const propagationMs = 65; // delay per neighbour, makes it ripple
-
-      for (let offset = -radius; offset <= radius; offset++) {
-        const idx = centerIdx + offset;
-        if (idx < 0 || idx >= bars.length) continue;
-        const dist = Math.abs(offset);
-        const falloff = 1 - dist / (radius + 1); // 1 at centre, 0 at edges
-        const b = bars[idx];
-        b.swellStart = now + dist * propagationMs;
-        b.swellDuration = 850 + Math.random() * 400;
-        b.swellStrength = falloff * 1.6;
-      }
-      nextSwellTime = now + 1200 + Math.random() * 2200;
+      swells.push({
+        startTime: now,
+        // 3.5-5.5s for a phrase to cross the entire row left-to-right.
+        lifetimeMs: 3500 + Math.random() * 2000,
+        width: 6 + Math.random() * 5, // 6-11 bars wide
+        strength: 0.9 + Math.random() * 0.7, // 0.9-1.6 peak boost
+      });
+      // Next phrase starts while the current is still crossing, so we
+      // always have something moving rightward.
+      nextSwellTime = now + 900 + Math.random() * 1500;
+      // Prune finished swells.
+      swells = swells.filter((s) => now - s.startTime < s.lifetimeMs + 400);
     };
 
     const animate = (now: number) => {
       if (now >= nextSwellTime) triggerSwell(now);
+
+      // One global phase advances slowly; each bar derives its phase from
+      // (globalPhase + personalOffset - i * SPATIAL_STEP) so the pattern
+      // visibly travels left to right.
+      globalPhase += PHASE_SPEED;
 
       ctx.clearRect(0, 0, width, height);
 
       const centerY = height / 2;
       const maxHalfAmp = (height * MAX_AMP_FRACTION) / 2;
 
-      for (const bar of bars) {
-        bar.phase += bar.phaseSpeed;
+      for (let i = 0; i < bars.length; i++) {
+        const bar = bars[i];
 
-        // Swell envelope: attack 0.2, hold 0.3, decay 0.5.
-        if (bar.swellStart !== null && now >= bar.swellStart) {
-          const t = (now - bar.swellStart) / bar.swellDuration;
-          if (t >= 1) {
-            bar.loudness = 1;
-            bar.swellStart = null;
-          } else {
-            let env: number;
-            if (t < 0.2) env = t / 0.2;
-            else if (t < 0.5) env = 1;
-            else env = 1 - (t - 0.5) / 0.5;
-            bar.loudness = 1 + env * bar.swellStrength;
-          }
+        // Accumulated swell contribution from every active phrase whose
+        // centre is currently passing near this bar.
+        let loudness = 1;
+        for (const s of swells) {
+          const progress = (now - s.startTime) / s.lifetimeMs;
+          if (progress < 0 || progress > 1) continue;
+          // Swell centre sweeps from bar 0 to bar (N-1) across its lifetime.
+          const centreIdx = progress * (bars.length - 1);
+          const dist = Math.abs(i - centreIdx);
+          if (dist > s.width) continue;
+          const spatial = 1 - dist / s.width;
+          // Envelope: fade in over first 12% of life, fade out over last 12%.
+          let env: number;
+          if (progress < 0.12) env = progress / 0.12;
+          else if (progress > 0.88) env = (1 - progress) / 0.12;
+          else env = 1;
+          loudness += s.strength * spatial * env;
         }
 
-        // Base amplitude from sum-of-sines on this bar's phase, normalised 0..1.
+        // Base sum-of-sines at this bar, normalised to 0..1.
+        const p = globalPhase + bar.personalOffset - i * SPATIAL_STEP;
         const w =
-          Math.sin(bar.phase) * 0.5 +
-          Math.sin(bar.phase * 2.3 + 1.2) * 0.3 +
-          Math.sin(bar.phase * 4.1 + 3.7) * 0.2;
+          Math.sin(p) * 0.5 +
+          Math.sin(p * 2.3 + 1.2) * 0.3 +
+          Math.sin(p * 4.1 + 3.7) * 0.2;
         const normalised = (w + 1) / 2;
 
         const halfAmp =
@@ -185,14 +201,14 @@ export function WhisperWave({
           (maxHalfAmp - MIN_HALF_AMP) *
             normalised *
             bar.baseAmpFactor *
-            bar.loudness;
+            loudness;
         const clampedHalf = Math.min(halfAmp, maxHalfAmp);
         const top = centerY - clampedHalf;
         const barH = clampedHalf * 2;
 
-        const alpha = 0.55 + (bar.loudness - 1) * 0.3;
+        const alpha = Math.min(0.55 + (loudness - 1) * 0.3, 1);
         const [r, g, b] = bar.color;
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(alpha, 1)})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
         ctx.beginPath();
         if (typeof ctx.roundRect === "function") {
           ctx.roundRect(bar.x, top, BAR_WIDTH, barH, BAR_WIDTH / 2);
