@@ -1,6 +1,6 @@
 import Navigation from "@/components/landing2/Navigation";
 import RotatingWord from "@/components/landing2/RotatingWord";
-import { Entropy } from "@/components/ui/entropy";
+import { WhisperWave } from "@/components/ui/whisper-wave";
 import TrustBar from "@/components/landing2/TrustBar";
 import ProblemSection from "@/components/landing2/ProblemSection";
 import ProductPillars from "@/components/landing2/ProductPillars";
@@ -70,7 +70,7 @@ export default function Home() {
             </SectionReveal>
           </div>
           <SectionReveal delay={0.3} className="h-full">
-            <Entropy />
+            <WhisperWave lineCount={30} />
           </SectionReveal>
         </div>
       </section>
