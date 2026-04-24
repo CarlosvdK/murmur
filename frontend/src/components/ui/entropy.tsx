@@ -24,9 +24,9 @@ const BRAND_PALETTE: [number, number, number][] = [
 // damping oscillation. Many dots don't move at all (anchors) so the web has
 // stable structure.
 const BASE_SPEED = 0.28; // pixels per frame for moving edge dots
-const SETTLE_SPEED = 1.5; // px/frame for text actors travelling to their glyph
+const SETTLE_SPEED = 1.9; // px/frame for text actors travelling to their glyph
 const ANGULAR_JITTER = 0.025; // radians per frame -- lazy direction drift
-const TEXT_ARRIVAL_RADIUS = 10; // px; speed decays to zero within this of target
+const TEXT_ARRIVAL_RADIUS = 8; // px; speed decays to zero within this of target
 const ANCHOR_FRACTION = 0.55; // share of edge dots that never move
 
 // Web topology. Instead of "connect any two within R" we use K-nearest
@@ -91,10 +91,12 @@ function computeTextMask(
   const octx = off.getContext("2d");
   if (!octx) return [];
 
-  // Stroke the glyphs instead of filling them. lineWidth is thin so the
-  // sampled "ink" is a one-to-two-dot-thick outline, not a slab.
+  // Stroke the glyphs instead of filling them. lineWidth is a bit wider
+  // than the sampling stride so every part of the stroke is reliably
+  // caught by the sample grid -- otherwise stride alignment artifacts
+  // make letters render as blocky rectangles.
   octx.strokeStyle = "white";
-  octx.lineWidth = Math.max(2.5, fontSize * 0.05);
+  octx.lineWidth = Math.max(3, fontSize * 0.065);
   octx.lineJoin = "round";
   octx.lineCap = "round";
   octx.font = `800 ${fontSize}px Inter, system-ui, sans-serif`;
@@ -144,9 +146,10 @@ export function Entropy({
     const rebuild = () => {
       const fontSize = Math.max(44, Math.floor(width / 10));
       const lineGap = Math.floor(fontSize * 0.12);
-      // Sparser stride: we are sampling a thin stroke now, not a fill, and
-      // we want the letters to feel written-with-thread, not pixellated.
-      const stride = Math.max(9, Math.round(width / 75));
+      // Stride must be smaller than the stroke lineWidth so every part of
+      // the letter gets caught, otherwise the sample grid aliasing turns
+      // round glyphs into blocky rectangles. Keep stride ~= lineWidth.
+      const stride = Math.max(5, Math.round(width / 130));
       const textPoints = computeTextMask(
         text,
         width,
