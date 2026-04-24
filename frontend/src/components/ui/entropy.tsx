@@ -23,9 +23,10 @@ const BRAND_PALETTE: [number, number, number][] = [
 // Directions drift via small angular noise -- no velocity accumulation, no
 // damping oscillation. Many dots don't move at all (anchors) so the web has
 // stable structure.
-const BASE_SPEED = 0.28; // pixels per frame for moving particles
+const BASE_SPEED = 0.28; // pixels per frame for moving edge dots
+const SETTLE_SPEED = 1.5; // px/frame for text actors travelling to their glyph
 const ANGULAR_JITTER = 0.025; // radians per frame -- lazy direction drift
-const TEXT_ARRIVAL_RADIUS = 8; // px; speed decays to zero within this of target
+const TEXT_ARRIVAL_RADIUS = 10; // px; speed decays to zero within this of target
 const ANCHOR_FRACTION = 0.55; // share of edge dots that never move
 
 // Web topology. Instead of "connect any two within R" we use K-nearest
@@ -120,7 +121,7 @@ function computeTextMask(
 export function Entropy({
   className = "",
   size,
-  cycleSeconds = 28,
+  cycleSeconds = 16,
   text = ["MAKE SENSE", "OF THE NOISE"],
 }: EntropyProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -283,16 +284,16 @@ export function Entropy({
         lastCycle = cycleIndex;
       }
 
-      // Time-based phase:
-      //   [0.00, 0.06] noise
-      //   [0.06, 0.75] formation -- particles glide toward glyphs
-      //   [0.75, 0.92] held word
-      //   [0.92, 1.00] release back to noise
+      // Time-based phase, tuned to a 16s cycle:
+      //   [0.00, 0.03]  scatter (~0.5s)
+      //   [0.03, 0.47]  formation, ~7s of gliding toward glyphs
+      //   [0.47, 0.91]  held word, ~7s
+      //   [0.91, 1.00]  release back into noise, ~1.4s
       let phase: number;
-      if (t < 0.06) phase = 0;
-      else if (t < 0.75) phase = smoothstep((t - 0.06) / 0.69);
-      else if (t < 0.92) phase = 1;
-      else phase = 1 - smoothstep((t - 0.92) / 0.08);
+      if (t < 0.03) phase = 0;
+      else if (t < 0.47) phase = smoothstep((t - 0.03) / 0.44);
+      else if (t < 0.91) phase = 1;
+      else phase = 1 - smoothstep((t - 0.91) / 0.09);
 
       ctx.clearRect(0, 0, width, height);
 
@@ -317,12 +318,18 @@ export function Entropy({
           const norm = Math.hypot(cx, cy) || 1;
           p.angle = Math.atan2(cy / norm, cx / norm);
 
-          // A little residual wander, stronger during noise, near-zero at hold.
-          p.angle += (Math.random() - 0.5) * ANGULAR_JITTER * (1 - 0.85 * phase);
+          // Residual wander decays to zero at phase=1 so landed particles
+          // stay pinned to their glyph pixel instead of drifting off.
+          p.angle += (Math.random() - 0.5) * ANGULAR_JITTER * (1 - phase);
 
-          // Ease speed to zero once within TEXT_ARRIVAL_RADIUS of target.
+          // Travel speed. Starts at BASE_SPEED during noise, ramps up to
+          // SETTLE_SPEED quickly (phase ~ 0.2) so particles have the full
+          // ~5s of cruising to cover the canvas, then decays with arrival
+          // factor so they park cleanly on the target.
+          const speedRamp = Math.min(1, phase * 5);
+          const cruiseSpeed = BASE_SPEED + (SETTLE_SPEED - BASE_SPEED) * speedRamp;
           const arrivalFactor = Math.min(1, dist / TEXT_ARRIVAL_RADIUS);
-          const speed = BASE_SPEED * (arrivalFactor * phase + (1 - phase));
+          const speed = cruiseSpeed * arrivalFactor;
           p.x += Math.cos(p.angle) * speed;
           p.y += Math.sin(p.angle) * speed;
         } else {
