@@ -20,7 +20,7 @@ export default function Home() {
       <Navigation />
 
       {/* HERO -- eggshell */}
-      <section className="relative min-h-[90vh] overflow-hidden px-6 pb-20 pt-32 lg:px-12 xl:px-20">
+      <section className="relative min-h-[90vh] overflow-hidden px-6 pb-20 pt-32 lg:px-8 xl:px-12 2xl:px-16">
         <Murmuration />
         <div
           className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
@@ -30,7 +30,7 @@ export default function Home() {
             background: "radial-gradient(ellipse, rgba(68,140,253,0.08) 0%, rgba(255,141,228,0.04) 40%, transparent 70%)",
           }}
         />
-        <div className="relative z-10 mx-auto max-w-[1400px] grid gap-12 lg:grid-cols-2 lg:items-center">
+        <div className="relative z-10 mx-auto grid max-w-[1800px] gap-16 lg:grid-cols-[1.05fr_1fr] lg:items-center xl:gap-24">
           <div>
             <SectionReveal>
               <span className="mb-6 inline-flex items-center gap-2 rounded-full bg-brand-orange px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white">
@@ -38,19 +38,19 @@ export default function Home() {
               </span>
             </SectionReveal>
             <SectionReveal delay={0.1}>
-              <h1 className="mb-8 text-[clamp(44px,7vw,88px)] font-black leading-[0.95] tracking-[-0.03em] text-black">
+              <h1 className="mb-8 text-[clamp(52px,8.5vw,120px)] font-black leading-[0.95] tracking-[-0.03em] text-black">
                 Your customers,
                 <br />
                 <RotatingWord />
               </h1>
             </SectionReveal>
             <SectionReveal delay={0.2}>
-              <p className="mb-6 max-w-lg text-xl leading-relaxed text-gray-500">
+              <p className="mb-6 max-w-2xl text-2xl leading-relaxed text-gray-500">
                 Murmur is the CRM that thinks. Run a full customer simulation
                 before making any business decision. Build digital twins of your
                 most important customers and vendors from your real conversations.
               </p>
-              <p className="mb-10 max-w-lg text-base leading-relaxed text-gray-400">
+              <p className="mb-10 max-w-2xl text-lg leading-relaxed text-gray-400">
                 Powered by behavioural science, cultural psychology, and live market
                 intelligence, not guesswork.
               </p>
