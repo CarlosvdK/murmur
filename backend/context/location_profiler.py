@@ -157,6 +157,24 @@ class LocationProfile:
 class LocationProfiler:
     """Manages location profile caching and generation."""
 
+    stub_data = {
+        "IR": {"inflation": 42.0, "unemployment": 8.2, "gdp_growth": -6.8, "interest_rate": 30.0},
+        "US": {"inflation": 3.2, "unemployment": 3.9, "gdp_growth": 2.5, "interest_rate": 5.25},
+        "CN": {"inflation": 1.8, "unemployment": 4.0, "gdp_growth": 5.0, "interest_rate": 3.65},
+        "BR": {"inflation": 4.5, "unemployment": 7.8, "gdp_growth": 2.9, "interest_rate": 10.5},
+        "NG": {"inflation": 32.2, "unemployment": 4.1, "gdp_growth": 2.7, "interest_rate": 18.5},
+        "IN": {"inflation": 5.4, "unemployment": 3.2, "gdp_growth": 7.2, "interest_rate": 6.5},
+        "DE": {"inflation": 3.1, "unemployment": 3.8, "gdp_growth": 0.3, "interest_rate": 4.5},
+        "JP": {"inflation": 2.5, "unemployment": 2.5, "gdp_growth": 1.9, "interest_rate": -0.1},
+        "MX": {"inflation": 4.8, "unemployment": 2.8, "gdp_growth": 3.2, "interest_rate": 10.75},
+        "GB": {"inflation": 4.0, "unemployment": 4.2, "gdp_growth": 0.5, "interest_rate": 5.25},
+        "CA": {"inflation": 2.7, "unemployment": 5.8, "gdp_growth": 1.5, "interest_rate": 5.0},
+        "FR": {"inflation": 3.4, "unemployment": 7.3, "gdp_growth": 0.7, "interest_rate": 4.25},
+        "AU": {"inflation": 4.0, "unemployment": 3.6, "gdp_growth": 1.6, "interest_rate": 4.35},
+        "ZA": {"inflation": 5.8, "unemployment": 32.0, "gdp_growth": 0.3, "interest_rate": 8.25},
+        "SA": {"inflation": 2.3, "unemployment": 5.6, "gdp_growth": -2.7, "interest_rate": 6.0},
+    }
+
     def __init__(self, db=None, cache=None):
         self.db = db
         self.cache = cache
@@ -218,16 +236,8 @@ class LocationProfiler:
             #     data = resp.json()
             #     profile.gdp_growth_rate = data[1][0]["NY.GDP.MKTP.KD.ZG.AD.SU.ZS"]
 
-            # Stub data for now
-            stub_data = {
-                "IR": {"inflation": 42.0, "unemployment": 8.2, "gdp_growth": -6.8, "interest_rate": 30.0},
-                "US": {"inflation": 3.2, "unemployment": 3.9, "gdp_growth": 2.5, "interest_rate": 5.25},
-                "CN": {"inflation": 1.8, "unemployment": 4.0, "gdp_growth": 5.0, "interest_rate": 3.65},
-                "BR": {"inflation": 4.5, "unemployment": 7.8, "gdp_growth": 2.9, "interest_rate": 10.5},
-            }
-
-            if profile.country_code in stub_data:
-                data = stub_data[profile.country_code]
+            if profile.country_code in self.stub_data:
+                data = self.stub_data[profile.country_code]
                 profile.inflation_rate = data["inflation"]
                 profile.unemployment_rate = data["unemployment"]
                 profile.gdp_growth_rate = data["gdp_growth"]

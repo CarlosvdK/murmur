@@ -1,0 +1,16 @@
+"""Pytest configuration and shared fixtures."""
+import pytest
+from uuid import uuid4
+from backend.api.main import app
+from backend.auth.dependencies import get_current_user_id
+
+
+# Set up auth override globally for all tests
+test_user_id = str(uuid4())
+
+
+def mock_get_current_user_id():
+    return test_user_id
+
+
+app.dependency_overrides[get_current_user_id] = mock_get_current_user_id

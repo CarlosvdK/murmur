@@ -13,6 +13,12 @@ import logging
 from typing import Optional
 
 import httpx
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+)
 
 from backend.config import get_settings
 from backend.context.tools.base import ContextTool
@@ -43,14 +49,7 @@ class NewsSearchTool(ContextTool):
             f"{business_type} {location or ''} news",
         )
 
-        async with httpx.AsyncClient(timeout=15) as client:
-            resp = await client.get(
-                "https://api.search.brave.com/res/v1/news/search",
-                headers={"X-Subscription-Token": settings.brave_search_api_key},
-                params={"q": search_query, "count": 8, "freshness": "pm"},
-            )
-            resp.raise_for_status()
-            data = resp.json()
+        data = await self._fetch_with_retry(search_query, settings.brave_search_api_key)
 
         articles = []
         for item in data.get("results", [])[:8]:
@@ -67,3 +66,27 @@ class NewsSearchTool(ContextTool):
             "article_count": len(articles),
             "articles": articles,
         }
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=8),
+        retry=retry_if_exception_type(httpx.HTTPStatusError),
+        reraise=True,
+    )
+    async def _fetch_with_retry(self, search_query: str, api_key: str) -> dict:
+        """Fetch news with retry on transient errors."""
+        async with httpx.AsyncClient(timeout=15) as client:
+            resp = await client.get(
+                "https://api.search.brave.com/res/v1/news/search",
+                headers={"X-Subscription-Token": api_key},
+                params={"q": search_query, "count": 8, "freshness": "pm"},
+            )
+            # Don't retry on auth errors (401, 403)
+            if resp.status_code in (401, 403):
+                raise httpx.HTTPStatusError(
+                    f"Auth error: {resp.status_code}",
+                    request=resp.request,
+                    response=resp,
+                )
+            resp.raise_for_status()
+            return resp.json()

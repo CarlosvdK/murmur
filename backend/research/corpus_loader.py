@@ -12,7 +12,7 @@ import logging
 from pathlib import Path
 
 from backend.db.client import get_supabase
-from backend.research.quality_scorer import score_experiment
+from backend.research.quality_scorer import score_experiment, is_usable_for_calibration
 
 logger = logging.getLogger(__name__)
 
@@ -35,6 +35,18 @@ def load_corpus_to_supabase():
 
     for r in records:
         try:
+            quality = score_experiment(r)
+
+            # Quality gate: skip records below 0.40 (not usable for calibration)
+            if quality < 0.40:
+                skipped += 1
+                logger.debug(
+                    "Skipped low-quality record '%s' (score: %.2f)",
+                    r.get("source_name", "?")[:50],
+                    quality
+                )
+                continue
+
             row = {
                 "source_name": r.get("source_name", "Unknown")[:500],
                 "source_url": r.get("source_url") or r.get("link"),
@@ -69,7 +81,7 @@ def load_corpus_to_supabase():
                 "cultural_context": r.get("cultural_context"),
                 "murmur_simulation_type": r.get("murmur_simulation_type"),
                 "applicable_survey_fields": r.get("applicable_survey_fields"),
-                "quality_score": score_experiment(r),
+                "quality_score": quality,
                 "abstract": (r.get("abstract") or r.get("snippet", ""))[:2000],
                 "key_quotes": r.get("key_quotes"),
             }

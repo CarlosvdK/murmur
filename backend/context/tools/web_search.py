@@ -14,11 +14,34 @@ from typing import Optional
 
 import httpx
 from anthropic import AsyncAnthropic
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    retry_if_result,
+)
 
 from backend.config import get_settings
 from backend.context.tools.base import ContextTool
 
 logger = logging.getLogger(__name__)
+
+
+def _is_retryable_error(response):
+    """Check if httpx.Response should be retried."""
+    if isinstance(response, Exception):
+        return False
+    # Retry on 429 (rate limit) and 5xx (server errors)
+    return response.status_code in (429, 500, 502, 503, 504)
+
+
+def _should_not_retry_auth(exc):
+    """Return True if we should NOT retry (auth errors)."""
+    if isinstance(exc, httpx.HTTPStatusError):
+        # Don't retry on 401, 403
+        return exc.response.status_code not in (401, 403)
+    return True
 
 
 class WebSearchTool(ContextTool):
@@ -42,14 +65,7 @@ class WebSearchTool(ContextTool):
         settings = get_settings()
         search_query = hints.get("search_query", f"{business_type} {location} {question}")
 
-        async with httpx.AsyncClient(timeout=20) as client:
-            resp = await client.get(
-                "https://api.search.brave.com/res/v1/web/search",
-                headers={"X-Subscription-Token": settings.brave_search_api_key},
-                params={"q": search_query, "count": 8, "freshness": "py"},
-            )
-            resp.raise_for_status()
-            data = resp.json()
+        data = await self._fetch_with_retry(search_query, settings.brave_search_api_key)
 
         results = []
         for item in data.get("web", {}).get("results", [])[:8]:
@@ -72,6 +88,30 @@ class WebSearchTool(ContextTool):
             "results": results,
             "extracted_insight": extraction,
         }
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=8),
+        retry=retry_if_exception_type(httpx.HTTPStatusError),
+        reraise=True,
+    )
+    async def _fetch_with_retry(self, search_query: str, api_key: str) -> dict:
+        """Fetch search results with retry on transient errors."""
+        async with httpx.AsyncClient(timeout=20) as client:
+            resp = await client.get(
+                "https://api.search.brave.com/res/v1/web/search",
+                headers={"X-Subscription-Token": api_key},
+                params={"q": search_query, "count": 8, "freshness": "py"},
+            )
+            # Don't retry on auth errors (401, 403)
+            if resp.status_code in (401, 403):
+                raise httpx.HTTPStatusError(
+                    f"Auth error: {resp.status_code}",
+                    request=resp.request,
+                    response=resp,
+                )
+            resp.raise_for_status()
+            return resp.json()
 
     async def _extract_insight(
         self, query: str, results: list[dict], question: str

@@ -10,6 +10,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import json
+import holidays
 
 logger = logging.getLogger(__name__)
 
@@ -260,14 +261,8 @@ class RealtimeIntelligence:
             else:
                 time_of_day = "evening"
 
-            # Is holiday (stub: just check if it's a common holiday)
-            month_day = date.strftime("%m-%d")
-            holidays = {
-                "01-01": "New Year",
-                "07-04": "Independence Day (US)",
-                "12-25": "Christmas",
-            }
-            is_holiday = month_day in holidays
+            # Is holiday - extract country code from location and check holidays package
+            is_holiday = self._is_holiday(date, location)
 
             # Is payday week (stub: assume mid-month and end-of-month)
             day = date.day
@@ -323,3 +318,36 @@ class RealtimeIntelligence:
             return "fall"
         else:
             return "winter"
+
+    @staticmethod
+    def _extract_country_code(location: str) -> str:
+        """Extract ISO country code from location string or return if already a code."""
+        # If already a 2-char country code, return it
+        if len(location) == 2 and location.isupper():
+            return location
+
+        country_map = {
+            "iran": "IR", "us": "US", "usa": "US", "united states": "US",
+            "china": "CN", "brazil": "BR", "nigeria": "NG", "india": "IN",
+            "germany": "DE", "japan": "JP", "mexico": "MX", "uk": "GB",
+            "united kingdom": "GB", "england": "GB", "united states of america": "US",
+        }
+        location_lower = location.lower()
+        for country_name, code in country_map.items():
+            if country_name in location_lower:
+                return code
+        return None
+
+    @staticmethod
+    def _is_holiday(date: datetime, location: str) -> bool:
+        """Check if date is a holiday in the location's country."""
+        try:
+            country_code = RealtimeIntelligence._extract_country_code(location)
+            if not country_code:
+                return False
+
+            # Get holidays for the country and year
+            country_holidays = holidays.country_holidays(country_code, years=date.year)
+            return date.date() in country_holidays
+        except Exception:
+            return False

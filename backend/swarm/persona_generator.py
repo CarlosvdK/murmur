@@ -217,7 +217,7 @@ async def _generate_from_manifest(
         if i < len(manifest.persona_specs):
             spec = manifest.persona_specs[i]
             persona.age = spec.age
-            persona.visit_frequency = spec.visit_frequency
+            persona.engagement_pattern = spec.visit_frequency
 
     logger.info("Generated %d personas (manifest-constrained) successfully", len(personas))
     return personas
@@ -236,8 +236,14 @@ def _parse_personas_response(raw_text: str) -> List[PersonaProfile]:
         else:
             raise ValueError(f"Failed to parse persona JSON: {raw_text[:200]}")
 
+    # Handle both {"personas": [...]} and [...]  formats
+    if isinstance(personas_data, dict) and "personas" in personas_data:
+        personas_list = personas_data["personas"]
+    else:
+        personas_list = personas_data
+
     personas = []
-    for p in personas_data:
+    for p in personas_list:
         personality = p.get("personality", "")
         if isinstance(personality, list):
             personality = ", ".join(str(t) for t in personality)

@@ -26,6 +26,19 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/survey", tags=["survey"])
 
+
+class ValidateSurveyRequest(BaseModel):
+    """Request to validate a survey question."""
+    question: str
+    context: Optional[str] = None
+
+
+class SurveyResponse(BaseModel):
+    """Response with survey questionnaire."""
+    questions: list[str]
+    description: Optional[str] = None
+
+
 # All business types (used in Claude synthesis)
 ALL_BUSINESS_TYPES = (
     # Food & Drink
@@ -101,6 +114,55 @@ def _parse_json_response(raw: str) -> dict:
             text = text[4:]
         text = text.strip()
     return json.loads(text)
+
+
+@router.post("/validate")
+async def validate_survey(data: ValidateSurveyRequest):
+    """Validate if a question is good for persona simulation."""
+    settings = get_settings()
+    ai_client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+
+    response = await ai_client.messages.create(
+        model=settings.model_name,
+        max_tokens=200,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"Evaluate this question for persona simulation research.\n\n"
+                f"Question: {data.question}\n"
+                f"Context: {data.context or 'none provided'}\n\n"
+                f"Return ONLY valid JSON:\n"
+                f'{{"is_valid": true/false, "reason": "brief explanation"}}'
+            ),
+        }],
+    )
+
+    result = _parse_json_response(response.content[0].text)
+    return {"valid": result.get("is_valid", False), "reason": result.get("reason", "")}
+
+
+@router.get("/get-survey")
+async def get_survey():
+    """Return a survey questionnaire for business profiling."""
+    settings = get_settings()
+    ai_client = AsyncAnthropic(api_key=settings.anthropic_api_key)
+
+    response = await ai_client.messages.create(
+        model=settings.model_name,
+        max_tokens=500,
+        messages=[{
+            "role": "user",
+            "content": (
+                f"Generate 5 key survey questions to understand a business for persona simulation.\n"
+                f"Each question should help identify the customer base and business model.\n\n"
+                f"Return ONLY valid JSON:\n"
+                f'{{"questions": ["question1", "question2", ...]}}'
+            ),
+        }],
+    )
+
+    result = _parse_json_response(response.content[0].text)
+    return {"questions": result.get("questions", [])}
 
 
 class ScrapeWebsiteRequest(BaseModel):

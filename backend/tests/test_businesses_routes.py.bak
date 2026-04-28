@@ -1,0 +1,293 @@
+"""Tests for business CRUD API endpoints."""
+import pytest
+from uuid import uuid4
+from unittest.mock import AsyncMock, patch, MagicMock
+
+from fastapi.testclient import TestClient
+from backend.api.main import app
+from backend.models.business import BusinessCreate, Business
+
+
+# Create test client
+client = TestClient(app)
+
+
+class TestCreateBusiness:
+    """Test POST /businesses endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_create_business_success(self):
+        """POST /businesses with valid data should create business."""
+        # Mock auth
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = str(uuid4())
+
+            # Mock Supabase insert
+            business_id = str(uuid4())
+            mock_supabase.table.return_value.insert.return_value.execute.return_value = MagicMock(
+                data=[{
+                    "id": business_id,
+                    "name": "Test Coffee Shop",
+                    "type": "restaurant",
+                    "description": "A cozy coffee shop",
+                    "customer_description": "Office workers and students",
+                    "location": "San Francisco, CA",
+                    "metadata": {},
+                    "user_id": mock_auth.return_value,
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                }]
+            )
+
+            payload = {
+                "name": "Test Coffee Shop",
+                "type": "restaurant",
+                "description": "A cozy coffee shop",
+                "customer_description": "Office workers and students",
+                "location": "San Francisco, CA",
+            }
+
+            response = client.post("/api/businesses", json=payload)
+            assert response.status_code == 200 or response.status_code == 201
+            # Should return created business
+            assert response.json()["name"] == "Test Coffee Shop"
+
+    @pytest.mark.asyncio
+    async def test_create_business_requires_auth(self):
+        """POST /businesses without auth should return 401."""
+        payload = {
+            "name": "Test Coffee Shop",
+            "type": "restaurant",
+            "description": "A cozy coffee shop",
+            "customer_description": "Office workers and students",
+            "location": "San Francisco, CA",
+        }
+
+        # Simulate no auth header
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.side_effect = Exception("No auth")
+            response = client.post("/api/businesses", json=payload)
+            # Should fail auth check (status 401 or 403)
+            assert response.status_code in [401, 403, 500]  # 500 because of the exception
+
+
+class TestGetBusiness:
+    """Test GET /businesses/{id} endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_get_business_owned_by_user(self):
+        """GET /businesses/{id} should return business if owned by user."""
+        business_id = str(uuid4())
+        user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            mock_supabase.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value = MagicMock(
+                data={
+                    "id": business_id,
+                    "user_id": user_id,
+                    "name": "Test Coffee Shop",
+                    "type": "restaurant",
+                    "description": "A cozy coffee shop",
+                    "customer_description": "Office workers",
+                    "location": "San Francisco, CA",
+                    "metadata": {},
+                    "created_at": "2024-01-01T00:00:00Z",
+                    "updated_at": "2024-01-01T00:00:00Z",
+                }
+            )
+
+            response = client.get(f"/businesses/{business_id}")
+            assert response.status_code == 200
+            assert response.json()["name"] == "Test Coffee Shop"
+
+    @pytest.mark.asyncio
+    async def test_get_business_not_found(self):
+        """GET /businesses/{id} should return 404 if not found."""
+        business_id = str(uuid4())
+        user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            # Simulate "not found" from Supabase
+            mock_supabase.table.return_value.select.return_value.eq.return_value.single.return_value.execute.side_effect = Exception("No rows")
+
+            response = client.get(f"/businesses/{business_id}")
+            assert response.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_get_business_wrong_owner(self):
+        """GET /businesses/{id} should return 403 if not owned by user."""
+        business_id = str(uuid4())
+        user_id = str(uuid4())
+        other_user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            # Business owned by different user
+            mock_supabase.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value = MagicMock(
+                data={
+                    "id": business_id,
+                    "user_id": other_user_id,  # Different owner!
+                    "name": "Test Coffee Shop",
+                    "type": "restaurant",
+                    "description": "A cozy coffee shop",
+                    "customer_description": "Office workers",
+                    "location": "San Francisco, CA",
+                    "metadata": {},
+                }
+            )
+
+            response = client.get(f"/businesses/{business_id}")
+            assert response.status_code == 403
+
+
+class TestUpdateBusiness:
+    """Test PATCH /businesses/{id} endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_update_business_success(self):
+        """PATCH /businesses/{id} should update fields."""
+        business_id = str(uuid4())
+        user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            # Mock the update response
+            mock_supabase.table.return_value.update.return_value.eq.return_value.eq.return_value.execute.return_value = MagicMock(
+                data=[{
+                    "id": business_id,
+                    "user_id": user_id,
+                    "name": "Updated Coffee Shop",
+                    "type": "restaurant",
+                    "description": "An updated cozy coffee shop",
+                    "customer_description": "Office workers",
+                    "location": "San Francisco, CA",
+                    "metadata": {},
+                }]
+            )
+
+            payload = {"name": "Updated Coffee Shop", "description": "An updated cozy coffee shop"}
+            response = client.patch(f"/businesses/{business_id}", json=payload)
+            assert response.status_code == 200
+            assert response.json()["name"] == "Updated Coffee Shop"
+
+    @pytest.mark.asyncio
+    async def test_update_business_forbidden(self):
+        """PATCH /businesses/{id} should return 403 if not owner."""
+        business_id = str(uuid4())
+        user_id = str(uuid4())
+        other_user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            # Try to update business owned by someone else
+            mock_supabase.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value = MagicMock(
+                data={"user_id": other_user_id}
+            )
+
+            payload = {"name": "Hacked Shop"}
+            response = client.patch(f"/businesses/{business_id}", json=payload)
+            assert response.status_code == 403
+
+
+class TestDeleteBusiness:
+    """Test DELETE /businesses/{id} endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_delete_business_success(self):
+        """DELETE /businesses/{id} should remove business."""
+        business_id = str(uuid4())
+        user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            mock_supabase.table.return_value.delete.return_value.eq.return_value.eq.return_value.execute.return_value = MagicMock(
+                data=[]
+            )
+
+            response = client.delete(f"/businesses/{business_id}")
+            # Should return 204 No Content or 200
+            assert response.status_code in [200, 204]
+
+    @pytest.mark.asyncio
+    async def test_delete_business_forbidden(self):
+        """DELETE /businesses/{id} should return 403 if not owner."""
+        business_id = str(uuid4())
+        user_id = str(uuid4())
+        other_user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            mock_supabase.table.return_value.select.return_value.eq.return_value.single.return_value.execute.return_value = MagicMock(
+                data={"user_id": other_user_id}
+            )
+
+            response = client.delete(f"/businesses/{business_id}")
+            assert response.status_code == 403
+
+
+class TestListBusinesses:
+    """Test GET /businesses endpoint."""
+
+    @pytest.mark.asyncio
+    async def test_list_businesses_returns_user_businesses(self):
+        """GET /businesses should return only user's businesses."""
+        user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            businesses = [
+                {
+                    "id": str(uuid4()),
+                    "user_id": user_id,
+                    "name": "Coffee Shop",
+                    "type": "restaurant",
+                    "description": "Cozy",
+                    "customer_description": "Office workers",
+                    "location": "SF",
+                    "metadata": {},
+                },
+                {
+                    "id": str(uuid4()),
+                    "user_id": user_id,
+                    "name": "Barber Shop",
+                    "type": "service",
+                    "description": "Professional",
+                    "customer_description": "Professionals",
+                    "location": "SF",
+                    "metadata": {},
+                }
+            ]
+
+            mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = MagicMock(
+                data=businesses
+            )
+
+            response = client.get("/api/businesses")
+            assert response.status_code == 200
+            assert len(response.json()) == 2
+
+    @pytest.mark.asyncio
+    async def test_list_businesses_empty(self):
+        """GET /businesses should return empty list if no businesses."""
+        user_id = str(uuid4())
+
+        with patch("backend.auth.dependencies.get_current_user_id") as mock_auth:
+            mock_auth.return_value = user_id
+
+            mock_supabase.table.return_value.select.return_value.eq.return_value.execute.return_value = MagicMock(
+                data=[]
+            )
+
+            response = client.get("/api/businesses")
+            assert response.status_code == 200
+            assert response.json() == []

@@ -55,6 +55,17 @@ def score_experiment(record: dict) -> float:
     if record.get("publication_name") in TOP_JOURNALS:
         earned += 5
 
+    # Citation count as quality signal (academic impact)
+    citations = record.get("citation_count") or record.get("citations") or 0
+    if citations >= 1000:
+        earned += 10  # Highly cited (>1000)
+    elif citations >= 100:
+        earned += 7   # Well-cited (100-999)
+    elif citations >= 20:
+        earned += 4   # Cited (20-99)
+    elif citations >= 5:
+        earned += 2   # Some citations (5-19)
+
     return round(earned / max_score, 3)
 
 
